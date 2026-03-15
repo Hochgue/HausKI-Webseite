@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HausKI – Über</title>
+  <meta name="description" content="Die Geschichte hinter HausKI: wie aus einem Weihnachtsgeschenk, Home Assistant und technischer Leidenschaft ein echtes Smart-Home-Projekt wurde.">
+
+  <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    :root{
+      --bg:#040911;
+      --bg2:#0a1320;
+      --card:rgba(11,22,37,0.85);
+      --card-strong:rgba(9,18,31,0.94);
+      --line:rgba(33,200,255,0.18);
+      --text:#ecf6ff;
+      --muted:#9db2c9;
+      --accent:#21c8ff;
+      --accent2:#6af0c7;
+      --shadow:0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(33,200,255,0.14), transparent 24%),
+        radial-gradient(circle at 80% 0%, rgba(106,240,199,0.08), transparent 20%),
+        linear-gradient(180deg,#050911 0%,#09111d 45%,#050911 100%);
+      color:var(--text);
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size:26px 26px;
+      pointer-events:none;
+      mask-image:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+      z-index:0;
+    }
+
+    .nav{
+      position:sticky;
+      top:0;
+      left:0;
+      width:100%;
+      background:rgba(6,15,26,0.82);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:16px 28px;
+      box-shadow:0 5px 20px rgba(0,0,0,0.25);
+      z-index:100;
+    }
+
+    .nav-logo{
+      font-size:18px;
+      font-weight:bold;
+      color:var(--accent);
+      letter-spacing:0.5px;
+    }
+
+    .nav-links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:18px;
+    }
+
+    .nav-links a{
+      color:#e6f2ff;
+      text-decoration:none;
+      font-size:14px;
+      white-space:nowrap;
+      transition:0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active{
+      color:var(--accent);
+    }
+
+    .container{
+      width:min(1180px, calc(100% - 32px));
+      margin:0 auto;
+      position:relative;
+      z-index:1;
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      padding:72px 0 28px;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.1fr 0.9fr;
+      gap:26px;
+      align-items:stretch;
+    }
+
+    .hero-main{
+      padding:40px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-main::after{
+      content:"";
+      position:absolute;
+      right:-120px;
+      top:-120px;
+      width:320px;
+      height:320px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(33,200,255,0.16), transparent 65%);
+      pointer-events:none;
+    }
+
+    .hero-side{
+      padding:22px;
+      display:grid;
+      gap:16px;
+      align-content:start;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(33,200,255,0.08);
+      border:1px solid rgba(33,200,255,0.18);
+      color:var(--accent);
+      font-size:12px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+
+    h1{
+      font-size:clamp(34px,5vw,52px);
+      line-height:1.04;
+      margin:0 0 18px;
+      letter-spacing:-1.8px;
+    }
+
+    .hero-text{
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.75;
+      max-width:62ch;
+      margin:0;
+    }
+
+    .hero-subtext{
+      margin:14px 0 0;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.7;
+      max-width:60ch;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-top:28px;
+    }
+
+    .button,
+    .button-outline{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:0 18px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:700;
+      transition:0.2s;
+    }
+
+    .button{
+      background:linear-gradient(135deg,var(--accent),#1da1ff);
+      color:#04111b;
+      box-shadow:0 10px 30px rgba(33,200,255,0.28);
+    }
+
+    .button-outline{
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--text);
+    }
+
+    .button:hover,
+    .button-outline:hover{
+      transform:translateY(-2px);
+    }
+
+    .quick-nav{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:22px;
+    }
+
+    .quick-nav a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:0 16px;
+      border-radius:12px;
+      text-decoration:none;
+      color:var(--text);
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.10);
+      transition:.2s;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .quick-nav a:hover{
+      transform:translateY(-2px);
+      border-color:var(--accent);
+      color:var(--accent);
+    }
+
+    .side-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:var(--muted);
+    }
+
+    .info-card{
+      padding:18px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.03);
+    }
+
+    .info-card h3{
+      margin:0 0 12px;
+      font-size:18px;
+    }
+
+    .info-list{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .info-list li{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06);
+      color:var(--muted);
+    }
+
+    .info-list span:last-child{
+      color:var(--text);
+      font-weight:600;
+      text-align:right;
+    }
+
+    .section{
+      padding:18px 0 0;
+      margin-bottom:58px;
+    }
+
+    .section-head{
+      margin-bottom:24px;
+    }
+
+    .section-badge{
+      display:inline-block;
+      padding:8px 14px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:var(--accent);
+      font-size:0.78rem;
+      font-weight:700;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+      background:rgba(33,200,255,0.08);
+      margin-bottom:14px;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:clamp(28px,4vw,40px);
+      letter-spacing:-1px;
+    }
+
+    .section-head p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.75;
+      max-width:940px;
+    }
+
+    .story-layout{
+      display:grid;
+      grid-template-columns:1.2fr 0.8fr;
+      gap:18px;
+    }
+
+    .story-card,
+    .quote-card,
+    .card{
+      padding:24px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:0 12px 35px rgba(0,0,0,0.22);
+    }
+
+    .story-card p,
+    .card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.85;
+    }
+
+    .story-card p + p{
+      margin-top:16px;
+    }
+
+    .quote-card{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      background:linear-gradient(180deg, rgba(12,22,37,0.92), rgba(7,15,28,0.96));
+    }
+
+    .quote-card blockquote{
+      margin:0;
+      font-size:1.45rem;
+      line-height:1.6;
+      color:var(--text);
+      font-weight:700;
+    }
+
+    .quote-card footer{
+      margin-top:18px;
+      color:var(--accent);
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:18px;
+    }
+
+    .grid-3{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+    }
+
+    .card h3{
+      margin:0 0 12px;
+      font-size:1.2rem;
+    }
+
+    .card ul{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .journey-steps{
+      display:grid;
+      gap:18px;
+    }
+
+    .journey-step{
+      padding:24px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:0 12px 35px rgba(0,0,0,0.18);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .journey-step::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      width:4px;
+      height:100%;
+      background:linear-gradient(180deg, var(--accent), rgba(33,200,255,0.15));
+    }
+
+    .journey-label{
+      display:inline-block;
+      margin-bottom:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(33,200,255,0.18);
+      background:rgba(33,200,255,0.08);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+
+    .journey-step h3{
+      margin:0 0 10px;
+      font-size:1.22rem;
+    }
+
+    .journey-step p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .highlight-card{
+      padding:26px;
+      border-radius:24px;
+      background:linear-gradient(180deg, rgba(12,22,37,0.92), rgba(7,15,28,0.96));
+      border:1px solid var(--line);
+      box-shadow:0 18px 60px rgba(0,0,0,0.28);
+    }
+
+    .highlight-card h3{
+      margin:0 0 12px;
+      font-size:1.4rem;
+    }
+
+    .highlight-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.8;
+      max-width:82ch;
+    }
+
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(33,200,255,0.18);
+      background:rgba(33,200,255,0.08);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+
+    .contact-note{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .footer{
+      padding:24px 0 60px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .footer-line{
+      border-top:1px solid rgba(255,255,255,0.08);
+      padding-top:22px;
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    @media (max-width:1024px){
+      .hero-grid,
+      .story-layout,
+      .grid-2,
+      .grid-3{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:640px){
+      .nav{
+        padding:14px 16px;
+        align-items:flex-start;
+        flex-direction:column;
+        gap:12px;
+      }
+
+      .hero-main,
+      .hero-side,
+      .story-card,
+      .quote-card,
+      .card,
+      .journey-step,
+      .highlight-card{
+        padding:20px;
+      }
+
+      .hero-actions{
+        flex-direction:column;
+      }
+
+      .button,
+      .button-outline{
+        width:100%;
+      }
+
+      .quick-nav{
+        flex-direction:column;
+      }
+
+      .quick-nav a{
+        width:100%;
+      }
+
+      .info-list li{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .info-list span:last-child{
+        text-align:left;
+      }
+
+      .quote-card blockquote{
+        font-size:1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo">HausKI</div>
+    <div class="nav-links">
+      <a href="index.html">Start</a>
+      <a href="architektur.html">Architektur</a>
+      <a href="blog.html">Blog</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="ueber.html" class="active">Über</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="panel hero-main">
+        <div class="eyebrow">Die Geschichte hinter HausKI</div>
+
+        <h1>Wie aus einem Geschenk ein echtes Technik-Hobby wurde</h1>
+
+        <p class="hero-text">
+          HausKI ist nicht aus einem Businessplan entstanden, sondern aus echter
+          Neugier, technischem Interesse und dem Wunsch, ein Zuhause sinnvoller,
+          verständlicher und intelligenter zu machen.
+        </p>
+
+        <p class="hero-subtext">
+          Was mit einer Alexa als Weihnachtsgeschenk begann, wurde Schritt für Schritt
+          zu einem Projekt, das heute weit über klassische Smart-Home-Spielereien hinausgeht.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button" href="architektur.html">Zur Architektur</a>
+          <a class="button-outline" href="roadmap.html">Zur Roadmap</a>
+        </div>
+
+        <div class="quick-nav">
+          <a href="index.html">Startseite</a>
+          <a href="architektur.html">Architektur</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="roadmap.html">Roadmap</a>
+        </div>
+      </div>
+
+      <aside class="panel hero-side">
+        <div class="side-title">Überblick • HausKI</div>
+
+        <div class="info-card">
+          <h3>Projektprofil</h3>
+          <ul class="info-list">
+            <li><span>Beginn</span><span>Mit Alexa als Einstieg</span></li>
+            <li><span>Plattform</span><span>Home Assistant</span></li>
+            <li><span>Schwerpunkt</span><span>Praxis, Logik, Systeme</span></li>
+            <li><span>Heute</span><span>Reales Hausprojekt</span></li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h3>Worum es geht</h3>
+          <ul class="info-list">
+            <li><span>Nicht nur Komfort</span><span>Auch Verständnis</span></li>
+            <li><span>Nicht nur Geräte</span><span>Systemlogik</span></li>
+            <li><span>Nicht nur Hobby</span><span>Leidenschaft</span></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">PROJEKTGESCHICHTE</span>
+        <h2>Wo alles begonnen hat</h2>
+      </div>
+
+      <div class="story-layout">
+        <article class="story-card">
+          <p>
+            Vor drei Jahren bekam ich von meiner Frau eine Alexa geschenkt –
+            eigentlich gedacht, um einfach besser Musik zu hören. Was damals
+            niemand wusste: Dieses Geschenk hat meine technische Leidenschaft
+            in eine ganz neue Richtung gelenkt und daraus nach und nach ein echtes Hobby gemacht.
+          </p>
+
+          <p>
+            Am Anfang wusste ich kaum etwas über Smart Homes. Ich kaufte ein paar
+            günstige Aktoren, probierte verschiedene Apps wie SmartLife, SmartThings,
+            Hama oder Tado aus – aber nichts war wirklich sauber miteinander verbunden.
+          </p>
+
+          <p>
+            Genau an diesem Punkt kam immer wieder dieselbe Frage in meinem Kopf auf:
+            <strong>Es muss doch eine Lösung geben, die alles zusammenführt.</strong>
+          </p>
+
+          <p>
+            Über Umwege landete ich zuerst beim ioBroker. Doch die Art der
+            Programmierung entsprach nicht ganz dem, wonach ich gesucht habe.
+            In verschiedenen Foren tauchte jedoch immer wieder ein Name auf:
+            <strong>Home Assistant.</strong>
+          </p>
+
+          <p>
+            Also probierte ich ihn aus – und von der ersten Sekunde an wusste ich:
+            <strong>Das ist die Plattform, die ich gesucht habe.</strong>
+          </p>
+        </article>
+
+        <aside class="quote-card">
+          <blockquote>
+            „Was als Weihnachtsgeschenk begonnen hat, ist heute ein echtes Hobby mit Leidenschaft geworden.“
+          </blockquote>
+          <footer>HausKI Ursprung</footer>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">ENTWICKLUNG</span>
+        <h2>Wie aus Neugier ein echtes System wurde</h2>
+        <p>
+          Seit dem Einstieg mit Home Assistant hat sich aus ersten Tests nach und nach
+          ein strukturiertes Smart-Home-Projekt entwickelt.
+        </p>
+      </div>
+
+      <div class="journey-steps">
+        <article class="journey-step">
+          <span class="journey-label">Schritt 1</span>
+          <h3>Vom App-Chaos zur zentralen Plattform</h3>
+          <p>
+            Statt viele einzelne Apps nebeneinander zu nutzen, entstand mit
+            Home Assistant erstmals eine gemeinsame Zentrale. Genau dort begann
+            der Unterschied zwischen ein paar smarten Geräten und einem echten Systemgedanken.
+          </p>
+        </article>
+
+        <article class="journey-step">
+          <span class="journey-label">Schritt 2</span>
+          <h3>Neue Technik, neue Möglichkeiten</h3>
+          <p>
+            Mit der Zeit kamen immer mehr Komponenten dazu: Shelly, Zigbee,
+            Bluetooth-Sensoren und weitere Geräte. Parallel dazu lernte ich YAML,
+            baute Automationen und machte mein Zuhause Schritt für Schritt intelligenter.
+          </p>
+        </article>
+
+        <article class="journey-step">
+          <span class="journey-label">Schritt 3</span>
+          <h3>Vom Schalten zum Verstehen</h3>
+          <p>
+            Heute geht es nicht mehr nur darum, etwas ein- oder auszuschalten.
+            HausKI verbindet Technik, Zustände, Energie, Sicherheit und Alltag
+            zu einem System, das nicht nur reagiert, sondern immer besser
+            nachvollziehbar wird.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">WAS HEUTE BEREITS LÄUFT</span>
+        <h2>Was ich heute über Home Assistant steuere</h2>
+        <p>
+          Viele Funktionen, die früher auf verschiedene Systeme verteilt waren,
+          laufen heute zentral über Home Assistant und HausKI.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <article class="card">
+          <h3>Komfort & Alltag</h3>
+          <ul>
+            <li>Beleuchtung</li>
+            <li>Heizung, größtenteils präsenzbasiert</li>
+            <li>Alltagsszenen und Zeitlogik</li>
+            <li>Sprachbefehle für definierte Abläufe</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Energie & Technik</h3>
+          <ul>
+            <li>PV- und Energiemanagement</li>
+            <li>Gerätestatus und Überwachung</li>
+            <li>Info, wenn die Waschmaschine fertig ist</li>
+            <li>Technische Zustände im Dashboard</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Sicherheit</h3>
+          <ul>
+            <li>Meldungen bei Wasseraustritt</li>
+            <li>Alarm, wenn der Kühlschrank zu lange offen steht</li>
+            <li>Kameras, Türen, Fenster</li>
+            <li>Sicherheitssysteme und Warnlogik</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">WAS MICH ANTREIBT</span>
+        <h2>Warum HausKI für mich mehr ist als Smart Home</h2>
+        <p>
+          HausKI ist für mich nicht einfach ein Technikprojekt, sondern ein
+          Lernfeld, ein kreativer Ausgleich und mittlerweile ein echtes Hobby
+          mit Leidenschaft.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Technische Weiterentwicklung</h3>
+          <p>
+            Home Assistant hat mein Zuhause nicht nur smarter gemacht, sondern mich
+            technisch enorm weitergebracht. Ich habe gelernt, Systeme zu denken,
+            YAML zu programmieren, Automationen aufzubauen und technische
+            Zusammenhänge besser zu strukturieren.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Echte Begeisterung</h3>
+          <p>
+            Was als Weihnachtsgeschenk begonnen hat, ist heute ein Hobby geworden,
+            das mich jeden Tag begeistert. Und ehrlich gesagt: manchmal ist es fast
+            schon eine kleine Sucht, weil ich ständig überlege, was ich als Nächstes
+            automatisieren oder verbessern kann.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="highlight-card">
+        <span class="pill">Heute</span>
+        <h3>HausKI ist mein persönliches Technikprojekt mit echter Leidenschaft</h3>
+        <p>
+          HausKI verbindet für mich Technik, Alltag, Struktur und Neugier.
+          Es ist kein fertiges Produkt, sondern ein wachsendes System, das mich
+          jeden Tag fordert und begeistert – und genau das macht es so besonders.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">Kontakt</span>
+        <h2>Kontakt & Austausch</h2>
+        <p>
+          HausKI ist ein Projekt, das ständig weiterwächst. Wenn ihr Fragen habt,
+          euch austauschen möchtet oder Ideen, Anregungen oder Vorschläge teilen wollt,
+          könnt ihr mir gerne schreiben. Ich freue mich über den Austausch mit anderen
+          Technik- und Smart-Home-Begeisterten.
+        </p>
+      </div>
+
+      <div class="highlight-card">
+        <span class="pill">Mail</span>
+        <h3>hauski@g-hochreiter.at</h3>
+        <p>
+          Egal ob Fragen zu Home Assistant, Ideen für Automationen oder Feedback zum
+          Projekt – ich freue mich über jede Nachricht.
+        </p>
+
+        <div style="margin-top:20px;">
+          <a class="button" href="mailto:hauski@g-hochreiter.at">Mail schreiben</a>
+        </div>
+
+        <p class="contact-note">
+          Antworten können manchmal etwas dauern – HausKI ist ein Hobbyprojekt neben dem Alltag.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer container">
+    <div class="footer-line">
+      <div>© 2026 HausKI • Günther Hochreiter</div>
+      <div>Über • Geschichte • Leidenschaft • Kontakt</div>
+    </div>
+  </footer>
+
+</body>
+</html>

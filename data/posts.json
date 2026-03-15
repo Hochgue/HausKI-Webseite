@@ -1,0 +1,56 @@
+{
+  "posts": [
+    {
+      "id": "li-001",
+      "source": "linkedin",
+      "title": "HausKI – Wie alles begonnen hat",
+      "excerpt": "Was mit einer Alexa als Weihnachtsgeschenk begann, wurde Schritt für Schritt zu einem echten Smart-Home-System auf Basis von Home Assistant.",
+      "content": "",
+      "date": "2026-03-01",
+      "isHausKI": true,
+      "isVisible": true,
+      "category": "Projektstart",
+      "tags": ["HausKI", "Home Assistant", "Projektstart"],
+      "url": "#"
+    },
+    {
+      "id": "li-002",
+      "source": "linkedin",
+      "title": "Klingel-Automation mit Snapshot",
+      "excerpt": "Wenn jemand klingelt, erstellt HausKI automatisch ein Bild und sendet es auf das Smartphone. Genau solche kleinen Alltagslösungen machen den Unterschied.",
+      "content": "",
+      "date": "2026-03-05",
+      "isHausKI": true,
+      "isVisible": true,
+      "category": "Automation",
+      "tags": ["Klingel", "Kamera", "Benachrichtigung"],
+      "url": "#"
+    },
+    {
+      "id": "li-003",
+      "source": "linkedin",
+      "title": "Nicht-HausKI Beispielbeitrag",
+      "excerpt": "Dieser Beitrag wäre zwar vorhanden, wird aber auf der Website nicht angezeigt.",
+      "content": "",
+      "date": "2026-03-07",
+      "isHausKI": false,
+      "isVisible": false,
+      "category": "Sonstiges",
+      "tags": ["Beispiel"],
+      "url": "#"
+    },
+    {
+      "id": "blog-001",
+      "source": "blog",
+      "title": "Warum HausKI mehr ist als ein Smart Home",
+      "excerpt": "HausKI verbindet Energie, Automationen, Sicherheit und Systemlogik zu einer Plattform, die im Alltag wirklich nützlich ist.",
+      "content": "",
+      "date": "2026-03-10",
+      "isHausKI": true,
+      "isVisible": true,
+      "category": "Blog",
+      "tags": ["HausKI", "Systemdenken"],
+      "url": "#"
+    }
+  ]
+}

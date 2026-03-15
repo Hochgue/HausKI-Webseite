@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HausKI – Blog Verwaltung</title>
+  <meta name="description" content="Verwaltung für HausKI Blog- und LinkedIn-Beiträge.">
+
+  <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    :root{
+      --bg:#040911;
+      --card:rgba(11,22,37,0.88);
+      --line:rgba(33,200,255,0.18);
+      --text:#ecf6ff;
+      --muted:#9db2c9;
+      --accent:#21c8ff;
+      --accent2:#6af0c7;
+      --danger:#ff6b6b;
+      --warning:#ffd166;
+      --shadow:0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(33,200,255,0.14), transparent 24%),
+        linear-gradient(180deg,#050911 0%,#09111d 45%,#050911 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    .container{
+      width:min(1280px, calc(100% - 32px));
+      margin:0 auto;
+      padding:28px 0 60px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+
+    .topbar h1{
+      margin:0;
+      font-size:clamp(30px,4vw,44px);
+      letter-spacing:-1px;
+    }
+
+    .subtext{
+      color:var(--muted);
+      line-height:1.7;
+      margin:8px 0 0;
+      max-width:70ch;
+    }
+
+    .button,
+    .button-secondary,
+    .button-danger{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      padding:0 16px;
+      border-radius:12px;
+      border:none;
+      cursor:pointer;
+      text-decoration:none;
+      font-weight:700;
+      transition:.2s;
+      font:inherit;
+    }
+
+    .button{
+      background:linear-gradient(135deg,var(--accent),#1da1ff);
+      color:#04111b;
+    }
+
+    .button-secondary{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.10);
+      color:var(--text);
+    }
+
+    .button-danger{
+      background:rgba(255,107,107,0.12);
+      border:1px solid rgba(255,107,107,0.22);
+      color:#ffb3b3;
+    }
+
+    .button:hover,
+    .button-secondary:hover,
+    .button-danger:hover{
+      transform:translateY(-2px);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:360px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:22px;
+      backdrop-filter:blur(10px);
+    }
+
+    .panel h2{
+      margin:0 0 14px;
+      font-size:1.2rem;
+    }
+
+    .panel h3{
+      margin:0 0 12px;
+      font-size:1.05rem;
+    }
+
+    .muted{
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .form-grid{
+      display:grid;
+      gap:14px;
+    }
+
+    label{
+      display:grid;
+      gap:8px;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="url"],
+    textarea,
+    select{
+      width:100%;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.03);
+      color:var(--text);
+      padding:12px 14px;
+      font:inherit;
+      outline:none;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    input[type="url"]:focus,
+    textarea:focus,
+    select:focus{
+      border-color:rgba(33,200,255,0.45);
+      box-shadow:0 0 0 3px rgba(33,200,255,0.12);
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      margin-top:-2px;
+    }
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .filter-bar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .filter-bar input,
+    .filter-bar select{
+      flex:1 1 180px;
+    }
+
+    .posts-list{
+      display:grid;
+      gap:14px;
+    }
+
+    .admin-card{
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:18px;
+      background:rgba(255,255,255,0.03);
+      padding:18px;
+    }
+
+    .admin-card-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+      align-items:flex-start;
+    }
+
+    .badge-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.03);
+      color:var(--text);
+    }
+
+    .badge.linkedin{
+      color:#8fd9ff;
+      border-color:rgba(143,217,255,0.18);
+      background:rgba(143,217,255,0.08);
+    }
+
+    .badge.blog{
+      color:#9ff3cf;
+      border-color:rgba(159,243,207,0.18);
+      background:rgba(159,243,207,0.08);
+    }
+
+    .badge.visible{
+      color:#9ff3cf;
+      border-color:rgba(159,243,207,0.18);
+      background:rgba(159,243,207,0.08);
+    }
+
+    .badge.hidden{
+      color:#ffb3b3;
+      border-color:rgba(255,107,107,0.22);
+      background:rgba(255,107,107,0.08);
+    }
+
+    .badge.hauski{
+      color:#21c8ff;
+      border-color:rgba(33,200,255,0.22);
+      background:rgba(33,200,255,0.08);
+    }
+
+    .admin-card h3{
+      margin:0 0 10px;
+      font-size:1.08rem;
+    }
+
+    .admin-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .inline-controls{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .checkline{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.08);
+      font-weight:600;
+    }
+
+    .admin-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .small{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .empty-state{
+      border:1px dashed rgba(255,255,255,0.12);
+      border-radius:18px;
+      padding:20px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    @media (max-width:980px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:600px){
+      .inline-controls{
+        grid-template-columns:1fr;
+      }
+
+      .toolbar .button,
+      .toolbar .button-secondary,
+      .toolbar .button-danger{
+        width:100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <h1>Blog-Verwaltung</h1>
+        <p class="subtext">
+          Hier verwaltest du LinkedIn-Beiträge und eigene Blogartikel für HausKI.
+          Beiträge können als HausKI markiert, sichtbar gemacht, ausgeblendet oder als neue Blogbeiträge angelegt werden.
+        </p>
+      </div>
+
+      <div class="toolbar">
+        <a class="button-secondary" href="blog.html">Zur Blog-Seite</a>
+        <button class="button" id="exportJsonBtn" type="button">JSON exportieren</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <aside class="panel">
+        <h2>Neuen Blogartikel anlegen</h2>
+
+        <div class="form-grid">
+          <label>
+            Titel
+            <input type="text" id="newTitle" placeholder="Titel des Blogartikels">
+          </label>
+
+          <label>
+            Datum
+            <input type="date" id="newDate">
+          </label>
+
+          <label>
+            Kurztext / Excerpt
+            <textarea id="newExcerpt" placeholder="Kurze Zusammenfassung des Beitrags"></textarea>
+          </label>
+
+          <label>
+            Kategorie
+            <input type="text" id="newCategory" placeholder="z. B. Automation, Energie, HausKI">
+          </label>
+
+          <label>
+            Tags
+            <input type="text" id="newTags" placeholder="Tags mit Komma trennen">
+          </label>
+
+          <label>
+            URL
+            <input type="url" id="newUrl" placeholder="z. B. blog-beitrag-01.html oder #">
+          </label>
+
+          <div class="hint">
+            Diese Maske erstellt einen eigenen Blogbeitrag mit Quelle <strong>blog</strong>.
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button class="button" id="addBlogPostBtn" type="button">Blogartikel anlegen</button>
+          <button class="button-secondary" id="loadDefaultsBtn" type="button">Beispieldaten neu laden</button>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <h2>Beiträge verwalten</h2>
+
+        <div class="filter-bar">
+          <input type="text" id="searchInput" placeholder="Titel oder Tags durchsuchen">
+          <select id="sourceFilter">
+            <option value="all">Alle Quellen</option>
+            <option value="linkedin">Nur LinkedIn</option>
+            <option value="blog">Nur Blog</option>
+          </select>
+          <select id="visibilityFilter">
+            <option value="all">Alle Sichtbarkeiten</option>
+            <option value="visible">Nur sichtbar</option>
+            <option value="hidden">Nur ausgeblendet</option>
+          </select>
+          <select id="hauskiFilter">
+            <option value="all">Alle Beiträge</option>
+            <option value="true">Nur HausKI</option>
+            <option value="false">Nicht HausKI</option>
+          </select>
+        </div>
+
+        <div id="postsList" class="posts-list"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'hauski_blog_posts';
+
+    const defaultData = {
+      posts: [
+        {
+          id: 'li-001',
+          source: 'linkedin',
+          title: 'HausKI – Wie alles begonnen hat',
+          excerpt: 'Was mit einer Alexa als Weihnachtsgeschenk begann, wurde Schritt für Schritt zu einem echten Smart-Home-System auf Basis von Home Assistant.',
+          content: '',
+          date: '2026-03-01',
+          isHausKI: true,
+          isVisible: true,
+          category: 'Projektstart',
+          tags: ['HausKI', 'Home Assistant', 'Projektstart'],
+          url: '#'
+        },
+        {
+          id: 'li-002',
+          source: 'linkedin',
+          title: 'Klingel-Automation mit Snapshot',
+          excerpt: 'Wenn jemand klingelt, erstellt HausKI automatisch ein Bild und sendet es auf das Smartphone. Genau solche kleinen Alltagslösungen machen den Unterschied.',
+          content: '',
+          date: '2026-03-05',
+          isHausKI: true,
+          isVisible: true,
+          category: 'Automation',
+          tags: ['Klingel', 'Kamera', 'Benachrichtigung'],
+          url: '#'
+        },
+        {
+          id: 'li-003',
+          source: 'linkedin',
+          title: 'Nicht-HausKI Beispielbeitrag',
+          excerpt: 'Dieser Beitrag wäre zwar vorhanden, wird aber auf der Website nicht angezeigt.',
+          content: '',
+          date: '2026-03-07',
+          isHausKI: false,
+          isVisible: false,
+          category: 'Sonstiges',
+          tags: ['Beispiel'],
+          url: '#'
+        },
+        {
+          id: 'blog-001',
+          source: 'blog',
+          title: 'Warum HausKI mehr ist als ein Smart Home',
+          excerpt: 'HausKI verbindet Energie, Automationen, Sicherheit und Systemlogik zu einer Plattform, die im Alltag wirklich nützlich ist.',
+          content: '',
+          date: '2026-03-10',
+          isHausKI: true,
+          isVisible: true,
+          category: 'Blog',
+          tags: ['HausKI', 'Systemdenken'],
+          url: '#'
+        }
+      ]
+    };
+
+    function cloneData(data){
+      return JSON.parse(JSON.stringify(data));
+    }
+
+    function getSafeDefaultData(){
+      return cloneData(defaultData);
+    }
+
+    function loadData(){
+      const stored = localStorage.getItem(STORAGE_KEY);
+
+      if(stored){
+        try{
+          const parsed = JSON.parse(stored);
+
+          if(parsed && Array.isArray(parsed.posts)){
+            return parsed;
+          }
+        }catch(error){
+          console.error('Fehler beim Laden der gespeicherten Daten:', error);
+        }
+      }
+
+      const fallback = getSafeDefaultData();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback, null, 2));
+      return fallback;
+    }
+
+    function saveData(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state, null, 2));
+    }
+
+    function exportData(){
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'posts.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function formatDate(dateString){
+      if(!dateString){
+        return '';
+      }
+
+      const date = new Date(dateString);
+
+      if(Number.isNaN(date.getTime())){
+        return dateString;
+      }
+
+      return date.toLocaleDateString('de-DE');
+    }
+
+    function normalize(str){
+      return (str || '').toString().toLowerCase();
+    }
+
+    function createId(prefix){
+      return `${prefix}-${Date.now()}`;
+    }
+
+    let state = loadData();
+
+    const postsList = document.getElementById('postsList');
+    const searchInput = document.getElementById('searchInput');
+    const sourceFilter = document.getElementById('sourceFilter');
+    const visibilityFilter = document.getElementById('visibilityFilter');
+    const hauskiFilter = document.getElementById('hauskiFilter');
+
+    function getFilteredPosts(){
+      const posts = Array.isArray(state.posts) ? state.posts : [];
+
+      return posts
+        .filter(post => {
+          const search = normalize(searchInput.value);
+          const haystack = [
+            post.title || '',
+            post.excerpt || '',
+            Array.isArray(post.tags) ? post.tags.join(' ') : ''
+          ].join(' ').toLowerCase();
+
+          const matchesSearch = !search || haystack.includes(search);
+          const matchesSource = sourceFilter.value === 'all' || post.source === sourceFilter.value;
+
+          const matchesVisibility =
+            visibilityFilter.value === 'all' ||
+            (visibilityFilter.value === 'visible' && post.isVisible) ||
+            (visibilityFilter.value === 'hidden' && !post.isVisible);
+
+          const matchesHauski =
+            hauskiFilter.value === 'all' ||
+            (hauskiFilter.value === 'true' && post.isHausKI) ||
+            (hauskiFilter.value === 'false' && !post.isHausKI);
+
+          return matchesSearch && matchesSource && matchesVisibility && matchesHauski;
+        })
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function updatePost(id, patch){
+      state.posts = state.posts.map(post => {
+        if(post.id === id){
+          return { ...post, ...patch };
+        }
+        return post;
+      });
+
+      saveData();
+      renderPosts();
+    }
+
+    function deletePost(id){
+      state.posts = state.posts.filter(post => post.id !== id);
+      saveData();
+      renderPosts();
+    }
+
+    function renderPosts(){
+      const posts = getFilteredPosts();
+
+      if(!posts.length){
+        postsList.innerHTML = '<div class="empty-state">Keine Beiträge gefunden.</div>';
+        return;
+      }
+
+      postsList.innerHTML = posts.map(post => `
+        <article class="admin-card">
+          <div class="admin-card-top">
+            <div>
+              <div class="badge-row">
+                <span class="badge ${post.source}">${post.source}</span>
+                <span class="badge ${post.isVisible ? 'visible' : 'hidden'}">${post.isVisible ? 'sichtbar' : 'ausgeblendet'}</span>
+                <span class="badge ${post.isHausKI ? 'hauski' : ''}">${post.isHausKI ? 'HausKI' : 'kein HausKI'}</span>
+              </div>
+              <h3>${post.title || ''}</h3>
+              <div class="small">${formatDate(post.date)} · ${post.category || 'ohne Kategorie'}</div>
+            </div>
+          </div>
+
+          <p>${post.excerpt || ''}</p>
+
+          ${Array.isArray(post.tags) && post.tags.length ? `
+            <div class="badge-row" style="margin-top:14px;">
+              ${post.tags.map(tag => `<span class="badge">${tag}</span>`).join('')}
+            </div>
+          ` : ''}
+
+          <div class="inline-controls">
+            <label class="checkline">
+              <input type="checkbox" ${post.isHausKI ? 'checked' : ''} onchange="toggleHausKI('${post.id}', this.checked)">
+              Als HausKI markieren
+            </label>
+
+            <label class="checkline">
+              <input type="checkbox" ${post.isVisible ? 'checked' : ''} onchange="toggleVisible('${post.id}', this.checked)">
+              Auf Website sichtbar
+            </label>
+          </div>
+
+          <div class="admin-actions">
+            <button class="button-secondary" type="button" onclick="editTitle('${post.id}')">Titel anpassen</button>
+            <button class="button-secondary" type="button" onclick="editExcerpt('${post.id}')">Kurztext anpassen</button>
+            <button class="button-secondary" type="button" onclick="editTags('${post.id}')">Tags anpassen</button>
+            <button class="button-danger" type="button" onclick="removePost('${post.id}')">Löschen</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    window.toggleHausKI = function(id, checked){
+      updatePost(id, { isHausKI: checked });
+    };
+
+    window.toggleVisible = function(id, checked){
+      updatePost(id, { isVisible: checked });
+    };
+
+    window.removePost = function(id){
+      if(confirm('Diesen Beitrag wirklich aus der Verwaltungsdatenbank löschen?')){
+        deletePost(id);
+      }
+    };
+
+    window.editTitle = function(id){
+      const post = state.posts.find(p => p.id === id);
+      if(!post) return;
+
+      const value = prompt('Neuen Titel eingeben:', post.title || '');
+      if(value !== null){
+        updatePost(id, { title: value.trim() });
+      }
+    };
+
+    window.editExcerpt = function(id){
+      const post = state.posts.find(p => p.id === id);
+      if(!post) return;
+
+      const value = prompt('Neuen Kurztext eingeben:', post.excerpt || '');
+      if(value !== null){
+        updatePost(id, { excerpt: value.trim() });
+      }
+    };
+
+    window.editTags = function(id){
+      const post = state.posts.find(p => p.id === id);
+      if(!post) return;
+
+      const value = prompt('Tags mit Komma trennen:', Array.isArray(post.tags) ? post.tags.join(', ') : '');
+      if(value !== null){
+        updatePost(id, {
+          tags: value.split(',').map(tag => tag.trim()).filter(Boolean)
+        });
+      }
+    };
+
+    function addBlogPost(){
+      const title = document.getElementById('newTitle').value.trim();
+      const date = document.getElementById('newDate').value;
+      const excerpt = document.getElementById('newExcerpt').value.trim();
+      const category = document.getElementById('newCategory').value.trim();
+      const tags = document.getElementById('newTags').value
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean);
+      const url = document.getElementById('newUrl').value.trim() || '#';
+
+      if(!title || !date || !excerpt){
+        alert('Bitte mindestens Titel, Datum und Kurztext ausfüllen.');
+        return;
+      }
+
+      state.posts.unshift({
+        id: createId('blog'),
+        source: 'blog',
+        title,
+        excerpt,
+        content: '',
+        date,
+        isHausKI: true,
+        isVisible: true,
+        category: category || 'Blog',
+        tags,
+        url
+      });
+
+      saveData();
+      renderPosts();
+
+      document.getElementById('newTitle').value = '';
+      document.getElementById('newDate').value = '';
+      document.getElementById('newExcerpt').value = '';
+      document.getElementById('newCategory').value = '';
+      document.getElementById('newTags').value = '';
+      document.getElementById('newUrl').value = '';
+    }
+
+    document.getElementById('addBlogPostBtn').addEventListener('click', addBlogPost);
+    document.getElementById('exportJsonBtn').addEventListener('click', exportData);
+
+    document.getElementById('loadDefaultsBtn').addEventListener('click', () => {
+      if(confirm('Beispieldaten wirklich neu laden? Bereits bearbeitete lokale Änderungen werden überschrieben.')){
+        state = getSafeDefaultData();
+        saveData();
+        renderPosts();
+      }
+    });
+
+    [searchInput, sourceFilter, visibilityFilter, hauskiFilter].forEach(element => {
+      element.addEventListener('input', renderPosts);
+      element.addEventListener('change', renderPosts);
+    });
+
+    renderPosts();
+  </script>
+</body>
+</html>

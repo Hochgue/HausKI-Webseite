@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HausKI – Architektur</title>
+  <meta name="description" content="Die technische Architektur von HausKI: Geräte, Integrationen, Automationen, Sicherheit, Kommunikation, Szenen und Auswertungen.">
+
+  <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    :root{
+      --bg:#040911;
+      --bg2:#0a1320;
+      --card:rgba(11,22,37,0.85);
+      --card-strong:rgba(9,18,31,0.94);
+      --line:rgba(33,200,255,0.18);
+      --text:#ecf6ff;
+      --muted:#9db2c9;
+      --accent:#21c8ff;
+      --accent2:#6af0c7;
+      --shadow:0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(33,200,255,0.14), transparent 24%),
+        radial-gradient(circle at 80% 0%, rgba(106,240,199,0.08), transparent 20%),
+        linear-gradient(180deg,#050911 0%,#09111d 45%,#050911 100%);
+      color:var(--text);
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size:26px 26px;
+      pointer-events:none;
+      mask-image:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+      z-index:0;
+    }
+
+    .nav{
+      position:sticky;
+      top:0;
+      left:0;
+      width:100%;
+      background:rgba(6,15,26,0.82);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:16px 28px;
+      box-shadow:0 5px 20px rgba(0,0,0,0.25);
+      z-index:100;
+    }
+
+    .nav-logo{
+      font-size:18px;
+      font-weight:bold;
+      color:var(--accent);
+      letter-spacing:0.5px;
+    }
+
+    .nav-links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:18px;
+    }
+
+    .nav-links a{
+      color:#e6f2ff;
+      text-decoration:none;
+      font-size:14px;
+      white-space:nowrap;
+      transition:0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active{
+      color:var(--accent);
+    }
+
+    .container{
+      width:min(1180px, calc(100% - 32px));
+      margin:0 auto;
+      position:relative;
+      z-index:1;
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      padding:72px 0 28px;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.1fr 0.9fr;
+      gap:26px;
+      align-items:stretch;
+    }
+
+    .hero-main{
+      padding:40px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-main::after{
+      content:"";
+      position:absolute;
+      right:-120px;
+      top:-120px;
+      width:320px;
+      height:320px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(33,200,255,0.16), transparent 65%);
+      pointer-events:none;
+    }
+
+    .hero-side{
+      padding:22px;
+      display:grid;
+      gap:16px;
+      align-content:start;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(33,200,255,0.08);
+      border:1px solid rgba(33,200,255,0.18);
+      color:var(--accent);
+      font-size:12px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+
+    h1{
+      font-size:clamp(34px,5vw,52px);
+      line-height:1.04;
+      margin:0 0 18px;
+      letter-spacing:-1.8px;
+    }
+
+    .hero-text{
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.75;
+      max-width:62ch;
+      margin:0;
+    }
+
+    .hero-subtext{
+      margin:14px 0 0;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.7;
+      max-width:60ch;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-top:28px;
+    }
+
+    .button,
+    .button-outline{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:0 18px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:700;
+      transition:0.2s;
+    }
+
+    .button{
+      background:linear-gradient(135deg,var(--accent),#1da1ff);
+      color:#04111b;
+      box-shadow:0 10px 30px rgba(33,200,255,0.28);
+    }
+
+    .button-outline{
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--text);
+    }
+
+    .button:hover,
+    .button-outline:hover{
+      transform:translateY(-2px);
+    }
+
+    .quick-nav{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:22px;
+    }
+
+    .quick-nav a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:0 16px;
+      border-radius:12px;
+      text-decoration:none;
+      color:var(--text);
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.10);
+      transition:.2s;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .quick-nav a:hover{
+      transform:translateY(-2px);
+      border-color:var(--accent);
+      color:var(--accent);
+    }
+
+    .side-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:var(--muted);
+    }
+
+    .info-card{
+      padding:18px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.03);
+    }
+
+    .info-card h3{
+      margin:0 0 12px;
+      font-size:18px;
+    }
+
+    .info-list{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .info-list li{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06);
+      color:var(--muted);
+    }
+
+    .info-list span:last-child{
+      color:var(--text);
+      font-weight:600;
+      text-align:right;
+    }
+
+    .section{
+      padding:18px 0 0;
+      margin-bottom:58px;
+    }
+
+    .section-head{
+      margin-bottom:24px;
+    }
+
+    .section-badge{
+      display:inline-block;
+      padding:8px 14px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:var(--accent);
+      font-size:0.78rem;
+      font-weight:700;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+      background:rgba(33,200,255,0.08);
+      margin-bottom:14px;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:clamp(28px,4vw,40px);
+      letter-spacing:-1px;
+    }
+
+    .section-head p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.75;
+      max-width:940px;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:18px;
+    }
+
+    .grid-3{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+    }
+
+    .grid-4{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:18px;
+    }
+
+    .card{
+      padding:24px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:0 12px 35px rgba(0,0,0,0.22);
+    }
+
+    .card h3{
+      margin:0 0 12px;
+      font-size:1.2rem;
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.75;
+    }
+
+    .card ul{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .highlight-card{
+      padding:26px;
+      border-radius:24px;
+      background:linear-gradient(180deg, rgba(12,22,37,0.92), rgba(7,15,28,0.96));
+      border:1px solid var(--line);
+      box-shadow:0 18px 60px rgba(0,0,0,0.28);
+    }
+
+    .highlight-card h3{
+      margin:0 0 12px;
+      font-size:1.4rem;
+    }
+
+    .highlight-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.8;
+      max-width:82ch;
+    }
+
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(33,200,255,0.18);
+      background:rgba(33,200,255,0.08);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+
+    .stats-card{
+      text-align:center;
+    }
+
+    .stats-card h3{
+      margin:0;
+      font-size:2rem;
+      color:var(--accent);
+    }
+
+    .stats-card p{
+      margin-top:8px;
+    }
+
+    .hub-diagram{
+      position:relative;
+      width:min(100%, 980px);
+      height:720px;
+      margin:40px auto 0;
+    }
+
+    .hub-center{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background:linear-gradient(180deg, rgba(12,22,37,0.96), rgba(7,15,28,0.98));
+      border:1px solid rgba(33,200,255,0.26);
+      box-shadow:0 18px 60px rgba(0,0,0,0.32);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      z-index:3;
+    }
+
+    .hub-center img{
+      width:64px;
+      height:64px;
+      object-fit:contain;
+      margin-bottom:12px;
+      filter:drop-shadow(0 0 10px rgba(33,200,255,0.35));
+    }
+
+    .hub-center span{
+      font-size:1.15rem;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .hub-node{
+      position:absolute;
+      width:240px;
+      min-height:86px;
+      padding:18px 20px;
+      border-radius:18px;
+      background:rgba(11,22,37,0.88);
+      border:1px solid rgba(33,200,255,0.20);
+      box-shadow:0 10px 30px rgba(0,0,0,0.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-weight:700;
+      z-index:2;
+    }
+
+    .node-top{
+      top:0;
+      left:50%;
+      transform:translateX(-50%);
+    }
+
+    .node-right-top{
+      top:120px;
+      right:0;
+    }
+
+    .node-right-bottom{
+      bottom:120px;
+      right:0;
+    }
+
+    .node-bottom{
+      bottom:0;
+      left:50%;
+      transform:translateX(-50%);
+    }
+
+    .node-left-bottom{
+      bottom:120px;
+      left:0;
+    }
+
+    .node-left-top{
+      top:120px;
+      left:0;
+    }
+
+    .hub-line{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:2px;
+      background:linear-gradient(180deg, rgba(33,200,255,0.55), rgba(33,200,255,0.10));
+      transform-origin:top center;
+      z-index:1;
+    }
+
+    .line-top{
+      height:145px;
+      transform:translate(-50%, -100%);
+    }
+
+    .line-bottom{
+      height:145px;
+      transform:translate(-50%, 0);
+    }
+
+    .line-right-top{
+      height:180px;
+      transform:translate(-50%, -50%) rotate(55deg);
+    }
+
+    .line-right-bottom{
+      height:180px;
+      transform:translate(-50%, -50%) rotate(125deg);
+    }
+
+    .line-left-bottom{
+      height:180px;
+      transform:translate(-50%, -50%) rotate(-125deg);
+    }
+
+    .line-left-top{
+      height:180px;
+      transform:translate(-50%, -50%) rotate(-55deg);
+    }
+
+    .flip-card{
+      perspective:1200px;
+      min-height:260px;
+      cursor:pointer;
+    }
+
+    .flip-card-inner{
+      position:relative;
+      width:100%;
+      height:100%;
+      min-height:260px;
+      transition:transform 0.7s ease;
+      transform-style:preserve-3d;
+    }
+
+    .flip-card:hover .flip-card-inner{
+      transform:rotateY(180deg);
+    }
+
+    .flip-card.is-flipped .flip-card-inner{
+      transform:rotateY(180deg);
+    }
+
+    .flip-card-front,
+    .flip-card-back{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+    }
+
+    .flip-card-back{
+      transform:rotateY(180deg);
+    }
+
+    .flip-card .card{
+      height:100%;
+    }
+
+    .card-mini-label{
+      display:inline-block;
+      margin-bottom:10px;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--accent);
+      font-weight:700;
+    }
+
+    .tab-section{
+      display:grid;
+      gap:18px;
+    }
+
+    .tab-nav{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      margin-top:6px;
+    }
+
+    .tab-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:0 16px;
+      border-radius:999px;
+      text-decoration:none;
+      color:var(--text);
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.10);
+      transition:.2s;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .tab-link:hover{
+      transform:translateY(-2px);
+      border-color:var(--accent);
+      color:var(--accent);
+    }
+
+    .tab-pane{
+      scroll-margin-top:110px;
+    }
+
+    .accordion-card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:0 12px 35px rgba(0,0,0,0.22);
+      overflow:hidden;
+    }
+
+    .accordion-card summary{
+      list-style:none;
+      cursor:pointer;
+      padding:22px 24px;
+      font-size:1.15rem;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      user-select:none;
+    }
+
+    .accordion-card summary::-webkit-details-marker{
+      display:none;
+    }
+
+    .accordion-card summary::after{
+      content:"+";
+      font-size:1.4rem;
+      color:var(--accent);
+      line-height:1;
+      transition:transform 0.2s ease;
+    }
+
+    .accordion-card[open] summary::after{
+      content:"−";
+    }
+
+    .accordion-card summary:hover{
+      background:rgba(255,255,255,0.02);
+    }
+
+    .accordion-content{
+      padding:0 24px 24px;
+      border-top:1px solid rgba(255,255,255,0.06);
+    }
+
+    .accordion-intro{
+      margin:18px 0 20px;
+      color:var(--muted);
+      line-height:1.75;
+      max-width:88ch;
+    }
+
+    .footer{
+      padding:24px 0 60px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .footer-line{
+      border-top:1px solid rgba(255,255,255,0.08);
+      padding-top:22px;
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    @media (max-width:1100px){
+      .grid-4{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media (max-width:1024px){
+      .hero-grid,
+      .grid-2,
+      .grid-3{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:900px){
+      .hub-diagram{
+        height:auto;
+        display:grid;
+        grid-template-columns:1fr;
+        gap:16px;
+      }
+
+      .hub-center,
+      .hub-node,
+      .hub-line{
+        position:static;
+        transform:none;
+        width:100%;
+        height:auto;
+      }
+
+      .hub-center{
+        border-radius:22px;
+        padding:24px;
+        width:100%;
+      }
+
+      .hub-node{
+        min-height:unset;
+      }
+
+      .hub-line{
+        display:none;
+      }
+    }
+
+    @media (max-width:640px){
+      .nav{
+        padding:14px 16px;
+        align-items:flex-start;
+        flex-direction:column;
+        gap:12px;
+      }
+
+      .hero-main,
+      .hero-side,
+      .card,
+      .highlight-card{
+        padding:20px;
+      }
+
+      .hero-actions{
+        flex-direction:column;
+      }
+
+      .button,
+      .button-outline{
+        width:100%;
+      }
+
+      .quick-nav{
+        flex-direction:column;
+      }
+
+      .quick-nav a{
+        width:100%;
+      }
+
+      .info-list li{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .info-list span:last-child{
+        text-align:left;
+      }
+
+      .grid-4{
+        grid-template-columns:1fr;
+      }
+
+      .flip-card,
+      .flip-card-inner{
+        min-height:280px;
+      }
+
+      .accordion-card summary,
+      .accordion-content{
+        padding-left:20px;
+        padding-right:20px;
+      }
+
+      .tab-nav{
+        gap:10px;
+      }
+
+      .tab-link{
+        width:100%;
+        justify-content:flex-start;
+        padding:0 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo">HausKI</div>
+    <div class="nav-links">
+      <a href="index.html">Start</a>
+      <a href="architektur.html" class="active">Architektur</a>
+      <a href="blog.html">Blog</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="ueber.html">Über</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="panel hero-main">
+        <div class="eyebrow">Technische Struktur von HausKI</div>
+
+        <h1>Wie HausKI konkret aufgebaut ist</h1>
+
+        <p class="hero-text">
+          HausKI basiert auf einer realen Home-Assistant-Umgebung mit echten Geräten,
+          konkreten Automationen, Sicherheitslogik, Auswertungen und aktiver
+          Kommunikation. Ziel ist kein theoretisches Konzept, sondern ein System,
+          das im Alltag mitarbeitet, überwacht und verständlich bleibt.
+        </p>
+
+        <p class="hero-subtext">
+          Diese Seite zeigt die Bausteine, aus denen HausKI heute tatsächlich besteht:
+          von Energie und Heizung über Sicherheit und Komfort bis hin zu Meldungen,
+          Sprachabfragen und Szenen.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button" href="dashboard.html">Dashboard ansehen</a>
+          <a class="button-outline" href="roadmap.html">Roadmap ansehen</a>
+        </div>
+
+        <div class="quick-nav">
+          <a href="index.html">Startseite</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="roadmap.html">Roadmap</a>
+          <a href="ueber.html">Über HausKI</a>
+        </div>
+      </div>
+
+      <aside class="panel hero-side">
+        <div class="side-title">Architektur • Überblick</div>
+
+        <div class="info-card">
+          <h3>HausKI besteht aus</h3>
+          <ul class="info-list">
+            <li><span>Zentrale</span><span>Home Assistant OS</span></li>
+            <li><span>Geräte</span><span>Energie, Heizung, Sicherheit</span></li>
+            <li><span>Logik</span><span>Automationen & Regeln</span></li>
+            <li><span>Kommunikation</span><span>Push, Sprache, Szenen</span></li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h3>Technische Schwerpunkte</h3>
+          <ul class="info-list">
+            <li><span>Alltag</span><span>Komfort & Zeitlogik</span></li>
+            <li><span>Sicherheit</span><span>Wasser, Rauch, Türen, Kameras</span></li>
+            <li><span>Auswertung</span><span>Energie & Heizungsverhalten</span></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">SYSTEMBASIS</span>
+        <h2>Das technische Fundament</h2>
+        <p>
+          Im Kern läuft HausKI auf Home Assistant OS. Dort werden Integrationen,
+          Sensoren, Templates, Automationen, Meldungen und Dashboards in einer
+          gemeinsamen Plattform zusammengeführt. Das Ziel ist eine zentrale
+          Systemlogik statt vieler einzelner Insellösungen.
+        </p>
+      </div>
+
+      <div class="highlight-card">
+        <span class="pill">Zentrale Plattform</span>
+        <h3>Home Assistant als Herzstück des Hauses</h3>
+        <p>
+          Home Assistant verbindet die Geräte, Zustände und Automationen zu einem
+          zusammenhängenden System. Energieflüsse, Heizung, Präsenz, Sicherheit,
+          Benachrichtigungen und Alltagslogik laufen dadurch nicht nebeneinander,
+          sondern greifen technisch ineinander.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">KENNZAHLEN</span>
+        <h2>HausKI als gewachsene Plattform</h2>
+        <p>
+          Hinter HausKI steckt kein kleines Testprojekt, sondern eine gewachsene
+          Umgebung mit vielen Zuständen, Signalen, Geräten und Verknüpfungen.
+        </p>
+      </div>
+
+      <div class="grid-4">
+        <article class="card stats-card">
+          <h3>40+</h3>
+          <p>Geräte</p>
+        </article>
+
+        <article class="card stats-card">
+          <h3>60+</h3>
+          <p>Automationen</p>
+        </article>
+
+        <article class="card stats-card">
+          <h3>120+</h3>
+          <p>Sensoren</p>
+        </article>
+
+        <article class="card stats-card">
+          <h3>25</h3>
+          <p>Integrationen</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">ARCHITEKTURÜBERSICHT</span>
+        <h2>Home Assistant als zentrale Schaltstelle</h2>
+        <p>
+          HausKI ist nicht linear aufgebaut, sondern als zentrales System gedacht.
+          Home Assistant steht in der Mitte und verbindet Geräte, Automationen,
+          Auswertungen, Sicherheit und Benachrichtigungen in beide Richtungen.
+        </p>
+      </div>
+
+      <div class="hub-diagram">
+        <div class="hub-node node-top">Geräte & Sensoren</div>
+        <div class="hub-node node-right-top">Automationen & Logik</div>
+        <div class="hub-node node-right-bottom">Auswertungen & Analyse</div>
+        <div class="hub-node node-bottom">Dashboard & Benachrichtigungen</div>
+        <div class="hub-node node-left-bottom">Sicherheit & Alarmo</div>
+        <div class="hub-node node-left-top">Sprache & Statusabfragen</div>
+
+        <div class="hub-center">
+          <img src="bilder/New_Home_Assistant_logo.svg.png" alt="Home Assistant Logo">
+          <span>Home Assistant</span>
+        </div>
+
+        <div class="hub-line line-top"></div>
+        <div class="hub-line line-right-top"></div>
+        <div class="hub-line line-right-bottom"></div>
+        <div class="hub-line line-bottom"></div>
+        <div class="hub-line line-left-bottom"></div>
+        <div class="hub-line line-left-top"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">GERÄTE & SYSTEME</span>
+        <h2>Welche Bereiche HausKI konkret nutzt</h2>
+        <p>
+          HausKI basiert auf realen Komponenten im Haus. Die Architektur ist daher
+          nicht abstrakt, sondern an echte Geräte, Sensoren und Zustände gekoppelt.
+          Die Karten drehen sich und zeigen die konkreteren Details.
+        </p>
+      </div>
+
+      <div class="grid-2">
+
+        <article class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front card">
+              <h3>⚡ Energie</h3>
+              <p>
+                PV, Netzbezug, Einspeisung und ausgewählte Verbraucher bilden
+                die Grundlage für Energiefluss und Lastanalyse.
+              </p>
+            </div>
+            <div class="flip-card-back card">
+              <span class="card-mini-label">Details</span>
+              <h3>⚡ Energie</h3>
+              <ul>
+                <li>PV-Daten und Wechselrichter-Informationen</li>
+                <li>Netzbezug und Einspeisung</li>
+                <li>Hausverbrauch und ausgewählte Einzelverbraucher</li>
+                <li>Shelly- und Zigbee-Plugs zur Messung und Schaltlogik</li>
+                <li>Grundlage für Eigenverbrauchs- und Lastanalyse</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front card">
+              <h3>🔥 Heizung</h3>
+              <p>
+                Die Heizungslogik verbindet Pelletheizung, Temperaturdaten,
+                Fensterzustände und Raumlogik zu einem echten Regelsystem.
+              </p>
+            </div>
+            <div class="flip-card-back card">
+              <span class="card-mini-label">Details</span>
+              <h3>🔥 Heizung</h3>
+              <ul>
+                <li>Pelletheizung als zentraler Analysebereich</li>
+                <li>Ansaugzyklen und Betriebsverhalten</li>
+                <li>Temperatursensoren als Basis für Raum- und Zustandslogik</li>
+                <li>Fenstererkennung als Teil der Heizlogik</li>
+                <li>Grundlage für spätere Muster- und Effizienzbewertung</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front card">
+              <h3>🔒 Sicherheit</h3>
+              <p>
+                Kameras, Klingel, Türstatus sowie Wasser- und Rauchsensoren
+                bilden den sicherheitsrelevanten Bereich von HausKI.
+              </p>
+            </div>
+            <div class="flip-card-back card">
+              <span class="card-mini-label">Details</span>
+              <h3>🔒 Sicherheit</h3>
+              <ul>
+                <li>Kameras für Eingangs- und Außenbereiche</li>
+                <li>Klingellogik mit Snapshot und Benachrichtigung</li>
+                <li>Türstatus und sicherheitsrelevante Zustände</li>
+                <li>Wasser-, Rauch- und weitere Warnsensoren</li>
+                <li>QNAP / Frigate / Kameraeinbindung als Videobasis</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front card">
+              <h3>🏠 Präsenz & Alltag</h3>
+              <p>
+                Präsenzsensoren, Smartphones und Zeitlogik sorgen dafür,
+                dass das Haus im Alltag passend reagieren kann.
+              </p>
+            </div>
+            <div class="flip-card-back card">
+              <span class="card-mini-label">Details</span>
+              <h3>🏠 Präsenz & Alltag</h3>
+              <ul>
+                <li>Präsenzsensoren und Home/Away-Zustände</li>
+                <li>Smartphones als Teil der Anwesenheitslogik</li>
+                <li>Zeitgesteuerte Abläufe und Komfortfunktionen</li>
+                <li>Alltagszustände als Kontext für Automationen</li>
+                <li>Basis für intelligente Reaktionen im Haus</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">GERÄTE IM EINSATZ</span>
+        <h2>Konkrete Technik im Haus</h2>
+        <p>
+          Neben den Bereichen selbst besteht HausKI aus konkreten Komponenten,
+          die im Alltag Daten liefern, schalten, überwachen oder Zustände erfassen.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Hardware & Sensorik</h3>
+          <ul>
+            <li>Shelly Plug / Shelly Relais</li>
+            <li>Zigbee Sensoren und Türkontakte</li>
+            <li>Temperatursensoren in Räumen</li>
+            <li>Präsenzsensoren</li>
+            <li>Wasser- und Warnsensoren</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Systeme & Infrastruktur</h3>
+          <ul>
+            <li>Tapo Kameras</li>
+            <li>QNAP + Frigate / QVR</li>
+            <li>Türklingel mit Snapshot-Logik</li>
+            <li>Smartphones als Meldungs- und Präsenzquelle</li>
+            <li>Home Assistant OS als zentrale Plattform</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="section-badge">VERTIEFUNG</span>
+        <h2>Weitere Bereiche im Detail</h2>
+      </div>
+
+      <div class="tab-section">
+        <div class="tab-nav">
+          <a class="tab-link" href="#alltag-komfort">Alltag & Komfort</a>
+          <a class="tab-link" href="#automationen">Automationen</a>
+          <a class="tab-link" href="#sicherheit">Sicherheit</a>
+          <a class="tab-link" href="#kommunikation-szenen">Kommunikation & Szenen</a>
+          <a class="tab-link" href="#auswertungen">Auswertungen</a>
+        </div>
+
+        <div class="tab-pane" id="alltag-komfort">
+          <details class="accordion-card">
+            <summary>Alltag & Komfort</summary>
+            <div class="accordion-content">
+              <p class="accordion-intro">
+                Neben Energie, Sicherheit und Analyse laufen in HausKI auch viele
+                alltägliche Automationen. Dazu gehören klassische Lichtsteuerungen,
+                zeitgesteuerte Abläufe, Zustandsüberwachungen und Regelungen,
+                die im Hintergrund für mehr Struktur und Komfort sorgen.
+              </p>
+
+              <div class="grid-2">
+                <article class="card">
+                  <h3>Licht & Zeitsteuerung</h3>
+                  <p>
+                    Neben einfachen Licht-Automationen übernimmt HausKI auch
+                    zeitgesteuerte Abläufe und wiederkehrende Schaltlogiken,
+                    die sich in den normalen Alltag des Hauses einfügen.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Einzelraumregelung</h3>
+                  <p>
+                    Die Heizungslogik endet nicht bei der Zentralheizung. Räume werden
+                    über Temperatursensoren, Zustände und definierte Regeln gezielter
+                    betrachtet und geregelt.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Fenstererkennung</h3>
+                  <p>
+                    Fensterzustände fließen in die Regelung ein, damit Räume nicht
+                    unnötig beheizt werden und offene Fenster als echter Systemzustand
+                    berücksichtigt bleiben.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Alltägliche Zustandsüberwachung</h3>
+                  <p>
+                    HausKI überwacht auch praktische Alltagszustände im Hintergrund,
+                    damit wichtige Veränderungen, Statuswechsel und wiederkehrende
+                    Situationen sichtbar und nutzbar werden.
+                  </p>
+                </article>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="tab-pane" id="automationen">
+          <details class="accordion-card" open>
+            <summary>Automationen</summary>
+            <div class="accordion-content">
+              <p class="accordion-intro">
+                HausKI besteht nicht nur aus Geräten und Sensoren, sondern aus
+                verknüpften Reaktionen. Automationen sorgen dafür, dass Zustände,
+                Meldungen und Handlungen als System zusammenarbeiten.
+              </p>
+
+              <div class="grid-2">
+                <article class="card">
+                  <h3>Klingel & Snapshot</h3>
+                  <p>
+                    Beim Klingeln wird ein Kamerasnapshot erzeugt und auf Endgeräte
+                    gesendet. Damit wird aus einem einfachen Klingelsignal eine direkt
+                    nutzbare Sicherheitsfunktion.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Präsenzabhängige Benachrichtigungen</h3>
+                  <p>
+                    Meldungen werden nicht blind ausgelöst, sondern hängen davon ab,
+                    wer zuhause ist, welche Zustände aktiv sind und ob eine Nachricht
+                    in der konkreten Situation sinnvoll ist.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Kontextlogik bei Sicherheit</h3>
+                  <p>
+                    Kamera-, Tür-, Präsenz- und Umgebungszustände werden gemeinsam
+                    betrachtet. So entsteht eine Sicherheitslogik, die im Alltag
+                    funktioniert und nicht nur theoretisch gut klingt.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Gerätestatus als Systembestandteil</h3>
+                  <p>
+                    Wichtige Zustände werden nicht nur intern verarbeitet, sondern
+                    für Dashboards und Meldungen aufbereitet. Dadurch bleiben
+                    Automationen sichtbar und nachvollziehbar.
+                  </p>
+                </article>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="tab-pane" id="sicherheit">
+          <details class="accordion-card">
+            <summary>Sicherheit</summary>
+            <div class="accordion-content">
+              <p class="accordion-intro">
+                Neben Komfort- und Energieautomationen übernimmt HausKI auch
+                wichtige Sicherheitsfunktionen im Haus. Sensoren überwachen
+                kritische Zustände und melden Auffälligkeiten frühzeitig.
+              </p>
+
+              <div class="grid-2">
+                <article class="card">
+                  <h3>Wasserüberwachung</h3>
+                  <p>
+                    Wassersensoren erkennen mögliche Leckagen oder ungewöhnliche
+                    Feuchtigkeit. Bei Auffälligkeiten werden sofort
+                    Benachrichtigungen ausgelöst.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Rauch- und Warnsensoren</h3>
+                  <p>
+                    Rauchmelder und weitere Warnsensoren können in das System
+                    integriert werden und kritische Situationen zusätzlich sichtbar machen.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Sicherheitszustände</h3>
+                  <p>
+                    Türen, Kameras, Klingel und weitere Sensoren bilden gemeinsam
+                    eine Übersicht über den aktuellen Sicherheitszustand des Hauses.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Alarmo</h3>
+                  <p>
+                    Alarmo erweitert HausKI um eine strukturierte Alarmlogik
+                    mit definierten Zuständen, Bereichen und Reaktionen.
+                  </p>
+                </article>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="tab-pane" id="kommunikation-szenen">
+          <details class="accordion-card">
+            <summary>Kommunikation & Szenen</summary>
+            <div class="accordion-content">
+              <p class="accordion-intro">
+                HausKI sammelt nicht nur Daten, sondern kommuniziert aktiv mit dem Nutzer.
+                Statusmeldungen, Sprachabfragen, Geräteüberwachung und definierte
+                Alltagsszenen machen das System direkt nutzbar.
+              </p>
+
+              <div class="grid-3">
+                <article class="card">
+                  <h3>WhatsApp / Push Benachrichtigungen</h3>
+                  <p>
+                    Ereignisse wie Klingeln, Sicherheitsmeldungen oder Gerätezustände
+                    können automatisch an Smartphones übermittelt werden.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Batterie- und Geräteüberwachung</h3>
+                  <p>
+                    Sensoren und Geräte werden kontinuierlich überwacht.
+                    Sinkende Batteriestände oder abgeschlossene Gerätezyklen
+                    werden frühzeitig erkannt.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Statusabfragen per Sprachassistent</h3>
+                  <p>
+                    Hausstatus, Energieverbrauch oder Gerätezustände können direkt
+                    per Sprachbefehl abgefragt werden.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Entertainment-Szenen</h3>
+                  <p>
+                    Per Sprachbefehl lassen sich definierte Szenen für Licht,
+                    Fernseher, Lautsprecher und weitere Geräte starten.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Dart-Automation</h3>
+                  <p>
+                    LEDs, Fernseher, Lautsprecher, Spotify und höhenverstellbarer PC-Tisch
+                    reagieren gemeinsam auf einen Sprachbefehl.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Ambiente Light für Fernsehabend</h3>
+                  <p>
+                    Eine Szene für entspannte TV-Abende mit passender Lichtstimmung
+                    und vorbereitetem Entertainment-Setup.
+                  </p>
+                </article>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="tab-pane" id="auswertungen">
+          <details class="accordion-card">
+            <summary>Auswertungen</summary>
+            <div class="accordion-content">
+              <p class="accordion-intro">
+                Der eigentliche Mehrwert entsteht dort, wo Daten nicht nur gesammelt,
+                sondern verständlich ausgewertet werden. Genau hier unterscheidet sich
+                HausKI von einem reinen Geräte-Setup.
+              </p>
+
+              <div class="grid-3">
+                <article class="card">
+                  <h3>Energiefluss</h3>
+                  <p>
+                    Hausverbrauch, Netzbezug, Einspeisung und PV-Leistung
+                    werden in Beziehung gesetzt.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Heizungsanalyse</h3>
+                  <p>
+                    Ansaugzyklen, Temperaturen und Betriebsverhalten
+                    werden beobachtet und bewertet.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Sicherheitsstatus</h3>
+                  <p>
+                    Kameras, Klingel, Türen und Warnmeldungen werden
+                    als zusammenhängender Bereich sichtbar gemacht.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Hausstatus</h3>
+                  <p>
+                    Präsenz, Zustände und technische Signale werden
+                    zu einer Gesamtübersicht verdichtet.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Visualisierung</h3>
+                  <p>
+                    Dashboards machen das System im Alltag schnell verständlich.
+                  </p>
+                </article>
+
+                <article class="card">
+                  <h3>Grundlage für spätere KI</h3>
+                  <p>
+                    Diese Auswertungen schaffen die Basis für spätere
+                    Agenten- und Analysefunktionen.
+                  </p>
+                </article>
+              </div>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer container">
+    <div class="footer-line">
+      <div>© 2026 HausKI • Günther Hochreiter</div>
+      <div>Architektur • Geräte • Automationen • Sicherheit • Kommunikation</div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.flip-card').forEach(card => {
+      card.addEventListener('click', function () {
+        this.classList.toggle('is-flipped');
+      });
+    });
+  </script>
+
+</body>
+</html>
