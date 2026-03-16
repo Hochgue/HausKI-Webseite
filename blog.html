@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HausKI – Blog</title>
+
+  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png">
+
   <meta name="description" content="HausKI Blog mit LinkedIn-Beiträgen und eigenen Blogartikeln zu Smart Home, Energie, Automationen und Systemlogik.">
 
   <style>
@@ -437,7 +440,6 @@
   </header>
 
   <main class="container">
-
     <section class="section">
       <div class="section-head">
         <span class="section-badge">Inhalte</span>
@@ -449,19 +451,22 @@
       </div>
 
       <div class="blog-tabs">
-        <button class="tab-btn active" data-tab="linkedin">LinkedIn</button>
-        <button class="tab-btn" data-tab="blog">Blog</button>
+        <button class="tab-btn active" data-tab="linkedin" type="button">LinkedIn</button>
+        <button class="tab-btn" data-tab="blog" type="button">Blog</button>
       </div>
 
       <div id="tab-linkedin" class="tab-panel active">
-        <div id="linkedin-grid" class="blog-grid"></div>
+        <div id="linkedin-grid" class="blog-grid">
+          <div class="empty-state">LinkedIn-Beiträge werden geladen …</div>
+        </div>
       </div>
 
       <div id="tab-blog" class="tab-panel">
-        <div id="blog-grid" class="blog-grid"></div>
+        <div id="blog-grid" class="blog-grid">
+          <div class="empty-state">Blogartikel werden geladen …</div>
+        </div>
       </div>
     </section>
-
   </main>
 
   <footer class="footer container">
@@ -472,114 +477,25 @@
   </footer>
 
   <script>
-    const tabs = document.querySelectorAll('.tab-btn');
+    const tabs = document.querySelectorAll(".tab-btn");
     const panels = {
-      linkedin: document.getElementById('tab-linkedin'),
-      blog: document.getElementById('tab-blog')
+      linkedin: document.getElementById("tab-linkedin"),
+      blog: document.getElementById("tab-blog")
     };
 
-    tabs.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabs.forEach(b => b.classList.remove('active'));
-        Object.values(panels).forEach(panel => panel.classList.remove('active'));
+    tabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabs.forEach((b) => b.classList.remove("active"));
+        Object.values(panels).forEach((panel) => panel.classList.remove("active"));
 
-        btn.classList.add('active');
-        panels[btn.dataset.tab].classList.add('active');
+        btn.classList.add("active");
+        panels[btn.dataset.tab].classList.add("active");
       });
     });
-
-    function formatDate(dateString){
-      try{
-        const d = new Date(dateString);
-        return d.toLocaleDateString('de-DE', {
-          year:'numeric',
-          month:'2-digit',
-          day:'2-digit'
-        });
-      }catch{
-        return dateString || '';
-      }
-    }
-
-    function createPostCard(post){
-      const tags = Array.isArray(post.tags) ? post.tags : [];
-      const url = post.url || '#';
-      const sourceClass = post.source === 'linkedin' ? 'linkedin' : 'blog';
-      const sourceLabel = post.source === 'linkedin' ? 'LinkedIn' : 'Blog';
-
-      return `
-        <article class="post-card">
-          <div class="post-top">
-            <span class="post-source ${sourceClass}">${sourceLabel}</span>
-            <span class="post-date">${formatDate(post.date)}</span>
-          </div>
-
-          <h3>${post.title || 'Ohne Titel'}</h3>
-          <p>${post.excerpt || ''}</p>
-
-          ${tags.length ? `
-            <div class="post-tags">
-              ${tags.map(tag => `<span>${tag}</span>`).join('')}
-            </div>
-          ` : ''}
-
-          <div class="post-actions">
-            <a class="read-more" href="${url}">Beitrag ansehen</a>
-          </div>
-        </article>
-      `;
-    }
-
-    async function loadPosts(){
-      try{
-        const res = await fetch('data/posts.json');
-        const data = await res.json();
-        const posts = Array.isArray(data.posts) ? data.posts : [];
-
-        const visibleHausKIPosts = posts.filter(post => post.isVisible && post.isHausKI);
-
-        const linkedinPosts = visibleHausKIPosts
-          .filter(post => post.source === 'linkedin')
-          .sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        const blogPosts = visibleHausKIPosts
-          .filter(post => post.source === 'blog')
-          .sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        const linkedinGrid = document.getElementById('linkedin-grid');
-        const blogGrid = document.getElementById('blog-grid');
-
-        if(linkedinPosts.length){
-          linkedinGrid.innerHTML = linkedinPosts.map(createPostCard).join('');
-        }else{
-          linkedinGrid.innerHTML = `
-            <div class="empty-state">
-              Noch keine freigegebenen HausKI-Beiträge aus LinkedIn sichtbar.
-            </div>
-          `;
-        }
-
-        if(blogPosts.length){
-          blogGrid.innerHTML = blogPosts.map(createPostCard).join('');
-        }else{
-          blogGrid.innerHTML = `
-            <div class="empty-state">
-              Noch keine eigenen Blogartikel veröffentlicht.
-            </div>
-          `;
-        }
-      }catch(err){
-        document.getElementById('linkedin-grid').innerHTML = `
-          <div class="empty-state">Die Beiträge konnten gerade nicht geladen werden.</div>
-        `;
-        document.getElementById('blog-grid').innerHTML = `
-          <div class="empty-state">Die Beiträge konnten gerade nicht geladen werden.</div>
-        `;
-        console.error(err);
-      }
-    }
-
-    loadPosts();
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/blog.js"></script>
 </body>
 </html>
