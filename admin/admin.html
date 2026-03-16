@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HausKI Admin</title>
+
+<style>
+body{
+font-family:Arial;
+background:#081320;
+color:white;
+margin:0;
+padding:40px;
+}
+
+.container{
+max-width:800px;
+margin:auto;
+}
+
+h1{
+margin-bottom:30px;
+}
+
+form{
+background:#0f1f33;
+padding:30px;
+border-radius:12px;
+}
+
+input,textarea,select{
+width:100%;
+padding:12px;
+margin-bottom:15px;
+border-radius:6px;
+border:none;
+font-size:14px;
+}
+
+button{
+background:#21c8ff;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+.success{
+margin-top:20px;
+color:#6af0c7;
+}
+
+.error{
+margin-top:20px;
+color:#ff6b6b;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>HausKI Blog Admin</h1>
+
+<form id="post-form">
+
+<label>Titel</label>
+<input id="title" required>
+
+<label>Auszug</label>
+<textarea id="excerpt"></textarea>
+
+<label>Inhalt</label>
+<textarea id="content"></textarea>
+
+<label>Post Typ</label>
+<select id="post_type">
+<option value="linkedin">LinkedIn</option>
+<option value="blog">Blog</option>
+</select>
+
+<label>LinkedIn URL</label>
+<input id="linkedin_url">
+
+<label>Cover Bild</label>
+<input id="cover_image">
+
+<label>Veröffentlicht am</label>
+<input type="date" id="published_at">
+
+<label>Sichtbar</label>
+<select id="visible">
+<option value="true">Ja</option>
+<option value="false">Nein</option>
+</select>
+
+<button type="submit">Beitrag speichern</button>
+
+<div id="message"></div>
+
+</form>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+
+const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const form = document.getElementById("post-form");
+
+form.addEventListener("submit", async (e)=>{
+
+e.preventDefault();
+
+const post = {
+
+title:document.getElementById("title").value,
+excerpt:document.getElementById("excerpt").value,
+content:document.getElementById("content").value,
+post_type:document.getElementById("post_type").value,
+linkedin_url:document.getElementById("linkedin_url").value,
+cover_image:document.getElementById("cover_image").value,
+published_at:document.getElementById("published_at").value,
+visible:document.getElementById("visible").value === "true"
+
+};
+
+const { error } = await supabase
+.from("posts")
+.insert(post);
+
+const message = document.getElementById("message");
+
+if(error){
+
+message.innerHTML = "<div class='error'>Fehler beim Speichern</div>";
+console.error(error);
+
+}else{
+
+message.innerHTML = "<div class='success'>Beitrag gespeichert</div>";
+form.reset();
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
