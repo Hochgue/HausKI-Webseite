@@ -49,7 +49,7 @@ function renderEmptyState(elementId, text) {
 
 async function loadPosts() {
   try {
-    const { data: posts, error } = await supabase
+    const { data: posts, error } = await supabaseClient
       .from("posts")
       .select("*")
       .eq("visible", true)
