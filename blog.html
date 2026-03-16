@@ -342,6 +342,7 @@
       border:1px solid rgba(255,255,255,0.10);
       color:var(--text);
       transition:.2s;
+      cursor:pointer;
     }
 
     .read-more:hover{
@@ -374,6 +375,183 @@
       flex-wrap:wrap;
     }
 
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(2,8,16,0.78);
+      backdrop-filter:blur(10px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:999;
+    }
+
+    .modal.active{
+      display:flex;
+    }
+
+    .modal-panel{
+      width:min(980px, 100%);
+      max-height:90vh;
+      overflow:auto;
+      background:linear-gradient(180deg, rgba(11,22,37,0.98), rgba(7,15,26,0.98));
+      border:1px solid rgba(33,200,255,0.18);
+      border-radius:24px;
+      box-shadow:0 30px 80px rgba(0,0,0,0.45);
+      padding:22px;
+      position:relative;
+    }
+
+    .modal-close{
+      position:sticky;
+      top:0;
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.04);
+      color:var(--text);
+      cursor:pointer;
+      font-size:20px;
+      z-index:5;
+    }
+
+    .modal-close:hover{
+      border-color:var(--accent);
+      color:var(--accent);
+    }
+
+    .modal-cover{
+      width:100%;
+      aspect-ratio:16 / 8;
+      object-fit:cover;
+      border-radius:18px;
+      margin:8px 0 22px;
+      border:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 18px 35px rgba(0,0,0,0.28);
+      background:#09111d;
+    }
+
+    .modal-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .modal-title{
+      margin:0;
+      font-size:clamp(28px,4vw,40px);
+      line-height:1.08;
+      letter-spacing:-1.2px;
+    }
+
+    .modal-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:0 0 24px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .meta-pill{
+      display:inline-flex;
+      align-items:center;
+      min-height:32px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .project-box{
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(33,200,255,0.16);
+      border-radius:18px;
+      padding:18px;
+      margin:0 0 24px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    .project-box h3{
+      margin:0 0 14px;
+      font-size:1rem;
+      color:var(--accent);
+      letter-spacing:0.02em;
+    }
+
+    .project-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+
+    .project-item{
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:14px;
+      padding:12px 14px;
+    }
+
+    .project-label{
+      display:block;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .project-value{
+      color:var(--text);
+      line-height:1.5;
+      font-size:14px;
+    }
+
+    .modal-content{
+      color:var(--text);
+      line-height:1.9;
+      font-size:17px;
+    }
+
+    .modal-content p{
+      margin:0 0 18px;
+      color:#dceaf7;
+    }
+
+    .modal-content h2,
+    .modal-content h3{
+      margin:28px 0 14px;
+      line-height:1.2;
+    }
+
+    .modal-content ul,
+    .modal-content ol{
+      margin:0 0 18px 22px;
+      color:#dceaf7;
+      line-height:1.8;
+    }
+
+    .modal-content li{
+      margin-bottom:8px;
+    }
+
+    .modal-actions{
+      margin-top:26px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
     @media (max-width:1024px){
       .blog-grid{
         grid-template-columns:repeat(2,1fr);
@@ -398,6 +576,19 @@
 
       .tab-btn{
         width:100%;
+      }
+
+      .modal{
+        padding:12px;
+      }
+
+      .modal-panel{
+        padding:16px;
+        border-radius:18px;
+      }
+
+      .project-grid{
+        grid-template-columns:1fr;
       }
     }
   </style>
@@ -467,12 +658,19 @@
     </div>
   </footer>
 
+  <!-- Modal -->
+  <div id="article-modal" class="modal" aria-hidden="true">
+    <div class="modal-panel">
+      <button id="modal-close" class="modal-close" type="button" aria-label="Schließen">×</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
     const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
-
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const tabs = document.querySelectorAll(".tab-btn");
@@ -481,11 +679,14 @@
       blog: document.getElementById("tab-blog")
     };
 
+    const modal = document.getElementById("article-modal");
+    const modalBody = document.getElementById("modal-body");
+    const modalClose = document.getElementById("modal-close");
+
     tabs.forEach((btn) => {
       btn.addEventListener("click", () => {
         tabs.forEach((b) => b.classList.remove("active"));
         Object.values(panels).forEach((panel) => panel.classList.remove("active"));
-
         btn.classList.add("active");
         panels[btn.dataset.tab].classList.add("active");
       });
@@ -503,14 +704,140 @@
     }
 
     function escapeHtml(text) {
-      if (!text) return "";
-      return text
+      if (text === null || text === undefined) return "";
+      return String(text)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
     }
+
+    function nl2p(text) {
+      if (!text) return "<p>Kein Inhalt vorhanden.</p>";
+
+      const safe = escapeHtml(text);
+      const blocks = safe
+        .split(/\n\s*\n/)
+        .map(block => block.trim())
+        .filter(Boolean);
+
+      return blocks.map(block => {
+        if (block.startsWith("- ")) {
+          const items = block
+            .split("\n")
+            .map(line => line.replace(/^- /, "").trim())
+            .filter(Boolean)
+            .map(item => `<li>${item}</li>`)
+            .join("");
+          return `<ul>${items}</ul>`;
+        }
+
+        return `<p>${block.replace(/\n/g, "<br>")}</p>`;
+      }).join("");
+    }
+
+    function buildProjectInfoBox(post) {
+      const typeLabel = post.post_type === "linkedin" ? "LinkedIn" : "Blog";
+      const coverStatus = post.cover_image ? "Ja" : "Nein";
+      const projectName = post.title || "HausKI Artikel";
+      const excerptText = post.excerpt || "Kein Auszug hinterlegt.";
+
+      return `
+        <div class="project-box">
+          <h3>Projektübersicht</h3>
+          <div class="project-grid">
+            <div class="project-item">
+              <span class="project-label">Projekt</span>
+              <div class="project-value">${escapeHtml(projectName)}</div>
+            </div>
+            <div class="project-item">
+              <span class="project-label">Typ</span>
+              <div class="project-value">${escapeHtml(typeLabel)}</div>
+            </div>
+            <div class="project-item">
+              <span class="project-label">Veröffentlicht</span>
+              <div class="project-value">${escapeHtml(formatDate(post.published_at) || "Nicht gesetzt")}</div>
+            </div>
+            <div class="project-item">
+              <span class="project-label">Coverbild</span>
+              <div class="project-value">${escapeHtml(coverStatus)}</div>
+            </div>
+            <div class="project-item" style="grid-column:1 / -1;">
+              <span class="project-label">Kurzbeschreibung</span>
+              <div class="project-value">${escapeHtml(excerptText)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function openModal(post) {
+      const safeTitle = escapeHtml(post.title || "Ohne Titel");
+      const date = formatDate(post.published_at);
+      const source = post.post_type === "linkedin" ? "LinkedIn" : "Blog";
+      const coverHtml = post.cover_image
+        ? `<img src="${post.cover_image}" alt="${safeTitle}" class="modal-cover">`
+        : "";
+
+      const externalLink = post.linkedin_url
+        ? `<a href="${post.linkedin_url}" target="_blank" rel="noopener noreferrer" class="read-more">Auf LinkedIn öffnen</a>`
+        : "";
+
+      modalBody.innerHTML = `
+        <div class="modal-top">
+          <div>
+            <h2 class="modal-title">${safeTitle}</h2>
+          </div>
+        </div>
+
+        <div class="modal-meta">
+          <span class="meta-pill">${escapeHtml(source)}</span>
+          <span class="meta-pill">${escapeHtml(date || "Kein Datum")}</span>
+        </div>
+
+        ${coverHtml}
+        ${buildProjectInfoBox(post)}
+
+        <div class="modal-content">
+          ${nl2p(post.content || post.excerpt)}
+        </div>
+
+        <div class="modal-actions">
+          ${externalLink}
+          <button type="button" class="read-more" id="modal-close-bottom">Schließen</button>
+        </div>
+      `;
+
+      modal.classList.add("active");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+
+      const closeBottom = document.getElementById("modal-close-bottom");
+      if (closeBottom) {
+        closeBottom.addEventListener("click", closeModal);
+      }
+    }
+
+    function closeModal() {
+      modal.classList.remove("active");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    modalClose.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("active")) {
+        closeModal();
+      }
+    });
 
     function createPostCard(post) {
       const article = document.createElement("article");
@@ -526,11 +853,6 @@
         ? `<img src="${post.cover_image}" alt="${safeTitle}" class="post-cover">`
         : "";
 
-      const linkHtml =
-        post.post_type === "linkedin" && post.linkedin_url
-          ? `<a href="${post.linkedin_url}" target="_blank" rel="noopener noreferrer" class="read-more">Auf LinkedIn öffnen</a>`
-          : `<a href="#" class="read-more">Artikel lesen</a>`;
-
       article.innerHTML = `
         ${coverImageHtml}
         <div class="post-top">
@@ -539,10 +861,29 @@
         </div>
         <h3>${safeTitle}</h3>
         <p>${safeExcerpt}</p>
-        <div class="post-actions">
-          ${linkHtml}
-        </div>
+        <div class="post-actions"></div>
       `;
+
+      const actions = article.querySelector(".post-actions");
+
+      if (post.post_type === "linkedin" && post.linkedin_url) {
+        const link = document.createElement("a");
+        link.href = post.linkedin_url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.className = "read-more";
+        link.textContent = "Auf LinkedIn öffnen";
+        actions.appendChild(link);
+      }
+
+      if (post.post_type === "blog") {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "read-more";
+        button.textContent = "Artikel lesen";
+        button.addEventListener("click", () => openModal(post));
+        actions.appendChild(button);
+      }
 
       return article;
     }
