@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HausKI – Blog</title>
-
   <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png">
-
   <meta name="description" content="HausKI Blog mit LinkedIn-Beiträgen und eigenen Blogartikeln zu Smart Home, Energie, Automationen und Systemlogik.">
 
   <style>
@@ -243,17 +241,30 @@
       background:var(--card);
       border:1px solid var(--line);
       border-radius:22px;
-      padding:24px;
+      padding:18px;
       box-shadow:0 12px 35px rgba(0,0,0,0.22);
       transition:0.25s ease;
       display:flex;
       flex-direction:column;
       min-height:100%;
+      overflow:hidden;
     }
 
     .post-card:hover{
       transform:translateY(-4px);
       box-shadow:0 16px 40px rgba(0,0,0,0.32);
+    }
+
+    .post-cover{
+      width:100%;
+      aspect-ratio:16 / 9;
+      object-fit:cover;
+      border-radius:16px;
+      margin-bottom:16px;
+      border:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 10px 24px rgba(0,0,0,0.28);
+      display:block;
+      background:#09111d;
     }
 
     .post-top{
@@ -308,26 +319,6 @@
       color:var(--muted);
       line-height:1.75;
       flex:1;
-    }
-
-    .post-tags{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:18px;
-    }
-
-    .post-tags span{
-      display:inline-flex;
-      align-items:center;
-      min-height:30px;
-      padding:0 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.08);
-      color:var(--text);
-      font-size:12px;
-      font-weight:600;
     }
 
     .post-actions{
@@ -476,7 +467,14 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
   <script>
+    const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     const tabs = document.querySelectorAll(".tab-btn");
     const panels = {
       linkedin: document.getElementById("tab-linkedin"),
@@ -492,10 +490,109 @@
         panels[btn.dataset.tab].classList.add("active");
       });
     });
-  </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="/js/supabase.js"></script>
-  <script src="/js/blog.js"></script>
+    function formatDate(dateString) {
+      if (!dateString) return "";
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    }
+
+    function escapeHtml(text) {
+      if (!text) return "";
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function createPostCard(post) {
+      const article = document.createElement("article");
+      article.className = "post-card";
+
+      const safeTitle = escapeHtml(post.title || "Ohne Titel");
+      const safeExcerpt = escapeHtml(post.excerpt || "");
+      const date = formatDate(post.published_at);
+      const postTypeClass = post.post_type === "linkedin" ? "linkedin" : "blog";
+      const postTypeLabel = post.post_type === "linkedin" ? "LinkedIn" : "Blog";
+
+      const coverImageHtml = post.cover_image
+        ? `<img src="${post.cover_image}" alt="${safeTitle}" class="post-cover">`
+        : "";
+
+      const linkHtml =
+        post.post_type === "linkedin" && post.linkedin_url
+          ? `<a href="${post.linkedin_url}" target="_blank" rel="noopener noreferrer" class="read-more">Auf LinkedIn öffnen</a>`
+          : `<a href="#" class="read-more">Artikel lesen</a>`;
+
+      article.innerHTML = `
+        ${coverImageHtml}
+        <div class="post-top">
+          <span class="post-source ${postTypeClass}">${postTypeLabel}</span>
+          <span class="post-date">${date}</span>
+        </div>
+        <h3>${safeTitle}</h3>
+        <p>${safeExcerpt}</p>
+        <div class="post-actions">
+          ${linkHtml}
+        </div>
+      `;
+
+      return article;
+    }
+
+    function renderPosts(posts, containerId, type) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      const filteredPosts = posts.filter((post) => post.post_type === type);
+
+      if (!filteredPosts.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            Noch keine ${type === "linkedin" ? "LinkedIn-Beiträge" : "Blogartikel"} vorhanden.
+          </div>
+        `;
+        return;
+      }
+
+      filteredPosts.forEach((post) => {
+        container.appendChild(createPostCard(post));
+      });
+    }
+
+    async function loadPosts() {
+      const linkedinGrid = document.getElementById("linkedin-grid");
+      const blogGrid = document.getElementById("blog-grid");
+
+      linkedinGrid.innerHTML = `<div class="empty-state">LinkedIn-Beiträge werden geladen …</div>`;
+      blogGrid.innerHTML = `<div class="empty-state">Blogartikel werden geladen …</div>`;
+
+      const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("visible", true)
+        .order("published_at", { ascending: false });
+
+      if (error) {
+        console.error("Fehler beim Laden der Beiträge:", error);
+        linkedinGrid.innerHTML = `<div class="empty-state">Fehler beim Laden der LinkedIn-Beiträge.</div>`;
+        blogGrid.innerHTML = `<div class="empty-state">Fehler beim Laden der Blogartikel.</div>`;
+        return;
+      }
+
+      const posts = Array.isArray(data) ? data : [];
+      renderPosts(posts, "linkedin-grid", "linkedin");
+      renderPosts(posts, "blog-grid", "blog");
+    }
+
+    loadPosts();
+  </script>
 </body>
 </html>
