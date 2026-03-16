@@ -135,7 +135,10 @@
     const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const adminSupabase = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
     const form = document.getElementById("post-form");
     const message = document.getElementById("message");
@@ -158,7 +161,7 @@
         visible: document.getElementById("visible").value === "true"
       };
 
-      const { error } = await supabase
+      const { error } = await adminSupabase
         .from("posts")
         .insert([post]);
 
