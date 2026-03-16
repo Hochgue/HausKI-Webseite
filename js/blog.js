@@ -49,7 +49,7 @@ function renderEmptyState(elementId, text) {
 
 async function loadPosts() {
   try {
-    const { data: posts, error } = await supabaseClient
+    const { data: posts, error } = await window.supabaseClient
       .from("posts")
       .select("*")
       .eq("visible", true)
@@ -85,7 +85,6 @@ async function loadPosts() {
     }
   } catch (error) {
     console.error("Fehler beim Laden der Beiträge:", error);
-
     renderEmptyState("linkedin-grid", "Beiträge konnten gerade nicht geladen werden.");
     renderEmptyState("blog-grid", "Beiträge konnten gerade nicht geladen werden.");
   }
