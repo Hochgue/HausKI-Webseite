@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HausKI Beitrag</title>
+  <meta name="description" content="HausKI Blogbeitrag" />
+  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png" />
+
+  <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    :root{
+      --bg:#030b16;
+      --bg2:#071426;
+      --card:rgba(9,22,38,0.92);
+      --card2:rgba(8,18,31,0.95);
+      --line:rgba(68,167,255,0.22);
+      --line-strong:rgba(68,167,255,0.42);
+      --text:#eef7ff;
+      --muted:#9bb7d3;
+      --soft:#cfe6ff;
+      --accent:#3aa0ff;
+      --accent2:#67c1ff;
+      --chip-bg:rgba(40,119,182,0.18);
+      --chip-line:rgba(98,179,255,0.34);
+      --shadow:0 18px 40px rgba(0,0,0,0.34);
+      --radius:24px;
+      --max:1080px;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(28,92,160,0.20), transparent 28%),
+        radial-gradient(circle at top right, rgba(0,180,255,0.10), transparent 20%),
+        linear-gradient(180deg, #04101d 0%, #020914 100%);
+      min-height:100vh;
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .page-shell{
+      width:min(calc(100% - 32px), var(--max));
+      margin:0 auto;
+      padding:28px 0 64px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      margin-bottom:22px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand-logo{
+      width:50px;
+      height:50px;
+      border-radius:16px;
+      background:
+        linear-gradient(135deg, rgba(69,182,255,0.20), rgba(0,0,0,0)),
+        rgba(8,20,35,0.96);
+      border:1px solid rgba(89,181,255,0.28);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      box-shadow:0 0 18px rgba(39,130,210,0.15);
+      flex-shrink:0;
+    }
+
+    .brand-logo img{
+      width:72%;
+      height:72%;
+      object-fit:contain;
+    }
+
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .brand-text strong{
+      font-size:1.1rem;
+      letter-spacing:0.2px;
+    }
+
+    .brand-text span{
+      color:var(--muted);
+      font-size:0.95rem;
+    }
+
+    .back-link{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      background:linear-gradient(180deg, rgba(14,40,66,0.95), rgba(7,24,41,0.96));
+      border:1px solid rgba(70,165,255,0.35);
+      box-shadow:0 10px 24px rgba(0,0,0,0.20);
+      color:var(--soft);
+      font-weight:700;
+      transition:transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .back-link:hover{
+      transform:translateY(-1px);
+      border-color:rgba(100,190,255,0.55);
+      box-shadow:0 14px 28px rgba(0,0,0,0.26);
+    }
+
+    .article-card{
+      background:linear-gradient(180deg, rgba(6,20,35,0.94), rgba(4,15,27,0.98));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .hero-wrap{
+      width:100%;
+      aspect-ratio:16 / 9;
+      background:
+        linear-gradient(135deg, rgba(69,182,255,0.14), rgba(0,0,0,0)),
+        #09111d;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      position:relative;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+    }
+
+    .hero-wrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .hero-placeholder{
+      color:#bcd8f3;
+      font-size:1.15rem;
+      text-align:center;
+      padding:20px;
+    }
+
+    .article-inner{
+      padding:28px;
+    }
+
+    .meta-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:18px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      padding:10px 14px;
+      border-radius:999px;
+      background:var(--chip-bg);
+      border:1px solid var(--chip-line);
+      color:#d7ebff;
+      font-size:0.95rem;
+      line-height:1;
+    }
+
+    h1{
+      margin:0 0 18px;
+      font-size:clamp(2rem, 4vw, 3rem);
+      line-height:1.1;
+      letter-spacing:-0.03em;
+      color:#ffffff;
+    }
+
+    .excerpt{
+      margin:0 0 24px;
+      font-size:1.12rem;
+      line-height:1.75;
+      color:#d5e7f9;
+      padding:18px 20px;
+      border-radius:20px;
+      background:rgba(9,25,43,0.66);
+      border:1px solid rgba(80,170,255,0.14);
+    }
+
+    .material-box{
+      margin:0 0 26px;
+      padding:18px 20px;
+      border-radius:20px;
+      background:linear-gradient(180deg, rgba(10,25,43,0.88), rgba(8,18,33,0.92));
+      border:1px solid rgba(86,172,255,0.14);
+    }
+
+    .material-box strong{
+      display:block;
+      margin-bottom:10px;
+      font-size:1.05rem;
+      color:#ffffff;
+    }
+
+    .material-box span{
+      color:#d4e6f8;
+      line-height:1.7;
+    }
+
+    .content{
+      font-size:1.08rem;
+      line-height:1.85;
+      color:#e7f3ff;
+    }
+
+    .content h2,
+    .content h3{
+      margin-top:34px;
+      margin-bottom:12px;
+      color:#ffffff;
+      line-height:1.25;
+    }
+
+    .content p{
+      margin:0 0 18px;
+    }
+
+    .content ul,
+    .content ol{
+      margin:0 0 20px 22px;
+      padding:0;
+    }
+
+    .content li{
+      margin-bottom:10px;
+    }
+
+    .content img{
+      max-width:100%;
+      border-radius:18px;
+      margin:18px 0;
+      border:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 10px 24px rgba(0,0,0,0.28);
+    }
+
+    .content a{
+      color:#8fd0ff;
+      text-decoration:underline;
+    }
+
+    .content blockquote{
+      margin:22px 0;
+      padding:16px 18px;
+      border-left:4px solid var(--accent2);
+      background:rgba(12,26,42,0.72);
+      border-radius:14px;
+      color:#dbeeff;
+    }
+
+    .loading,
+    .error-box{
+      padding:36px 28px;
+      text-align:center;
+      color:#dbeeff;
+    }
+
+    .error-box h2{
+      margin-top:0;
+      color:#fff;
+    }
+
+    .error-actions{
+      margin-top:20px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .footer-note{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:0.95rem;
+      text-align:right;
+    }
+
+    @media (max-width: 720px){
+      .page-shell{
+        width:min(calc(100% - 20px), var(--max));
+        padding:18px 0 42px;
+      }
+
+      .article-inner{
+        padding:20px;
+      }
+
+      .excerpt,
+      .material-box{
+        padding:16px;
+      }
+
+      .content{
+        font-size:1rem;
+        line-height:1.78;
+      }
+
+      .brand-text strong{
+        font-size:1rem;
+      }
+
+      .brand-text span{
+        font-size:0.88rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="bilder/New_Home_Assistant_logo.svg.png" alt="HausKI Logo">
+        </div>
+        <div class="brand-text">
+          <strong>HausKI</strong>
+          <span>Mein intelligentes Zuhause</span>
+        </div>
+      </div>
+
+      <a class="back-link" href="blog.html">← Zurück zum Blog</a>
+    </div>
+
+    <article class="article-card" id="articleCard">
+      <div class="loading" id="loadingState">Beitrag wird geladen ...</div>
+    </article>
+
+  </div>
+
+  <script>
+    const articleCard = document.getElementById("articleCard");
+    const loadingState = document.getElementById("loadingState");
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "";
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString("de-DE");
+    }
+
+    function parseMarkdown(text) {
+      if (!text) return "<p>Kein Inhalt vorhanden.</p>";
+
+      let html = String(text);
+
+      html = html.replace(/\r\n/g, "\n");
+
+      html = html.replace(/^### (.*)$/gm, "<h3>$1</h3>");
+      html = html.replace(/^## (.*)$/gm, "<h2>$1</h2>");
+      html = html.replace(/^> (.*)$/gm, "<blockquote>$1</blockquote>");
+
+      html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+      html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+      const lines = html.split("\n");
+      let output = "";
+      let inUl = false;
+      let inOl = false;
+
+      for (let rawLine of lines) {
+        const line = rawLine.trim();
+
+        if (!line) {
+          if (inUl) {
+            output += "</ul>";
+            inUl = false;
+          }
+          if (inOl) {
+            output += "</ol>";
+            inOl = false;
+          }
+          continue;
+        }
+
+        if (line.startsWith("<h2>") || line.startsWith("<h3>") || line.startsWith("<blockquote>")) {
+          if (inUl) {
+            output += "</ul>";
+            inUl = false;
+          }
+          if (inOl) {
+            output += "</ol>";
+            inOl = false;
+          }
+          output += line;
+          continue;
+        }
+
+        if (/^- /.test(line)) {
+          if (inOl) {
+            output += "</ol>";
+            inOl = false;
+          }
+          if (!inUl) {
+            output += "<ul>";
+            inUl = true;
+          }
+          output += `<li>${line.replace(/^- /, "")}</li>`;
+          continue;
+        }
+
+        if (/^\d+\.\s/.test(line)) {
+          if (inUl) {
+            output += "</ul>";
+            inUl = false;
+          }
+          if (!inOl) {
+            output += "<ol>";
+            inOl = true;
+          }
+          output += `<li>${line.replace(/^\d+\.\s/, "")}</li>`;
+          continue;
+        }
+
+        if (inUl) {
+          output += "</ul>";
+          inUl = false;
+        }
+        if (inOl) {
+          output += "</ol>";
+          inOl = false;
+        }
+
+        output += `<p>${line}</p>`;
+      }
+
+      if (inUl) output += "</ul>";
+      if (inOl) output += "</ol>";
+
+      return output;
+    }
+
+    function buildImage(imagePath, title) {
+      if (!imagePath || imagePath.trim() === "") {
+        return `
+          <div class="hero-wrap">
+            <div class="hero-placeholder">Noch kein Bild hinterlegt.</div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="hero-wrap">
+          <img src="${escapeHtml(imagePath)}" alt="${escapeHtml(title)}" onerror="this.parentElement.innerHTML='<div class=&quot;hero-placeholder&quot;>Bild konnte nicht geladen werden.</div>';">
+        </div>
+      `;
+    }
+
+    function renderPost(post) {
+      const tags = Array.isArray(post.tags) ? post.tags : [];
+      const sourceLabel = post.source === "linkedin" ? "LinkedIn" : "HausKI Blog";
+      const material = post.material && String(post.material).trim() !== "" ? post.material : "-";
+
+      document.title = `${post.title} | HausKI`;
+
+      articleCard.innerHTML = `
+        ${buildImage(post.image, post.title)}
+        <div class="article-inner">
+          <div class="meta-row">
+            <span class="chip">${escapeHtml(sourceLabel)}</span>
+            ${post.date ? `<span class="chip">${escapeHtml(formatDate(post.date))}</span>` : ""}
+            ${post.category ? `<span class="chip">${escapeHtml(post.category)}</span>` : ""}
+            ${tags.map(tag => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}
+          </div>
+
+          <h1>${escapeHtml(post.title || "Ohne Titel")}</h1>
+
+          ${post.excerpt ? `<div class="excerpt">${escapeHtml(post.excerpt)}</div>` : ""}
+
+          <div class="material-box">
+            <strong>Verwendetes Material:</strong>
+            <span>${escapeHtml(material)}</span>
+          </div>
+
+          <div class="content">
+            ${parseMarkdown(post.content)}
+          </div>
+
+          <div class="footer-note">${escapeHtml(sourceLabel)}</div>
+        </div>
+      `;
+    }
+
+    function renderError(message) {
+      articleCard.innerHTML = `
+        <div class="error-box">
+          <h2>Beitrag nicht gefunden</h2>
+          <p>${escapeHtml(message)}</p>
+          <div class="error-actions">
+            <a class="back-link" href="blog.html">Zurück zum Blog</a>
+          </div>
+        </div>
+      `;
+      document.title = "Beitrag nicht gefunden | HausKI";
+    }
+
+    async function loadPost() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      if (!id) {
+        renderError("In der URL wurde keine Beitrags-ID übergeben.");
+        return;
+      }
+
+      try {
+        const response = await fetch("posts.json?v=" + Date.now());
+
+        if (!response.ok) {
+          throw new Error("posts.json konnte nicht geladen werden.");
+        }
+
+        const posts = await response.json();
+
+        if (!Array.isArray(posts)) {
+          throw new Error("posts.json hat kein gültiges Array-Format.");
+        }
+
+        const post = posts.find(entry => String(entry.id) === String(id));
+
+        if (!post) {
+          renderError(`Es wurde kein Beitrag mit der ID "${id}" gefunden.`);
+          return;
+        }
+
+        renderPost(post);
+      } catch (error) {
+        console.error(error);
+        renderError("Die Beitragsdaten konnten nicht geladen werden.");
+      }
+    }
+
+    loadPost();
+  </script>
+</body>
+</html>

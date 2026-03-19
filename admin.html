@@ -4,1004 +4,606 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HausKI Admin</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <meta name="description" content="HausKI Blog Adminbereich" />
+  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png" />
 
   <style>
-    * {
-      box-sizing: border-box;
+    *{
+      box-sizing:border-box;
     }
 
-    :root {
-      --bg: #040911;
-      --panel: rgba(10, 21, 36, 0.92);
-      --line: rgba(76, 177, 255, 0.16);
-      --text: #eaf4ff;
-      --muted: #96afc8;
-      --blue: #45b6ff;
-      --shadow: 0 22px 46px rgba(0, 0, 0, 0.34);
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 14px;
-      --max: 1440px;
-      --success-bg: rgba(110, 231, 183, 0.08);
-      --success-line: rgba(110, 231, 183, 0.18);
-      --error-bg: rgba(255, 123, 123, 0.08);
-      --error-line: rgba(255, 123, 123, 0.18);
-      --warn-bg: rgba(255, 208, 102, 0.08);
-      --warn-line: rgba(255, 208, 102, 0.18);
+    :root{
+      --bg:#04111d;
+      --bg2:#081c30;
+      --card:rgba(8,21,36,0.94);
+      --card-2:rgba(10,25,43,0.96);
+      --line:rgba(78,170,255,0.18);
+      --line-strong:rgba(95,185,255,0.42);
+      --text:#eef7ff;
+      --muted:#9cbddb;
+      --soft:#d8ebff;
+      --accent:#4aa8ff;
+      --accent-2:#84d6ff;
+      --danger:#ff6b81;
+      --danger-2:#ff8e9d;
+      --success:#61d69c;
+      --warning:#ffcb6b;
+      --radius:24px;
+      --shadow:0 18px 40px rgba(0,0,0,0.28);
+      --max:1380px;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--text);
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(69, 182, 255, 0.16), transparent 24%),
-        radial-gradient(circle at top right, rgba(0, 224, 255, 0.10), transparent 20%),
-        linear-gradient(180deg, #040911 0%, #08111c 50%, #06101a 100%);
-      min-height: 100vh;
+        radial-gradient(circle at top left, rgba(27,93,163,0.24), transparent 28%),
+        radial-gradient(circle at top right, rgba(0,186,255,0.10), transparent 20%),
+        linear-gradient(180deg, #04111d 0%, #020914 100%);
+      min-height:100vh;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
+    a{
+      color:inherit;
+      text-decoration:none;
     }
 
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    .container {
-      width: min(var(--max), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      backdrop-filter: blur(14px);
-      background: rgba(4, 10, 18, 0.78);
-      border-bottom: 1px solid rgba(110, 180, 255, 0.12);
-    }
-
-    .nav {
-      min-height: 74px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      min-width: 0;
-    }
-
-    .brand-logo {
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-      border-radius: 12px;
-      filter: drop-shadow(0 0 12px rgba(69, 182, 255, 0.24));
-      flex-shrink: 0;
-    }
-
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.05;
-    }
-
-    .brand-text strong {
-      font-size: 1.08rem;
-      color: #f3faff;
-      letter-spacing: 0.2px;
-    }
-
-    .brand-text span {
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .nav-links a {
-      padding: 10px 14px;
-      border-radius: 999px;
-      color: var(--muted);
-      transition: 0.2s ease;
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: #fff;
-      background: rgba(69, 182, 255, 0.12);
-      box-shadow: inset 0 0 0 1px rgba(69, 182, 255, 0.2);
-    }
-
-    .page {
-      padding: 34px 0 60px;
-    }
-
-    .hero-box {
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(12, 25, 42, 0.96), rgba(7, 17, 30, 0.96));
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      padding: clamp(26px, 4vw, 42px);
-      margin-bottom: 24px;
-    }
-
-    .hero-box::before {
-      content: "";
-      position: absolute;
-      right: -70px;
-      bottom: -70px;
-      width: 230px;
-      height: 230px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(69, 182, 255, 0.18), transparent 70%);
-      pointer-events: none;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(69, 182, 255, 0.12);
-      color: #c7eeff;
-      border: 1px solid rgba(69, 182, 255, 0.18);
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin-bottom: 14px;
-    }
-
-    .hero-box h1 {
-      margin: 0 0 12px;
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1;
-      letter-spacing: -1.2px;
-    }
-
-    .hero-box p {
-      margin: 0;
-      max-width: 860px;
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 1.02rem;
-    }
-
-    .admin-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
-      gap: 24px;
-      align-items: start;
-    }
-
-    .panel {
-      background: linear-gradient(180deg, rgba(11, 23, 39, 0.94), rgba(7, 16, 28, 0.96));
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .panel-head {
-      padding: 20px 22px 16px;
-      border-bottom: 1px solid rgba(110, 180, 255, 0.08);
-    }
-
-    .panel-head h2 {
-      margin: 0;
-      font-size: 1.18rem;
-      letter-spacing: -0.3px;
-    }
-
-    .panel-head p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 0.94rem;
-    }
-
-    .panel-body {
-      padding: 22px;
-    }
-
-    .section {
-      padding: 18px 0 4px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .section:first-child {
-      padding-top: 0;
-      border-top: 0;
-    }
-
-    .section-title {
-      margin: 0 0 14px;
-      font-size: 1rem;
-      color: #dff3ff;
-      letter-spacing: 0.2px;
-    }
-
-    .field-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .field-grid.single {
-      grid-template-columns: 1fr;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-width: 0;
-    }
-
-    .field label {
-      font-size: 0.93rem;
-      font-weight: 700;
-      color: #e8f4ff;
-    }
-
-    .field small {
-      color: var(--muted);
-      font-size: 0.82rem;
-      line-height: 1.5;
-    }
-
+    button,
     input,
-    select,
-    textarea {
-      width: 100%;
-      border: 1px solid rgba(110, 180, 255, 0.14);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 14px 14px;
-      font: inherit;
-      outline: none;
-      transition: 0.2s ease;
+    textarea,
+    select{
+      font:inherit;
     }
 
-    input::placeholder,
-    textarea::placeholder {
-      color: #7f9ab5;
+    .page-shell{
+      width:min(calc(100% - 32px), var(--max));
+      margin:0 auto;
+      padding:28px 0 60px;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: rgba(69, 182, 255, 0.34);
-      box-shadow: 0 0 0 3px rgba(69, 182, 255, 0.08);
-      background: rgba(255, 255, 255, 0.05);
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
     }
 
-    textarea {
-      min-height: 130px;
-      resize: vertical;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
     }
 
-    input[type="file"] {
-      padding: 10px 12px;
+    .brand-logo{
+      width:54px;
+      height:54px;
+      border-radius:16px;
+      background:
+        linear-gradient(135deg, rgba(69,182,255,0.18), rgba(0,0,0,0)),
+        rgba(8,20,35,0.96);
+      border:1px solid rgba(89,181,255,0.28);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      box-shadow:0 0 20px rgba(39,130,210,0.16);
+      flex-shrink:0;
     }
 
-    .type-switch {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+    .brand-logo img{
+      width:74%;
+      height:74%;
+      object-fit:contain;
     }
 
-    .type-option {
-      position: relative;
+    .brand-text strong{
+      display:block;
+      font-size:1.2rem;
+      margin-bottom:4px;
     }
 
-    .type-option input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
+    .brand-text span{
+      color:var(--muted);
+      font-size:0.96rem;
     }
 
-    .type-card {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 16px;
-      min-height: 110px;
-      border-radius: 18px;
-      border: 1px solid rgba(110, 180, 255, 0.14);
-      background: rgba(255, 255, 255, 0.03);
-      cursor: pointer;
-      transition: 0.2s ease;
+    .top-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
-    .type-card strong {
-      font-size: 1rem;
-      color: #f1f8ff;
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:46px;
+      padding:0 18px;
+      border-radius:999px;
+      font-weight:700;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease;
+      color:#fff;
+      border:1px solid rgba(105,193,255,0.24);
+      background:linear-gradient(180deg, rgba(15,41,67,0.95), rgba(8,24,40,0.96));
     }
 
-    .type-card span {
-      color: var(--muted);
-      line-height: 1.5;
-      font-size: 0.9rem;
+    .btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 24px rgba(0,0,0,0.22);
+      border-color:rgba(136,212,255,0.44);
     }
 
-    .type-option input:checked + .type-card {
-      border-color: rgba(69, 182, 255, 0.36);
-      background: linear-gradient(180deg, rgba(69, 182, 255, 0.16), rgba(69, 182, 255, 0.06));
-      box-shadow: inset 0 0 0 1px rgba(69, 182, 255, 0.10), 0 14px 28px rgba(0, 0, 0, 0.18);
+    .btn.primary{
+      background:linear-gradient(180deg, rgba(21,96,159,0.96), rgba(9,60,106,0.96));
+      border-color:rgba(121,204,255,0.44);
     }
 
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      border: 1px solid rgba(110, 180, 255, 0.14);
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 18px;
-      padding: 14px 16px;
+    .btn.success{
+      background:linear-gradient(180deg, rgba(30,116,79,0.96), rgba(14,80,53,0.96));
+      border-color:rgba(105,223,163,0.40);
     }
 
-    .toggle-row .copy strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 0.95rem;
+    .btn.warn{
+      background:linear-gradient(180deg, rgba(138,96,18,0.96), rgba(98,66,10,0.96));
+      border-color:rgba(255,210,104,0.36);
     }
 
-    .toggle-row .copy span {
-      color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.45;
+    .btn.danger{
+      background:linear-gradient(180deg, rgba(148,47,69,0.96), rgba(108,28,44,0.96));
+      border-color:rgba(255,143,157,0.36);
     }
 
-    .switch {
-      position: relative;
-      width: 56px;
-      height: 32px;
-      flex-shrink: 0;
+    .layout{
+      display:grid;
+      grid-template-columns:1.05fr 0.95fr;
+      gap:24px;
+      align-items:start;
     }
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-      position: absolute;
+    .card{
+      background:linear-gradient(180deg, rgba(7,20,35,0.95), rgba(5,16,28,0.98));
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
     }
 
-    .slider {
-      position: absolute;
-      inset: 0;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      transition: 0.2s ease;
-      cursor: pointer;
+    .card-head{
+      padding:22px 24px 0;
     }
 
-    .slider::before {
-      content: "";
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      left: 3px;
-      top: 3px;
-      border-radius: 50%;
-      background: #f6fbff;
-      transition: 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+    .card-head h2{
+      margin:0 0 8px;
+      font-size:1.5rem;
+      color:#fff;
     }
 
-    .switch input:checked + .slider {
-      background: rgba(69, 182, 255, 0.3);
-      border-color: rgba(69, 182, 255, 0.38);
+    .card-head p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
     }
 
-    .switch input:checked + .slider::before {
-      transform: translateX(24px);
+    .card-body{
+      padding:24px;
     }
 
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 14px;
+    .status-bar{
+      margin-bottom:20px;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(9,23,38,0.76);
+      color:#dceeff;
+      line-height:1.6;
     }
 
-    .btn {
-      border: 0;
-      border-radius: 999px;
-      padding: 13px 18px;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
+    .status-bar.success{
+      border-color:rgba(105,223,163,0.28);
+      color:#d9ffe9;
+      background:rgba(18,52,37,0.52);
     }
 
-    .btn-primary {
-      color: #04111d;
-      background: linear-gradient(180deg, #6bdcff, #45b6ff);
-      box-shadow: 0 12px 24px rgba(69, 182, 255, 0.18);
+    .status-bar.warn{
+      border-color:rgba(255,210,104,0.28);
+      color:#fff0c9;
+      background:rgba(66,49,15,0.48);
     }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
+    .status-bar.error{
+      border-color:rgba(255,143,157,0.28);
+      color:#ffe1e6;
+      background:rgba(69,20,30,0.46);
     }
 
-    .btn-secondary {
-      color: #eaf4ff;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    form{
+      display:grid;
+      gap:16px;
     }
 
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.09);
+    .grid-2{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:16px;
     }
 
-    .btn-danger {
-      color: #fff2f2;
-      background: rgba(255, 92, 92, 0.12);
-      border: 1px solid rgba(255, 92, 92, 0.22);
+    .grid-3{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:16px;
     }
 
-    .btn-danger:hover {
-      background: rgba(255, 92, 92, 0.18);
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
     }
 
-    .status-box {
-      margin-top: 16px;
-      display: none;
-      border-radius: 16px;
-      padding: 14px 16px;
-      font-size: 0.94rem;
-      line-height: 1.55;
+    .field label{
+      font-weight:700;
+      color:#f2f8ff;
     }
 
-    .status-box.success {
-      display: block;
-      background: var(--success-bg);
-      border: 1px solid var(--success-line);
-      color: #d9fff0;
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      border:none;
+      outline:none;
+      color:#fff;
+      background:rgba(8,21,35,0.96);
+      border:1px solid rgba(87,174,255,0.16);
+      border-radius:16px;
+      padding:14px 15px;
+      transition:border-color .18s ease, box-shadow .18s ease;
     }
 
-    .status-box.error {
-      display: block;
-      background: var(--error-bg);
-      border: 1px solid var(--error-line);
-      color: #ffe4e4;
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus{
+      border-color:rgba(115,199,255,0.50);
+      box-shadow:0 0 0 3px rgba(59,147,220,0.12);
     }
 
-    .status-box.warn {
-      display: block;
-      background: var(--warn-bg);
-      border: 1px solid var(--warn-line);
-      color: #fff3d1;
+    .field textarea{
+      min-height:120px;
+      resize:vertical;
+      line-height:1.7;
     }
 
-    .preview-shell {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      position: sticky;
-      top: 98px;
+    .hint{
+      color:#84a9ca;
+      font-size:0.9rem;
+      line-height:1.6;
     }
 
-    .preview-card {
-      overflow: hidden;
-      border-radius: 22px;
-      background: linear-gradient(180deg, rgba(11, 23, 39, 0.96), rgba(7, 15, 27, 0.96));
-      border: 1px solid rgba(110, 180, 255, 0.14);
-      box-shadow: var(--shadow);
+    .inline-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:8px;
     }
 
-    .preview-image-wrap {
-      position: relative;
-      aspect-ratio: 16 / 9;
-      background: #09111d;
-      overflow: hidden;
+    .list-toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
     }
 
-    .preview-image-wrap img {
-      position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transform: scale(1.11);
-  transform-origin: center;
-  display: none;
+    .list-count{
+      color:#d9ebff;
+      font-weight:700;
     }
 
-    .preview-placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #9cb5ce;
-      font-size: 0.96rem;
-      padding: 18px;
-      text-align: center;
-      line-height: 1.6;
+    .mini-search{
+      width:min(100%, 320px);
+      padding:13px 15px;
+      border:none;
+      outline:none;
+      color:#fff;
+      background:rgba(8,21,35,0.96);
+      border:1px solid rgba(87,174,255,0.16);
+      border-radius:999px;
     }
 
-    .preview-badge {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      backdrop-filter: blur(8px);
-      z-index: 2;
+    .mini-search:focus{
+      border-color:rgba(115,199,255,0.50);
+      box-shadow:0 0 0 3px rgba(59,147,220,0.12);
     }
 
-    .badge-blog {
-      background: rgba(88, 225, 255, 0.16);
-      color: #d7f7ff;
-      border: 1px solid rgba(88, 225, 255, 0.24);
+    .post-list{
+      display:grid;
+      gap:14px;
     }
 
-    .badge-linkedin {
-      background: rgba(76, 144, 255, 0.2);
-      color: #d9ebff;
-      border: 1px solid rgba(76, 144, 255, 0.28);
+    .post-item{
+      padding:16px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(10,25,43,0.86), rgba(7,18,32,0.94));
+      border:1px solid rgba(90,179,255,0.14);
     }
 
-    .preview-content {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+    .post-item-top{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:10px;
     }
 
-    .preview-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 0.88rem;
+    .post-item h3{
+      margin:0;
+      font-size:1.08rem;
+      line-height:1.35;
+      color:#fff;
     }
 
-    .preview-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .post-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
     }
 
-    .preview-title {
-      margin: 0;
-      font-size: 1.24rem;
-      line-height: 1.28;
-      letter-spacing: -0.3px;
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 11px;
+      border-radius:999px;
+      background:rgba(34,102,158,0.18);
+      border:1px solid rgba(100,184,255,0.24);
+      color:#d9edff;
+      font-size:0.88rem;
+      line-height:1;
     }
 
-    .preview-excerpt {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.65;
-      font-size: 0.98rem;
+    .post-item p{
+      margin:0 0 12px;
+      color:#d6e8f8;
+      line-height:1.65;
     }
 
-    .preview-material {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 0.92rem;
-      color: var(--muted);
-      line-height: 1.55;
+    .post-item-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    .preview-material strong {
-      color: #dff4ff;
+    .small-btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      min-height:40px;
+      padding:0 14px;
+      border-radius:999px;
+      font-weight:700;
+      color:#fff;
+      background:linear-gradient(180deg, rgba(14,69,114,0.96), rgba(9,46,77,0.96));
+      border:1px solid rgba(106,192,255,0.26);
     }
 
-    .preview-footer {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 0.88rem;
+    .small-btn.danger{
+      background:linear-gradient(180deg, rgba(144,45,67,0.96), rgba(104,27,42,0.96));
+      border-color:rgba(255,143,157,0.32);
     }
 
-    .json-box {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 18px;
-      overflow: hidden;
+    .small-btn:hover{
+      transform:translateY(-1px);
     }
 
-    .json-box-head {
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    .empty-list{
+      padding:18px;
+      border-radius:18px;
+      border:1px dashed rgba(106,192,255,0.18);
+      color:#cfe4fa;
+      text-align:center;
+      background:rgba(8,20,34,0.48);
     }
 
-    .json-output {
-      margin: 0;
-      padding: 16px;
-      color: #d9f3ff;
-      font-family: Consolas, Monaco, monospace;
-      font-size: 0.85rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-      max-height: 380px;
-      overflow: auto;
-    }
-
-    .helper {
-      color: var(--muted);
-      font-size: 0.86rem;
-      line-height: 1.55;
-      margin-top: 10px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    @media (max-width: 1120px) {
-      .admin-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .preview-shell {
-        position: static;
+    @media (max-width: 1100px){
+      .layout{
+        grid-template-columns:1fr;
       }
     }
 
-    @media (max-width: 760px) {
-      .nav {
-        padding: 14px 0;
-        flex-direction: column;
-        align-items: flex-start;
+    @media (max-width: 760px){
+      .page-shell{
+        width:min(calc(100% - 20px), var(--max));
+        padding:18px 0 38px;
       }
 
-      .nav-links {
-        width: 100%;
-        justify-content: flex-start;
+      .grid-2,
+      .grid-3{
+        grid-template-columns:1fr;
       }
 
-      .field-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .type-switch {
-        grid-template-columns: 1fr;
+      .card-head,
+      .card-body{
+        padding-left:18px;
+        padding-right:18px;
       }
     }
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <a class="brand" href="index.html">
-        <img class="brand-logo" src="bilder/New_Home_Assistant_logo.svg.png" alt="HausKI Logo" />
+  <div class="page-shell">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="bilder/New_Home_Assistant_logo.svg.png" alt="HausKI Logo">
+        </div>
         <div class="brand-text">
-          <strong>HausKI</strong>
-          <span>Blog & Content Admin</span>
+          <strong>HausKI Admin</strong>
+          <span>Beiträge anlegen, bearbeiten, exportieren</span>
         </div>
-      </a>
+      </div>
 
-      <nav class="nav-links">
-        <a href="index.html">Start</a>
-        <a href="blog.html">Blog</a>
-        <a href="roadmap.html">Roadmap</a>
-        <a href="admin.html" class="active">Admin</a>
-      </nav>
+      <div class="top-actions">
+        <a class="btn" href="blog.html">Zum Blog</a>
+        <a class="btn" href="index.html">Zur Startseite</a>
+      </div>
     </div>
-  </header>
 
-  <main class="page">
-    <div class="container">
-      <section class="hero-box">
-        <div class="eyebrow">HausKI Content Center</div>
-        <h1>Beiträge erstellen, Bilder hochladen und löschen</h1>
-        <p>
-          Hier legst du neue HausKI-Beiträge an, lädst Bilder direkt in Supabase Storage
-          hoch und speicherst alles direkt in die Tabelle <strong>posts</strong>.
-        </p>
-      </section>
-
-      <section class="admin-grid">
-        <div class="panel">
-          <div class="panel-head">
-            <h2>Beitrag verwalten</h2>
-            <p>Mit Bild-Upload direkt auf den Bucket <strong>blog-images</strong>.</p>
-          </div>
-
-          <div class="panel-body">
-            <form id="postForm">
-              <div class="section">
-                <h3 class="section-title">1. Beitragstyp</h3>
-
-                <div class="type-switch">
-                  <label class="type-option">
-                    <input type="radio" name="type" value="blog" checked />
-                    <span class="type-card">
-                      <strong>Blogartikel</strong>
-                      <span>Für ausführliche Inhalte, Praxisberichte, Learnings und Dokumentation.</span>
-                    </span>
-                  </label>
-
-                  <label class="type-option">
-                    <input type="radio" name="type" value="linkedin" />
-                    <span class="type-card">
-                      <strong>LinkedIn Update</strong>
-                      <span>Für kurze Projektupdates, Gedanken, Fortschritte und Impulse.</span>
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="section">
-                <h3 class="section-title">2. Grunddaten</h3>
-
-                <div class="field-grid">
-                  <div class="field">
-                    <label for="title">Titel</label>
-                    <input id="title" type="text" placeholder="z. B. HausKI HUD: Live-Energie auf einen Blick" required />
-                  </div>
-
-                  <div class="field">
-                    <label for="slug">ID / Slug</label>
-                    <input id="slug" type="text" placeholder="wird automatisch erzeugt" />
-                    <small>Wichtig für Löschen und Detailseite. Kann leer bleiben.</small>
-                  </div>
-
-                  <div class="field">
-                    <label for="category">Kategorie</label>
-                    <input id="category" type="text" placeholder="z. B. Dashboard, Heizung, HausKI" />
-                  </div>
-
-                  <div class="field">
-                    <label for="date">Veröffentlichungsdatum</label>
-                    <input id="date" type="date" required />
-                  </div>
-                </div>
-              </div>
-
-              <div class="section">
-                <h3 class="section-title">3. Inhalt</h3>
-
-                <div class="field-grid single">
-                  <div class="field">
-                    <label for="excerpt">Auszug</label>
-                    <textarea id="excerpt" placeholder="Kurzer Teasertext für die Kartenansicht im Blog." required></textarea>
-                  </div>
-
-                  <div class="field">
-                    <label for="content">Volltext / Inhalt</label>
-                    <textarea id="content" placeholder="Hier kommt der eigentliche Beitrag hinein." required></textarea>
-                  </div>
-
-                  <div class="field">
-                    <label for="material">Verwendetes Material / Geräte</label>
-                    <input id="material" type="text" placeholder="z. B. Home Assistant, Shelly Plug, Solax, Templates" />
-                  </div>
-
-                  <div class="field hidden" id="linkedinField">
-                    <label for="linkedin_url">LinkedIn URL</label>
-                    <input id="linkedin_url" type="url" placeholder="https://www.linkedin.com/..." />
-                    <small>Nur relevant, wenn der Beitragstyp LinkedIn ist.</small>
-                  </div>
-                </div>
-              </div>
-
-              <div class="section">
-                <h3 class="section-title">4. Medien & Sichtbarkeit</h3>
-
-                <div class="field-grid">
-                  <div class="field">
-                    <label for="image">Bild-URL</label>
-                    <input id="image" type="text" placeholder="Wird nach dem Upload automatisch eingetragen" />
-                    <small>Kann auch manuell gesetzt werden.</small>
-                  </div>
-
-                  <div class="field">
-                    <label for="source">Quelle</label>
-                    <select id="source">
-                      <option value="manual">HausKI Blog</option>
-                      <option value="linkedin">LinkedIn</option>
-                    </select>
-                  </div>
-
-                  <div class="field">
-                    <label for="imageFile">Bild auswählen</label>
-                    <input id="imageFile" type="file" accept="image/*" />
-                    <small>Danach auf „Bild hochladen“ klicken.</small>
-                  </div>
-
-                  <div class="field">
-                    <label>&nbsp;</label>
-                    <button type="button" class="btn btn-secondary" id="uploadImageBtn">Bild hochladen</button>
-                  </div>
-                </div>
-
-                <div class="field-grid" style="margin-top:16px;">
-                  <div class="field">
-                    <div class="toggle-row">
-                      <div class="copy">
-                        <strong>Sichtbar</strong>
-                        <span>Unsichtbare Beiträge erscheinen nicht im Blog.</span>
-                      </div>
-
-                      <label class="switch">
-                        <input id="published" type="checkbox" checked />
-                        <span class="slider"></span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="actions">
-                  <button type="submit" class="btn btn-primary" id="saveBtn">Beitrag speichern</button>
-                  <button type="button" class="btn btn-danger" id="deleteBtn">Beitrag löschen</button>
-                  <button type="button" class="btn btn-secondary" id="resetBtn">Formular leeren</button>
-                  <button type="button" class="btn btn-secondary" id="copyJsonBtn">JSON kopieren</button>
-                </div>
-
-                <div id="statusBox" class="status-box"></div>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <div class="preview-shell">
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Live-Vorschau</h2>
-              <p>So wirkt der Beitrag später als Karte im Blog.</p>
-            </div>
-
-            <div class="panel-body">
-              <article class="preview-card">
-                <div class="preview-image-wrap">
-                  <div id="previewBadge" class="preview-badge badge-blog">Blog</div>
-                  <img id="previewImage" alt="Beitragsbild Vorschau" />
-                  <div id="previewPlaceholder" class="preview-placeholder">
-                    Noch kein Bild gesetzt.<br />
-                    Wähle ein Bild aus und lade es hoch.
-                  </div>
-                </div>
-
-                <div class="preview-content">
-                  <div class="preview-meta">
-                    <span class="preview-pill" id="previewDate">Datum</span>
-                    <span class="preview-pill" id="previewCategory">Kategorie</span>
-                  </div>
-
-                  <h3 class="preview-title" id="previewTitle">Dein Beitragstitel erscheint hier</h3>
-                  <p class="preview-excerpt" id="previewExcerpt">
-                    Hier siehst du den Auszug des Beitrags.
-                  </p>
-
-                  <div class="preview-material" id="previewMaterial">
-                    <strong>Verwendetes Material:</strong><br />
-                    Noch nichts eingetragen.
-                  </div>
-
-                  <div class="preview-footer">
-                    <span id="previewSource">HausKI Blog</span>
-                    <span id="previewVisibility">Sichtbar</span>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          <div class="json-box">
-            <div class="json-box-head">
-              <strong>Generierter Datensatz</strong>
-            </div>
-            <pre class="json-output" id="jsonOutput">{}</pre>
-          </div>
-
-          <p class="helper">
-            Zum Löschen muss die ID / der Slug gesetzt sein. Bilder werden in
-            <strong>blog-images</strong> hochgeladen und danach automatisch in die Bild-URL übernommen.
+    <div class="layout">
+      <section class="card">
+        <div class="card-head">
+          <h2>Beitrag anlegen oder bearbeiten</h2>
+          <p>
+            Hier pflegst du Blog- und LinkedIn-Beiträge. Nach dem Speichern liegen die Daten lokal im Browser.
+            Anschließend kannst du mit einem Klick die <strong>posts.json</strong> exportieren.
           </p>
         </div>
+
+        <div class="card-body">
+          <div id="statusBar" class="status-bar">
+            Bereit. Du kannst einen neuen Beitrag anlegen.
+          </div>
+
+          <form id="postForm">
+            <input type="hidden" id="editingId" value="" />
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="title">Titel</label>
+                <input id="title" type="text" placeholder="z. B. Tedee Smart Lock in HausKI integriert" required />
+              </div>
+
+              <div class="field">
+                <label for="slug">ID / Slug</label>
+                <input id="slug" type="text" placeholder="wird automatisch erzeugt" />
+                <div class="hint">Wird für <code>post.html?id=...</code> verwendet.</div>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="field">
+                <label for="date">Datum</label>
+                <input id="date" type="date" />
+              </div>
+
+              <div class="field">
+                <label for="source">Quelle</label>
+                <select id="source">
+                  <option value="blog">Blog</option>
+                  <option value="linkedin">LinkedIn</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="category">Kategorie</label>
+                <input id="category" type="text" placeholder="z. B. Automation" />
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="tags">Tags</label>
+                <input id="tags" type="text" placeholder="z. B. Tedee, Sicherheit, Einbau" />
+                <div class="hint">Mehrere Tags mit Beistrich trennen.</div>
+              </div>
+
+              <div class="field">
+                <label for="image">Bildpfad</label>
+                <input id="image" type="text" placeholder="z. B. blog-images/tedee-smart-lock.jpg" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="excerpt">Kurztext / Vorschau</label>
+              <textarea id="excerpt" placeholder="Kurzer Teasertext für die Blogkarte"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="material">Verwendetes Material</label>
+              <input id="material" type="text" placeholder="z. B. Tedee 2 Go, Keypad, Türkontakt" />
+            </div>
+
+            <div class="field">
+              <label for="content">Inhalt</label>
+              <textarea id="content" placeholder="Hier kommt dein ganzer Beitrag rein. Markdown leicht unterstützt: ## Überschrift, - Liste, **fett**, *kursiv*"></textarea>
+            </div>
+
+            <div class="inline-actions">
+              <button class="btn primary" type="submit">Beitrag speichern</button>
+              <button class="btn" type="button" id="resetBtn">Formular leeren</button>
+              <button class="btn warn" type="button" id="demoBtn">Beispieldaten laden</button>
+              <button class="btn success" type="button" id="exportBtn">posts.json exportieren</button>
+              <button class="btn danger" type="button" id="clearAllBtn">Alle lokalen Beiträge löschen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Vorhandene Beiträge</h2>
+          <p>
+            Hier siehst du alle lokal gespeicherten Einträge. Du kannst sie direkt laden, bearbeiten oder löschen.
+          </p>
+        </div>
+
+        <div class="card-body">
+          <div class="list-toolbar">
+            <div class="list-count" id="listCount">0 Beiträge lokal gespeichert</div>
+            <input id="listSearch" class="mini-search" type="text" placeholder="Beiträge filtern ..." />
+          </div>
+
+          <div id="postList" class="post-list"></div>
+        </div>
       </section>
     </div>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
+  </div>
 
   <script>
-    const form = document.getElementById("postForm");
-    const statusBox = document.getElementById("statusBox");
-    const saveBtn = document.getElementById("saveBtn");
-    const deleteBtn = document.getElementById("deleteBtn");
-    const uploadImageBtn = document.getElementById("uploadImageBtn");
+    const STORAGE_KEY = "hauski_posts";
 
+    const postForm = document.getElementById("postForm");
+    const editingId = document.getElementById("editingId");
     const titleInput = document.getElementById("title");
     const slugInput = document.getElementById("slug");
-    const categoryInput = document.getElementById("category");
     const dateInput = document.getElementById("date");
-    const excerptInput = document.getElementById("excerpt");
-    const contentInput = document.getElementById("content");
-    const materialInput = document.getElementById("material");
-    const linkedinUrlInput = document.getElementById("linkedin_url");
-    const imageInput = document.getElementById("image");
-    const imageFileInput = document.getElementById("imageFile");
     const sourceInput = document.getElementById("source");
-    const publishedInput = document.getElementById("published");
-    const linkedinField = document.getElementById("linkedinField");
+    const categoryInput = document.getElementById("category");
+    const tagsInput = document.getElementById("tags");
+    const imageInput = document.getElementById("image");
+    const excerptInput = document.getElementById("excerpt");
+    const materialInput = document.getElementById("material");
+    const contentInput = document.getElementById("content");
+
+    const statusBar = document.getElementById("statusBar");
+    const postList = document.getElementById("postList");
+    const listCount = document.getElementById("listCount");
+    const listSearch = document.getElementById("listSearch");
+
     const resetBtn = document.getElementById("resetBtn");
-    const copyJsonBtn = document.getElementById("copyJsonBtn");
+    const demoBtn = document.getElementById("demoBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const clearAllBtn = document.getElementById("clearAllBtn");
 
-    const previewBadge = document.getElementById("previewBadge");
-    const previewImage = document.getElementById("previewImage");
-    const previewPlaceholder = document.getElementById("previewPlaceholder");
-    const previewDate = document.getElementById("previewDate");
-    const previewCategory = document.getElementById("previewCategory");
-    const previewTitle = document.getElementById("previewTitle");
-    const previewExcerpt = document.getElementById("previewExcerpt");
-    const previewMaterial = document.getElementById("previewMaterial");
-    const previewSource = document.getElementById("previewSource");
-    const previewVisibility = document.getElementById("previewVisibility");
-    const jsonOutput = document.getElementById("jsonOutput");
+    let posts = [];
+    let listFilter = "";
 
-    const typeInputs = document.querySelectorAll('input[name="type"]');
-
-    function setTodayIfEmpty() {
-      if (!dateInput.value) {
-        const today = new Date();
-        const y = today.getFullYear();
-        const m = String(today.getMonth() + 1).padStart(2, "0");
-        const d = String(today.getDate()).padStart(2, "0");
-        dateInput.value = `${y}-${m}-${d}`;
+    function setStatus(message, type = "") {
+      statusBar.className = "status-bar";
+      if (type) {
+        statusBar.classList.add(type);
       }
+      statusBar.textContent = message;
     }
 
-    function slugify(text) {
-      return text
-        .toString()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-    }
-
-    function escapeHtml(text) {
-      return text
+    function escapeHtml(value) {
+      return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -1009,307 +611,344 @@
         .replace(/'/g, "&#039;");
     }
 
-    function textToSimpleHtml(text) {
-      const safe = escapeHtml(text.trim());
-      if (!safe) return "";
-      return safe
-        .split(/\n{2,}/)
-        .map(paragraph => `<p>${paragraph.replace(/\n/g, "<br>")}</p>`)
-        .join("");
-    }
-
-    function getSelectedType() {
-      return document.querySelector('input[name="type"]:checked')?.value || "blog";
+    function createSlug(text) {
+      return String(text || "")
+        .toLowerCase()
+        .trim()
+        .replace(/ä/g, "ae")
+        .replace(/ö/g, "oe")
+        .replace(/ü/g, "ue")
+        .replace(/ß/g, "ss")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
     }
 
     function formatDate(dateString) {
-      if (!dateString) return "Datum";
+      if (!dateString) return "";
       const date = new Date(dateString);
       if (Number.isNaN(date.getTime())) return dateString;
-      return date.toLocaleDateString("de-AT", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
+      return date.toLocaleDateString("de-DE");
+    }
+
+    function getPosts() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        console.error(error);
+        return [];
+      }
+    }
+
+    function savePosts() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts, null, 2));
+    }
+
+    function sortPosts(items) {
+      return [...items].sort((a, b) => {
+        const dateA = new Date(a.date || 0).getTime();
+        const dateB = new Date(b.date || 0).getTime();
+        return dateB - dateA;
       });
     }
 
-    function buildRecord() {
-      const type = getSelectedType();
+    function resetForm() {
+      editingId.value = "";
+      postForm.reset();
+      dateInput.value = new Date().toISOString().split("T")[0];
+      sourceInput.value = "blog";
+      slugInput.value = "";
+      setStatus("Bereit. Du kannst einen neuen Beitrag anlegen.");
+    }
+
+    function fillForm(post) {
+      editingId.value = post.id || "";
+      titleInput.value = post.title || "";
+      slugInput.value = post.id || "";
+      dateInput.value = post.date || "";
+      sourceInput.value = post.source || "blog";
+      categoryInput.value = post.category || "";
+      tagsInput.value = Array.isArray(post.tags) ? post.tags.join(", ") : "";
+      imageInput.value = post.image || "";
+      excerptInput.value = post.excerpt || "";
+      materialInput.value = post.material || "";
+      contentInput.value = post.content || "";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setStatus(`Beitrag "${post.title}" zum Bearbeiten geladen.`, "warn");
+    }
+
+    function removePost(id) {
+      const post = posts.find(item => item.id === id);
+      if (!post) return;
+
+      const ok = confirm(`Beitrag "${post.title}" wirklich löschen?`);
+      if (!ok) return;
+
+      posts = posts.filter(item => item.id !== id);
+      savePosts();
+      renderList();
+
+      if (editingId.value === id) {
+        resetForm();
+      }
+
+      setStatus(`Beitrag "${post.title}" wurde gelöscht.`, "error");
+    }
+
+    function renderList() {
+      const filtered = sortPosts(posts).filter(post => {
+        if (!listFilter) return true;
+        const haystack = [
+          post.title,
+          post.id,
+          post.category,
+          post.excerpt,
+          post.material,
+          post.content,
+          Array.isArray(post.tags) ? post.tags.join(" ") : ""
+        ].join(" ").toLowerCase();
+
+        return haystack.includes(listFilter);
+      });
+
+      listCount.textContent = `${posts.length} ${posts.length === 1 ? "Beitrag" : "Beiträge"} lokal gespeichert`;
+
+      if (!filtered.length) {
+        postList.innerHTML = `<div class="empty-list">Keine passenden Beiträge gefunden.</div>`;
+        return;
+      }
+
+      postList.innerHTML = filtered.map(post => `
+        <article class="post-item">
+          <div class="post-item-top">
+            <div>
+              <h3>${escapeHtml(post.title || "Ohne Titel")}</h3>
+              <div class="post-badges">
+                <span class="badge">${escapeHtml(post.source || "blog")}</span>
+                ${post.date ? `<span class="badge">${escapeHtml(formatDate(post.date))}</span>` : ""}
+                ${post.category ? `<span class="badge">${escapeHtml(post.category)}</span>` : ""}
+                <span class="badge">${escapeHtml(post.id || "-")}</span>
+              </div>
+            </div>
+          </div>
+
+          <p>${escapeHtml(post.excerpt || "Kein Kurztext vorhanden.")}</p>
+
+          <div class="post-item-actions">
+            <button class="small-btn" type="button" onclick="editPost('${encodeURIComponent(post.id)}')">Bearbeiten</button>
+            <button class="small-btn" type="button" onclick="openPostPreview('${encodeURIComponent(post.id)}')">Vorschau</button>
+            <button class="small-btn danger" type="button" onclick="deletePost('${encodeURIComponent(post.id)}')">Löschen</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function exportPostsJson() {
+      const sorted = sortPosts(posts);
+      const blob = new Blob([JSON.stringify(sorted, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "posts.json";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      setStatus("posts.json wurde exportiert. Lege die Datei ins Hauptverzeichnis deiner Website.", "success");
+    }
+
+    function loadDemoData() {
+      const demoPosts = [
+        {
+          id: "tedee-smart-lock",
+          title: "Tedee Smart Lock in HausKI integriert - Tür, Alarm & Automation im Griff",
+          date: "2026-03-19",
+          category: "Automation",
+          tags: ["Einbau", "Tedee", "Sicherheit"],
+          source: "blog",
+          image: "blog-images/tedee-smart-lock.jpg",
+          excerpt: "Tedee Smart Lock in HausKI integriert – Tür, Alarm und Automationen im Griff.",
+          material: "Tedee 2 Go, Keypad, Moes Zigbee Türkontakt",
+          content: "## Ausgangslage\nIch wollte die Haustür sauber in HausKI einbinden.\n\n## Ziel\n- automatisches Sperren nach definierter Zeit\n- Zusammenspiel mit Alarmo\n- Status sauber im HUD sichtbar\n\n## Umsetzung\nDie Tür ist über den Kontaktsensor und das Tedee Schloss in Home Assistant eingebunden.\n\n> Besonders wichtig war mir, dass die Lösung alltagstauglich bleibt.\n\n## Fazit\nDie Integration funktioniert sauber und bringt deutlich mehr Übersicht und Sicherheit."
+        },
+        {
+          id: "gong-installation",
+          title: "Gong Installation in HausKI sauber eingebunden",
+          date: "2026-03-19",
+          category: "Einbau",
+          tags: ["Shelly", "Türgong", "Automation"],
+          source: "blog",
+          image: "",
+          excerpt: "Wie ich den Gong sauber in HausKI eingebunden habe und welche Erkenntnisse daraus entstanden sind.",
+          material: "Shelly i4, vorhandener Gong, Home Assistant",
+          content: "## Idee\nDer Gong sollte nicht nur läuten, sondern ein Event in HausKI auslösen.\n\n## Umsetzung\nDer Trigger läuft über den Shelly i4.\n\n## Mehrwert\n- Benachrichtigung am Handy\n- Snapshot der Kamera\n- spätere Erweiterung mit QVR Pro"
+        },
+        {
+          id: "linkedin-hauski-energie-dashboard",
+          title: "HausKI Energiedashboard – Live Blick auf Verbrauch und Leistung",
+          date: "2026-03-18",
+          category: "Energie",
+          tags: ["Dashboard", "Grafana", "Home Assistant"],
+          source: "linkedin",
+          image: "",
+          excerpt: "Ein kurzer LinkedIn-Einblick in mein HausKI-Energiedashboard und die Visualisierung von Live-Daten.",
+          material: "Home Assistant, Grafana, Solax, BKW",
+          content: "## LinkedIn Beitrag\nIch arbeite laufend daran, Energieflüsse nicht nur zu messen, sondern verständlich sichtbar zu machen."
+        }
+      ];
+
+      const ok = confirm("Beispieldaten laden und vorhandene lokale Beiträge ersetzen?");
+      if (!ok) return;
+
+      posts = demoPosts;
+      savePosts();
+      renderList();
+      resetForm();
+      setStatus("Beispieldaten wurden geladen.", "success");
+    }
+
+    function clearAllPosts() {
+      if (!posts.length) {
+        setStatus("Es sind keine lokalen Beiträge vorhanden.", "warn");
+        return;
+      }
+
+      const ok = confirm("Wirklich alle lokal gespeicherten Beiträge löschen?");
+      if (!ok) return;
+
+      posts = [];
+      savePosts();
+      renderList();
+      resetForm();
+      setStatus("Alle lokalen Beiträge wurden gelöscht.", "error");
+    }
+
+    function createPostObject() {
       const title = titleInput.value.trim();
       const manualSlug = slugInput.value.trim();
-      const id = manualSlug || slugify(title) || `post-${Date.now()}`;
-      const source = sourceInput.value || (type === "linkedin" ? "linkedin" : "manual");
+      const id = manualSlug ? createSlug(manualSlug) : createSlug(title);
+
+      if (!title) {
+        throw new Error("Bitte einen Titel eingeben.");
+      }
+
+      if (!id) {
+        throw new Error("Es konnte keine gültige ID erzeugt werden.");
+      }
+
+      const rawTags = tagsInput.value
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean);
 
       return {
         id,
         title,
-        excerpt: excerptInput.value.trim(),
-        content: textToSimpleHtml(contentInput.value),
-        image: imageInput.value.trim(),
-        date: dateInput.value,
-        type,
+        date: dateInput.value || "",
         category: categoryInput.value.trim(),
+        tags: rawTags,
+        source: sourceInput.value,
+        image: imageInput.value.trim(),
+        excerpt: excerptInput.value.trim(),
         material: materialInput.value.trim(),
-        source,
-        linkedin_url: type === "linkedin" ? (linkedinUrlInput.value.trim() || null) : null,
-        published: publishedInput.checked
+        content: contentInput.value.trim()
       };
     }
 
-    function updateTypeState() {
-      const type = getSelectedType();
-      linkedinField.classList.toggle("hidden", type !== "linkedin");
-
-      if (type === "linkedin") {
-        sourceInput.value = "linkedin";
-      } else if (sourceInput.value === "linkedin") {
-        sourceInput.value = "manual";
-      }
-
-      previewBadge.textContent = type === "linkedin" ? "LinkedIn" : "Blog";
-      previewBadge.className = `preview-badge ${type === "linkedin" ? "badge-linkedin" : "badge-blog"}`;
-      updatePreview();
-    }
-
-    function updatePreviewImage() {
-      const value = imageInput.value.trim();
-
-      if (!value) {
-        previewImage.style.display = "none";
-        previewImage.removeAttribute("src");
-        previewPlaceholder.style.display = "flex";
-        previewPlaceholder.innerHTML = "Noch kein Bild gesetzt.<br>Wähle ein Bild aus und lade es hoch.";
-        return;
-      }
-
-      previewImage.src = value;
-      previewImage.style.display = "block";
-      previewPlaceholder.style.display = "none";
-
-      previewImage.onerror = () => {
-        previewImage.style.display = "none";
-        previewPlaceholder.style.display = "flex";
-        previewPlaceholder.innerHTML = "Bild konnte nicht geladen werden.<br>Bitte Upload oder URL prüfen.";
-      };
-
-      previewImage.onload = () => {
-        previewImage.style.display = "block";
-        previewPlaceholder.style.display = "none";
-      };
-    }
-
-    function updatePreview() {
-      const record = buildRecord();
-
-      previewTitle.textContent = record.title || "Dein Beitragstitel erscheint hier";
-      previewExcerpt.textContent =
-        record.excerpt || "Hier siehst du den Auszug des Beitrags.";
-      previewDate.textContent = formatDate(record.date);
-      previewCategory.textContent = record.category || "Allgemein";
-      previewMaterial.innerHTML = `<strong>Verwendetes Material:</strong><br>${record.material || "Noch nichts eingetragen."}`;
-      previewSource.textContent = record.source === "linkedin" ? "Quelle: LinkedIn" : "HausKI Blog";
-      previewVisibility.textContent = record.published ? "Sichtbar" : "Nicht sichtbar";
-
-      jsonOutput.textContent = JSON.stringify(record, null, 2);
-      updatePreviewImage();
-    }
-
-    function clearStatus() {
-      statusBox.className = "status-box";
-      statusBox.textContent = "";
-    }
-
-    function showStatus(message, type = "success") {
-      statusBox.className = `status-box ${type}`;
-      statusBox.textContent = message;
-    }
-
-    function resetForm() {
-      form.reset();
-      slugInput.dataset.userEdited = "";
-      clearStatus();
-      setTodayIfEmpty();
-      updateTypeState();
-      updatePreview();
-    }
-
-    async function uploadImageToSupabase() {
-      clearStatus();
-
-      const file = imageFileInput.files[0];
-
-      if (!file) {
-        showStatus("Bitte zuerst ein Bild auswählen.", "warn");
-        return;
-      }
-
-      uploadImageBtn.disabled = true;
-      uploadImageBtn.textContent = "Lädt hoch ...";
+    postForm.addEventListener("submit", (event) => {
+      event.preventDefault();
 
       try {
-        const safeName = file.name
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-zA-Z0-9._-]/g, "-");
+        const newPost = createPostObject();
+        const oldId = editingId.value.trim();
 
-        const slugBase = slugInput.value.trim() || slugify(titleInput.value.trim()) || "bild";
-        const filePath = `blog/${slugBase}-${Date.now()}-${safeName}`;
+        if (oldId) {
+          const index = posts.findIndex(item => item.id === oldId);
+          if (index === -1) {
+            throw new Error("Der zu bearbeitende Beitrag wurde nicht gefunden.");
+          }
 
-        const { error: uploadError } = await window.supabaseClient.storage
-          .from("blog-images")
-          .upload(filePath, file, {
-            upsert: true
-          });
+          const duplicate = posts.find(item => item.id === newPost.id && item.id !== oldId);
+          if (duplicate) {
+            throw new Error(`Die ID "${newPost.id}" existiert bereits.`);
+          }
 
-        if (uploadError) {
-          throw uploadError;
+          posts[index] = newPost;
+          savePosts();
+          renderList();
+          editingId.value = newPost.id;
+          slugInput.value = newPost.id;
+          setStatus(`Beitrag "${newPost.title}" wurde aktualisiert.`, "success");
+        } else {
+          const exists = posts.find(item => item.id === newPost.id);
+          if (exists) {
+            throw new Error(`Die ID "${newPost.id}" existiert bereits. Bitte Slug ändern.`);
+          }
+
+          posts.push(newPost);
+          savePosts();
+          renderList();
+          editingId.value = newPost.id;
+          slugInput.value = newPost.id;
+          setStatus(`Beitrag "${newPost.title}" wurde gespeichert.`, "success");
         }
-
-        const { data } = window.supabaseClient.storage
-          .from("blog-images")
-          .getPublicUrl(filePath);
-
-        imageInput.value = data.publicUrl;
-        updatePreview();
-
-        showStatus("✅ Bild wurde erfolgreich hochgeladen.");
       } catch (error) {
         console.error(error);
-        showStatus(`Fehler beim Bildupload: ${error.message}`, "error");
-      } finally {
-        uploadImageBtn.disabled = false;
-        uploadImageBtn.textContent = "Bild hochladen";
+        setStatus(error.message || "Beitrag konnte nicht gespeichert werden.", "error");
       }
-    }
+    });
 
     titleInput.addEventListener("input", () => {
-      if (!slugInput.dataset.userEdited) {
-        slugInput.value = slugify(titleInput.value);
+      if (!editingId.value && !slugInput.dataset.manual) {
+        slugInput.value = createSlug(titleInput.value);
       }
-      updatePreview();
     });
 
     slugInput.addEventListener("input", () => {
-      slugInput.dataset.userEdited = slugInput.value.trim() ? "true" : "";
-      updatePreview();
+      slugInput.dataset.manual = slugInput.value.trim() ? "1" : "";
     });
 
-    [
-      categoryInput,
-      dateInput,
-      excerptInput,
-      contentInput,
-      materialInput,
-      linkedinUrlInput,
-      imageInput,
-      sourceInput,
-      publishedInput
-    ].forEach(field => {
-      field.addEventListener("input", updatePreview);
-      field.addEventListener("change", updatePreview);
+    resetBtn.addEventListener("click", () => {
+      resetForm();
+      slugInput.dataset.manual = "";
     });
 
-    imageFileInput.addEventListener("change", () => {
-      const file = imageFileInput.files[0];
-      if (file) {
-        showStatus(`Bild ausgewählt: ${file.name}`, "warn");
-      }
+    demoBtn.addEventListener("click", loadDemoData);
+    exportBtn.addEventListener("click", exportPostsJson);
+    clearAllBtn.addEventListener("click", clearAllPosts);
+
+    listSearch.addEventListener("input", (event) => {
+      listFilter = event.target.value.trim().toLowerCase();
+      renderList();
     });
 
-    typeInputs.forEach(input => {
-      input.addEventListener("change", updateTypeState);
-    });
+    window.editPost = function(id) {
+      const decodedId = decodeURIComponent(id);
+      const post = posts.find(item => item.id === decodedId);
+      if (!post) return;
+      fillForm(post);
+    };
 
-    resetBtn.addEventListener("click", resetForm);
-    uploadImageBtn.addEventListener("click", uploadImageToSupabase);
+    window.deletePost = function(id) {
+      removePost(decodeURIComponent(id));
+    };
 
-    copyJsonBtn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(jsonOutput.textContent);
-        showStatus("JSON wurde in die Zwischenablage kopiert.");
-      } catch (error) {
-        showStatus("Kopieren hat nicht funktioniert. Bitte JSON manuell markieren und kopieren.", "error");
-      }
-    });
+    window.openPostPreview = function(id) {
+      const decodedId = decodeURIComponent(id);
+      window.open(`post.html?id=${encodeURIComponent(decodedId)}`, "_blank");
+    };
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      clearStatus();
+    function init() {
+      posts = getPosts();
+      renderList();
+      resetForm();
+    }
 
-      const record = buildRecord();
-
-      if (!record.title || !record.excerpt || !record.content || !record.date) {
-        showStatus("Bitte Titel, Auszug, Inhalt und Veröffentlichungsdatum ausfüllen.", "error");
-        return;
-      }
-
-      saveBtn.disabled = true;
-      saveBtn.textContent = "Speichert ...";
-
-      try {
-        const { error } = await window.supabaseClient
-          .from("posts")
-          .insert([record]);
-
-        if (error) {
-          throw error;
-        }
-
-        showStatus("✅ Beitrag wurde erfolgreich in Supabase gespeichert.");
-        resetForm();
-      } catch (error) {
-        console.error(error);
-        showStatus(`Fehler beim Speichern: ${error.message}`, "error");
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Beitrag speichern";
-      }
-    });
-
-    deleteBtn.addEventListener("click", async () => {
-      clearStatus();
-
-      const slug = slugInput.value.trim() || slugify(titleInput.value.trim());
-
-      if (!slug) {
-        showStatus("Bitte zuerst eine ID / einen Slug eintragen oder einen Titel setzen.", "warn");
-        return;
-      }
-
-      const confirmed = window.confirm(`Willst du den Beitrag mit der ID "${slug}" wirklich löschen?`);
-      if (!confirmed) return;
-
-      deleteBtn.disabled = true;
-      deleteBtn.textContent = "Löscht ...";
-
-      try {
-        const { error, count } = await window.supabaseClient
-          .from("posts")
-          .delete({ count: "exact" })
-          .eq("id", slug);
-
-        if (error) {
-          throw error;
-        }
-
-        if (count === 0) {
-          showStatus(`Kein Beitrag mit der ID "${slug}" gefunden.`, "warn");
-        } else {
-          showStatus(`🗑️ Beitrag "${slug}" wurde gelöscht.`);
-          resetForm();
-        }
-      } catch (error) {
-        console.error(error);
-        showStatus(`Fehler beim Löschen: ${error.message}`, "error");
-      } finally {
-        deleteBtn.disabled = false;
-        deleteBtn.textContent = "Beitrag löschen";
-      }
-    });
-
-    setTodayIfEmpty();
-    updateTypeState();
-    updatePreview();
+    init();
   </script>
 </body>
 </html>

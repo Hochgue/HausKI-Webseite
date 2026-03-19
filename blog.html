@@ -4,654 +4,680 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HausKI Blog</title>
-  <meta
-    name="description"
-    content="Blog und LinkedIn-Updates rund um HausKI – Smart Home, Energie, Automatisierung und echte Praxisberichte."
-  />
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <meta name="description" content="Blog, LinkedIn-Beiträge und HausKI-Projektdokumentation von Günther Hochreiter." />
+  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png" />
 
   <style>
-    * {
-      box-sizing: border-box;
+    *{
+      box-sizing:border-box;
     }
 
-    :root {
-      --bg: #040911;
-      --bg2: #0a1320;
-      --panel: rgba(10, 20, 34, 0.88);
-      --panel-strong: rgba(8, 16, 28, 0.96);
-      --line: rgba(69, 182, 255, 0.18);
-      --line-strong: rgba(69, 182, 255, 0.34);
-      --text: #eaf4ff;
-      --muted: #9cb6cf;
-      --blue: #45b6ff;
-      --blue-soft: rgba(69, 182, 255, 0.14);
-      --cyan: #74ecff;
-      --shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 14px;
-      --max: 1240px;
+    :root{
+      --bg:#03101c;
+      --bg2:#06192b;
+      --card:rgba(7,20,35,0.90);
+      --card-2:rgba(9,24,41,0.96);
+      --line:rgba(74,170,255,0.20);
+      --line-strong:rgba(74,170,255,0.42);
+      --text:#eef7ff;
+      --muted:#9ec0df;
+      --soft:#dcecff;
+      --accent:#4aa8ff;
+      --accent-2:#7dd2ff;
+      --chip-bg:rgba(31,94,146,0.18);
+      --chip-line:rgba(99,182,255,0.28);
+      --shadow:0 18px 40px rgba(0,0,0,0.28);
+      --radius:24px;
+      --max:1320px;
     }
 
-    html {
-      scroll-behavior: smooth;
+    html{
+      scroll-behavior:smooth;
     }
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--text);
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(69, 182, 255, 0.16), transparent 22%),
-        radial-gradient(circle at top right, rgba(0, 220, 255, 0.1), transparent 18%),
-        linear-gradient(180deg, #040911 0%, #09111d 45%, #07111c 100%);
-      min-height: 100vh;
+        radial-gradient(circle at top left, rgba(27,93,163,0.24), transparent 28%),
+        radial-gradient(circle at top right, rgba(0,186,255,0.10), transparent 20%),
+        linear-gradient(180deg, #04111d 0%, #020914 100%);
+      min-height:100vh;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
+    a{
+      color:inherit;
+      text-decoration:none;
     }
 
-    img {
-      max-width: 100%;
-      display: block;
+    img{
+      display:block;
+      max-width:100%;
     }
 
-    .container {
-      width: min(var(--max), calc(100% - 32px));
-      margin: 0 auto;
+    .page-shell{
+      width:min(calc(100% - 32px), var(--max));
+      margin:0 auto;
+      padding:34px 0 70px;
     }
 
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      backdrop-filter: blur(14px);
-      background: rgba(4, 10, 18, 0.74);
-      border-bottom: 1px solid rgba(110, 180, 255, 0.12);
+    .hero{
+      margin-bottom:28px;
+      padding:28px;
+      border-radius:28px;
+      background:
+        linear-gradient(135deg, rgba(69,182,255,0.12), rgba(0,0,0,0)),
+        linear-gradient(180deg, rgba(7,20,35,0.95), rgba(6,18,31,0.98));
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
     }
 
-    .nav {
-      min-height: 74px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
+    .hero-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      min-width: 0;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:16px;
     }
 
-    .brand-logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 12px rgba(69, 182, 255, 0.24));
-      flex-shrink: 0;
+    .brand-logo{
+      width:58px;
+      height:58px;
+      border-radius:18px;
+      background:
+        linear-gradient(135deg, rgba(69,182,255,0.18), rgba(0,0,0,0)),
+        rgba(8,20,35,0.96);
+      border:1px solid rgba(89,181,255,0.28);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      box-shadow:0 0 20px rgba(39,130,210,0.16);
+      flex-shrink:0;
     }
 
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.05;
-      min-width: 0;
+    .brand-logo img{
+      width:74%;
+      height:74%;
+      object-fit:contain;
     }
 
-    .brand-text strong {
-      font-size: 1.06rem;
-      color: #f3faff;
-      letter-spacing: 0.2px;
+    .hero-text h1{
+      margin:0 0 8px;
+      font-size:clamp(2rem, 4vw, 3.2rem);
+      line-height:1.02;
+      letter-spacing:-0.04em;
+      color:#fff;
     }
 
-    .brand-text span {
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-top: 3px;
+    .hero-text p{
+      margin:0;
+      color:var(--muted);
+      font-size:1.03rem;
+      line-height:1.7;
+      max-width:760px;
     }
 
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    .hero-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
-    .nav-links a {
-      padding: 10px 14px;
-      border-radius: 999px;
-      color: var(--muted);
-      transition: 0.2s ease;
-      font-size: 0.95rem;
-      font-weight: 600;
+    .hero-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid rgba(82,171,255,0.35);
+      background:linear-gradient(180deg, rgba(15,41,67,0.95), rgba(8,24,40,0.96));
+      color:#eaf5ff;
+      font-weight:700;
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
 
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: #fff;
-      background: rgba(69, 182, 255, 0.12);
-      box-shadow: inset 0 0 0 1px rgba(69, 182, 255, 0.2);
+    .hero-btn:hover{
+      transform:translateY(-1px);
+      border-color:rgba(110,195,255,0.56);
+      box-shadow:0 12px 24px rgba(0,0,0,0.22);
     }
 
-    .hero {
-      padding: 52px 0 28px;
+    .hero-btn.primary{
+      background:linear-gradient(180deg, rgba(24,101,168,0.92), rgba(10,58,102,0.95));
+      border-color:rgba(114,201,255,0.42);
     }
 
-    .hero-box {
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(11, 23, 39, 0.96), rgba(7, 16, 28, 0.96));
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      padding: clamp(28px, 5vw, 48px);
+    .toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
     }
 
-    .hero-box::before {
-      content: "";
-      position: absolute;
-      right: -70px;
-      bottom: -70px;
-      width: 230px;
-      height: 230px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(69, 182, 255, 0.2), transparent 70%);
-      pointer-events: none;
+    .filters{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(69, 182, 255, 0.12);
-      color: #c7eeff;
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      border: 1px solid rgba(69, 182, 255, 0.16);
+    .filter-btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      padding:12px 18px;
+      border-radius:999px;
+      background:rgba(7,18,31,0.92);
+      border:1px solid rgba(82,171,255,0.20);
+      color:#b9d8f3;
+      font-weight:700;
+      font-size:1rem;
+      transition:all .18s ease;
     }
 
-    .hero h1 {
-      margin: 0 0 14px;
-      font-size: clamp(2rem, 5vw, 3.4rem);
-      line-height: 0.98;
-      letter-spacing: -1.5px;
-      max-width: 12ch;
+    .filter-btn:hover{
+      border-color:rgba(109,194,255,0.45);
+      color:#fff;
     }
 
-    .hero p {
-      margin: 0;
-      max-width: 760px;
-      color: var(--muted);
-      font-size: 1.04rem;
-      line-height: 1.7;
+    .filter-btn.active{
+      background:linear-gradient(180deg, rgba(20,88,145,0.92), rgba(8,54,96,0.96));
+      border-color:rgba(110,196,255,0.50);
+      color:#fff;
+      box-shadow:0 0 0 1px rgba(115,198,255,0.08) inset;
     }
 
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
-      padding: 14px 0 10px;
+    .toolbar-right{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
     }
 
-    .filter-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .count{
+      color:#cfe6ff;
+      font-size:1.02rem;
+      white-space:nowrap;
     }
 
-    .filter-btn {
-      border: 1px solid rgba(110, 180, 255, 0.16);
-      background: rgba(10, 19, 32, 0.9);
-      color: var(--muted);
-      padding: 11px 16px;
-      border-radius: 999px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
+    .search-wrap{
+      position:relative;
     }
 
-    .filter-btn:hover {
-      color: #fff;
-      border-color: rgba(69, 182, 255, 0.26);
-      background: rgba(12, 26, 43, 0.96);
+    .search-input{
+      width:min(320px, 78vw);
+      padding:13px 16px;
+      border-radius:999px;
+      border:1px solid rgba(82,171,255,0.20);
+      background:rgba(6,18,31,0.94);
+      color:#fff;
+      outline:none;
+      font-size:0.98rem;
     }
 
-    .filter-btn.active {
-      color: #fff;
-      background: linear-gradient(180deg, rgba(69, 182, 255, 0.22), rgba(69, 182, 255, 0.1));
-      border-color: rgba(69, 182, 255, 0.32);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    .search-input::placeholder{
+      color:#7fa6c8;
     }
 
-    .count-info {
-      color: var(--muted);
-      font-size: 0.95rem;
+    .search-input:focus{
+      border-color:rgba(115,199,255,0.48);
+      box-shadow:0 0 0 3px rgba(59,147,220,0.12);
     }
 
-    .post-section {
-      padding: 8px 0 70px;
+    .posts-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:24px;
     }
 
-    .post-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 24px;
+    .post-card{
+      display:flex;
+      flex-direction:column;
+      min-height:100%;
+      background:linear-gradient(180deg, rgba(6,20,35,0.96), rgba(4,15,27,0.98));
+      border:1px solid var(--line);
+      border-radius:24px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
 
-    .post-card {
-      display: flex;
-      flex-direction: column;
-      min-height: 100%;
-      overflow: hidden;
-      border-radius: 22px;
-      background: linear-gradient(180deg, rgba(11, 23, 39, 0.96), rgba(7, 15, 27, 0.96));
-      border: 1px solid rgba(110, 180, 255, 0.14);
-      box-shadow: var(--shadow);
-      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    .post-card:hover{
+      transform:translateY(-3px);
+      border-color:rgba(105,193,255,0.38);
+      box-shadow:0 22px 40px rgba(0,0,0,0.34);
     }
 
-    .post-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(69, 182, 255, 0.28);
-      box-shadow: 0 22px 42px rgba(0, 0, 0, 0.42);
+    .post-image-wrap{
+      position:relative;
+      aspect-ratio:16 / 9;
+      background:
+        linear-gradient(135deg, rgba(69,182,255,0.14), rgba(0,0,0,0)),
+        #09111d;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
     }
 
-    .post-image-wrap {
-      position: relative;
-      aspect-ratio: 16 / 9;
-      background: #09111d;
-      overflow: hidden;
+    .post-cover{
+      width:100%;
+      height:100%;
+      object-fit:cover;
     }
 
-    .post-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .post-cover-placeholder{
+      color:#c7dff8;
+      text-align:center;
+      padding:18px;
+      font-size:1.05rem;
     }
 
-    .post-image-fallback {
-      width: 100%;
-      height: 100%;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      text-align: center;
-      color: var(--muted);
-      background: linear-gradient(135deg, rgba(69, 182, 255, 0.12), transparent);
+    .post-type{
+      position:absolute;
+      top:14px;
+      left:14px;
+      display:inline-flex;
+      align-items:center;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(54,127,181,0.34);
+      border:1px solid rgba(129,205,255,0.34);
+      color:#eaf6ff;
+      font-weight:700;
+      font-size:0.95rem;
+      backdrop-filter:blur(8px);
     }
 
-    .post-badge {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      backdrop-filter: blur(8px);
-      z-index: 2;
+    .post-body{
+      display:flex;
+      flex-direction:column;
+      flex:1;
+      padding:20px;
     }
 
-    .badge-blog {
-      background: rgba(88, 225, 255, 0.16);
-      color: #d7f7ff;
-      border: 1px solid rgba(88, 225, 255, 0.26);
+    .post-meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
     }
 
-    .badge-linkedin {
-      background: rgba(76, 144, 255, 0.2);
-      color: #d9ebff;
-      border: 1px solid rgba(76, 144, 255, 0.28);
+    .post-meta span{
+      display:inline-flex;
+      align-items:center;
+      padding:9px 12px;
+      border-radius:999px;
+      background:var(--chip-bg);
+      border:1px solid var(--chip-line);
+      color:#d7ebff;
+      font-size:0.92rem;
+      line-height:1;
     }
 
-    .post-content {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding: 20px 20px 22px;
-      flex: 1;
+    .post-title{
+      margin:0 0 14px;
+      font-size:clamp(1.3rem, 2vw, 1.7rem);
+      line-height:1.18;
+      color:#fff;
     }
 
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 0.88rem;
+    .post-excerpt{
+      margin:0 0 22px;
+      color:#d6e7f8;
+      font-size:1.02rem;
+      line-height:1.7;
+      flex:1;
     }
 
-    .meta-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .material-box{
+      margin-top:auto;
+      margin-bottom:18px;
+      padding:16px 18px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(10,25,43,0.88), rgba(8,18,33,0.92));
+      border:1px solid rgba(86,172,255,0.14);
     }
 
-    .post-title {
-      margin: 0;
-      font-size: 1.24rem;
-      line-height: 1.28;
-      letter-spacing: -0.3px;
+    .material-box strong{
+      display:block;
+      margin-bottom:8px;
+      font-size:1rem;
+      color:#fff;
     }
 
-    .post-excerpt {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.65;
-      font-size: 0.98rem;
-      flex: 1;
+    .material-box span{
+      color:#d4e6f8;
+      line-height:1.65;
     }
 
-    .material-box {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 0.92rem;
-      color: var(--muted);
-      line-height: 1.55;
+    .post-footer{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
     }
 
-    .material-box strong {
-      color: #dff4ff;
+    .post-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:46px;
+      padding:0 18px;
+      border-radius:999px;
+      background:linear-gradient(180deg, rgba(22,99,163,0.95), rgba(9,61,106,0.96));
+      border:1px solid rgba(109,194,255,0.42);
+      color:#fff;
+      font-weight:700;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
 
-    .post-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-top: auto;
+    .post-link:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 24px rgba(0,0,0,0.24);
+      border-color:rgba(141,214,255,0.55);
     }
 
-    .read-more {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 16px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(69, 182, 255, 0.22), rgba(69, 182, 255, 0.1));
-      border: 1px solid rgba(69, 182, 255, 0.26);
-      color: #f4fbff;
-      font-weight: 700;
-      transition: 0.2s ease;
+    .post-source{
+      color:#d2e6fa;
+      font-size:0.98rem;
+      white-space:nowrap;
     }
 
-    .read-more:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+    .empty-state,
+    .status-box{
+      padding:34px 24px;
+      border-radius:24px;
+      background:linear-gradient(180deg, rgba(7,20,35,0.95), rgba(5,15,27,0.98));
+      border:1px solid var(--line);
+      color:#d7ebff;
+      box-shadow:var(--shadow);
+      text-align:center;
     }
 
-    .source-label {
-      color: var(--muted);
-      font-size: 0.88rem;
+    .empty-state h2,
+    .status-box h2{
+      margin-top:0;
+      color:#fff;
     }
 
-    .empty-state {
-      display: none;
-      margin-top: 12px;
-      padding: 34px 22px;
-      border-radius: 22px;
-      border: 1px dashed rgba(110, 180, 255, 0.18);
-      background: rgba(10, 21, 35, 0.82);
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.7;
-    }
-
-    .site-footer {
-      padding: 26px 0 40px;
-      border-top: 1px solid rgba(110, 180, 255, 0.08);
-      color: var(--muted);
-      font-size: 0.94rem;
-    }
-
-    @media (max-width: 1050px) {
-      .post-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    @media (max-width: 1100px){
+      .posts-grid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 760px) {
-      .nav {
-        padding: 14px 0;
-        flex-direction: column;
-        align-items: flex-start;
+    @media (max-width: 760px){
+      .page-shell{
+        width:min(calc(100% - 20px), var(--max));
+        padding:20px 0 46px;
       }
 
-      .nav-links {
-        width: 100%;
-        justify-content: flex-start;
+      .hero{
+        padding:20px;
+        border-radius:24px;
       }
 
-      .hero h1 {
-        max-width: none;
+      .toolbar{
+        align-items:flex-start;
       }
 
-      .post-grid {
-        grid-template-columns: 1fr;
+      .toolbar-right{
+        width:100%;
+        justify-content:space-between;
       }
 
-      .toolbar {
-        align-items: flex-start;
+      .search-input{
+        width:100%;
+      }
+
+      .posts-grid{
+        grid-template-columns:1fr;
+      }
+
+      .post-body{
+        padding:18px;
       }
     }
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <a class="brand" href="index.html">
-        <img class="brand-logo" src="bilder/New_Home_Assistant_logo.svg.png" alt="HausKI Logo" />
-        <div class="brand-text">
-          <strong>HausKI</strong>
-          <span>Mein intelligentes Zuhause</span>
-        </div>
-      </a>
+  <div class="page-shell">
 
-      <nav class="nav-links">
-        <a href="index.html">Start</a>
-        <a href="ueber.html">Über</a>
-        <a href="blog.html" class="active">Blog</a>
-        <a href="roadmap.html">Roadmap</a>
-        <a href="admin.html">Admin</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
     <section class="hero">
-      <div class="container">
-        <div class="hero-box">
-          <div class="eyebrow">HausKI Updates &amp; Artikel</div>
-          <h1>Blog und LinkedIn an einem Ort</h1>
-          <p>
-            Hier sammle ich Projektberichte, echte Praxiserfahrungen, Dashboard-Updates,
-            Automationen, Fehleranalysen und Gedanken rund um Smart Home, Energie und HausKI.
-            Kurze Updates erscheinen im LinkedIn-Stil, ausführlichere Inhalte als Blogartikel.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="post-section">
-      <div class="container">
-        <div class="toolbar">
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="all">Alle</button>
-            <button class="filter-btn" data-filter="linkedin">LinkedIn</button>
-            <button class="filter-btn" data-filter="blog">Blog</button>
+      <div class="hero-top">
+        <div class="brand">
+          <div class="brand-logo">
+            <img src="bilder/New_Home_Assistant_logo.svg.png" alt="HausKI Logo">
           </div>
-
-          <div class="count-info" id="countInfo">0 Beiträge</div>
+          <div class="hero-text">
+            <h1>HausKI Blog</h1>
+            <p>
+              Hier findest du eigene Blogbeiträge, ausgewählte LinkedIn-Posts und technische Einblicke
+              rund um Smart Home, Energie, Automationen und HausKI.
+            </p>
+          </div>
         </div>
 
-        <div class="post-grid" id="postGrid"></div>
-
-        <div class="empty-state" id="emptyState">
-          Die Beiträge konnten gerade nicht geladen werden.
+        <div class="hero-actions">
+          <a class="hero-btn" href="index.html">Zur Startseite</a>
+          <a class="hero-btn primary" href="admin.html">Zur Adminseite</a>
         </div>
       </div>
     </section>
-  </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      © 2026 HausKI – Smart Home, Energie und echte Praxis.
+    <div class="toolbar">
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Alle</button>
+        <button class="filter-btn" data-filter="linkedin">LinkedIn</button>
+        <button class="filter-btn" data-filter="blog">Blog</button>
+      </div>
+
+      <div class="toolbar-right">
+        <div class="count" id="postCount">0 Beiträge</div>
+        <div class="search-wrap">
+          <input
+            id="searchInput"
+            class="search-input"
+            type="text"
+            placeholder="Beiträge durchsuchen ..."
+          />
+        </div>
+      </div>
     </div>
-  </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
+    <div id="statusBox" class="status-box">
+      <h2>Beiträge werden geladen ...</h2>
+      <p>Bitte kurz warten.</p>
+    </div>
+
+    <div id="postsGrid" class="posts-grid" hidden></div>
+
+    <div id="emptyState" class="empty-state" hidden>
+      <h2>Keine Beiträge gefunden</h2>
+      <p>Für den aktuellen Filter oder Suchbegriff gibt es noch keine Einträge.</p>
+    </div>
+  </div>
 
   <script>
-    let posts = [];
-
-    const grid = document.getElementById("postGrid");
-    const countInfo = document.getElementById("countInfo");
-    const emptyState = document.getElementById("emptyState");
+    const postsGrid = document.getElementById("postsGrid");
+    const postCount = document.getElementById("postCount");
+    const searchInput = document.getElementById("searchInput");
     const filterButtons = document.querySelectorAll(".filter-btn");
+    const statusBox = document.getElementById("statusBox");
+    const emptyState = document.getElementById("emptyState");
 
+    let allPosts = [];
     let activeFilter = "all";
+    let searchTerm = "";
 
     function formatDate(dateString) {
       if (!dateString) return "";
       const date = new Date(dateString);
       if (Number.isNaN(date.getTime())) return dateString;
-      return date.toLocaleDateString("de-AT", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
+      return date.toLocaleDateString("de-DE");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function normalize(value) {
+      return String(value || "")
+        .toLowerCase()
+        .trim();
+    }
+
+    function sortPosts(posts) {
+      return [...posts].sort((a, b) => {
+        const dateA = new Date(a.date || 0).getTime();
+        const dateB = new Date(b.date || 0).getTime();
+        return dateB - dateA;
       });
     }
 
-    function getTypeLabel(type) {
-      return type === "linkedin" ? "LinkedIn" : "Blog";
-    }
+    function renderPostCard(post) {
+      const imageHtml = post.image && post.image.trim() !== ""
+        ? `<img class="post-cover" src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" onerror="this.parentElement.innerHTML='<div class=&quot;post-cover-placeholder&quot;>Bild konnte nicht geladen werden.</div>';">`
+        : `<div class="post-cover-placeholder">Noch kein Bild hinterlegt.</div>`;
 
-    function getTypeBadgeClass(type) {
-      return type === "linkedin" ? "badge-linkedin" : "badge-blog";
-    }
+      const tags = Array.isArray(post.tags) ? post.tags : [];
+      const sourceLabel = post.source === "linkedin" ? "LinkedIn" : "Blog";
+      const footerSource = post.source === "linkedin" ? "LinkedIn" : "HausKI Blog";
+      const material = post.material && String(post.material).trim() !== "" ? post.material : "-";
 
-    function createPostCard(post) {
-      const card = document.createElement("article");
-      card.className = "post-card";
-
-      const imageHtml = post.image
-        ? `
-          <img class="post-image" src="${post.image}" alt="${post.title}">
-          <div class="post-image-fallback">Bild konnte nicht geladen werden.</div>
-        `
-        : `
-          <div class="post-image-fallback" style="display:flex;">Noch kein Bild hinterlegt.</div>
-        `;
-
-      card.innerHTML = `
-        <div class="post-image-wrap">
-          <div class="post-badge ${getTypeBadgeClass(post.type)}">${getTypeLabel(post.type)}</div>
-          ${imageHtml}
-        </div>
-
-        <div class="post-content">
-          <div class="meta-row">
-            <span class="meta-pill">${formatDate(post.date)}</span>
-            <span class="meta-pill">${post.category || "Allgemein"}</span>
+      return `
+        <article class="post-card">
+          <div class="post-image-wrap">
+            ${imageHtml}
+            <span class="post-type">${escapeHtml(sourceLabel)}</span>
           </div>
 
-          <h2 class="post-title">${post.title || ""}</h2>
-          <p class="post-excerpt">${post.excerpt || ""}</p>
+          <div class="post-body">
+            <div class="post-meta">
+              ${post.date ? `<span>${escapeHtml(formatDate(post.date))}</span>` : ""}
+              ${post.category ? `<span>${escapeHtml(post.category)}</span>` : ""}
+              ${tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+            </div>
 
-          <div class="material-box">
-            <strong>Verwendetes Material:</strong><br>
-            ${post.material || "-"}
-          </div>
+            <h2 class="post-title">${escapeHtml(post.title || "Ohne Titel")}</h2>
+            <p class="post-excerpt">${escapeHtml(post.excerpt || "")}</p>
 
-          <div class="post-footer">
-            <a class="read-more" href="post.html?id=${post.id}">Mehr lesen</a>
-            <span class="source-label">
-              ${post.source === "linkedin" ? "Quelle: LinkedIn" : "HausKI Blog"}
-            </span>
+            <div class="material-box">
+              <strong>Verwendetes Material:</strong>
+              <span>${escapeHtml(material)}</span>
+            </div>
+
+            <div class="post-footer">
+              <a class="post-link" href="post.html?id=${encodeURIComponent(post.id)}">Mehr lesen</a>
+              <span class="post-source">${escapeHtml(footerSource)}</span>
+            </div>
           </div>
-        </div>
+        </article>
       `;
+    }
 
-      const image = card.querySelector(".post-image");
-      const fallback = card.querySelector(".post-image-fallback");
+    function filterPosts() {
+      let filtered = [...allPosts];
 
-      if (image && fallback) {
-        image.onerror = () => {
-          image.style.display = "none";
-          fallback.style.display = "flex";
-        };
+      if (activeFilter !== "all") {
+        filtered = filtered.filter(post => normalize(post.source) === activeFilter);
       }
 
-      return card;
+      if (searchTerm) {
+        filtered = filtered.filter(post => {
+          const tags = Array.isArray(post.tags) ? post.tags.join(" ") : "";
+          const haystack = [
+            post.title,
+            post.excerpt,
+            post.category,
+            post.material,
+            post.content,
+            tags
+          ].join(" ").toLowerCase();
+
+          return haystack.includes(searchTerm);
+        });
+      }
+
+      return sortPosts(filtered);
+    }
+
+    function updateCount(count) {
+      postCount.textContent = `${count} ${count === 1 ? "Beitrag" : "Beiträge"}`;
     }
 
     function renderPosts() {
-      grid.innerHTML = "";
+      const filtered = filterPosts();
 
-      const visiblePosts = posts
-        .filter(post => post.published !== false)
-        .filter(post => activeFilter === "all" ? true : post.type === activeFilter)
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
+      updateCount(filtered.length);
 
-      countInfo.textContent = `${visiblePosts.length} ${visiblePosts.length === 1 ? "Beitrag" : "Beiträge"}`;
-
-      if (visiblePosts.length === 0) {
-        emptyState.style.display = "block";
-        emptyState.textContent = "Aktuell sind noch keine Beiträge vorhanden.";
+      if (!allPosts.length) {
+        statusBox.hidden = false;
+        statusBox.innerHTML = `
+          <h2>Noch keine Beiträge vorhanden</h2>
+          <p>Lege zuerst in der Adminseite Beiträge an und exportiere danach die posts.json.</p>
+        `;
+        postsGrid.hidden = true;
+        emptyState.hidden = true;
         return;
       }
 
-      emptyState.style.display = "none";
+      statusBox.hidden = true;
 
-      visiblePosts.forEach(post => {
-        grid.appendChild(createPostCard(post));
-      });
+      if (!filtered.length) {
+        postsGrid.hidden = true;
+        emptyState.hidden = false;
+        return;
+      }
+
+      emptyState.hidden = true;
+      postsGrid.hidden = false;
+      postsGrid.innerHTML = filtered.map(renderPostCard).join("");
     }
 
     async function loadPosts() {
       try {
-        if (!window.supabaseClient) {
-          throw new Error("Supabase Client wurde nicht geladen.");
+        const response = await fetch("posts.json?v=" + Date.now());
+
+        if (!response.ok) {
+          throw new Error("posts.json konnte nicht geladen werden.");
         }
 
-        const { data, error } = await window.supabaseClient
-          .from("posts")
-          .select("*")
-          .order("date", { ascending: false });
+        const data = await response.json();
 
-        if (error) {
-          throw error;
+        if (!Array.isArray(data)) {
+          throw new Error("posts.json muss ein Array enthalten.");
         }
 
-        posts = Array.isArray(data) ? data : [];
+        allPosts = sortPosts(data);
         renderPosts();
       } catch (error) {
-        console.error("Fehler beim Laden der Beiträge:", error);
-        countInfo.textContent = "0 Beiträge";
-        emptyState.style.display = "block";
-        emptyState.textContent = `Die Beiträge konnten gerade nicht geladen werden. (${error.message})`;
+        console.error(error);
+        statusBox.hidden = false;
+        statusBox.innerHTML = `
+          <h2>Beiträge konnten nicht geladen werden</h2>
+          <p>Prüfe bitte, ob die Datei <strong>posts.json</strong> im Hauptverzeichnis liegt und gültiges JSON enthält.</p>
+        `;
+        postsGrid.hidden = true;
+        emptyState.hidden = true;
+        updateCount(0);
       }
     }
 
@@ -662,6 +688,11 @@
         activeFilter = button.dataset.filter;
         renderPosts();
       });
+    });
+
+    searchInput.addEventListener("input", (event) => {
+      searchTerm = event.target.value.trim().toLowerCase();
+      renderPosts();
     });
 
     loadPosts();
