@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HausKI Admin</title>
-  <meta name="robots" content="noindex,nofollow" />
-  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png" />
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png">
 
   <style>
     *{
@@ -13,150 +13,171 @@
     }
 
     :root{
-      --bg:#040b14;
-      --bg2:#07111d;
-      --panel:#081320;
-      --panel-soft:#0d1826;
-      --card:#0a1624;
-      --line:rgba(70,150,220,0.16);
-      --line-strong:rgba(74,170,255,0.28);
-      --text:#eaf4ff;
-      --muted:#9fb5cc;
-      --accent:#30b8ff;
-      --accent-soft:rgba(48,184,255,0.12);
-      --success:#5dd89b;
-      --warning:#ffcb6b;
-      --danger:#ff7c90;
-      --shadow:0 18px 40px rgba(0,0,0,0.28);
-      --radius:20px;
-      --max:1280px;
+      --bg:#040911;
+      --bg2:#0a1320;
+      --card:rgba(11,22,37,0.85);
+      --card-strong:rgba(9,18,31,0.94);
+      --line:rgba(33,200,255,0.18);
+      --text:#ecf6ff;
+      --muted:#9db2c9;
+      --accent:#21c8ff;
+      --accent2:#6af0c7;
+      --danger:#ff809a;
+      --warn:#ffd36c;
+      --success:#7be0b3;
+      --shadow:0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    html{
+      scroll-behavior:smooth;
     }
 
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
-      color:var(--text);
       background:
-        radial-gradient(circle at top center, rgba(26,107,173,0.16), transparent 34%),
-        linear-gradient(180deg, #040b14 0%, #020812 100%);
-      min-height:100vh;
+        radial-gradient(circle at 20% 10%, rgba(33,200,255,0.14), transparent 24%),
+        radial-gradient(circle at 80% 0%, rgba(106,240,199,0.08), transparent 20%),
+        linear-gradient(180deg,#050911 0%,#09111d 45%,#050911 100%);
+      color:var(--text);
     }
 
-    a{
-      color:inherit;
-      text-decoration:none;
-    }
-
-    button,
-    input,
-    textarea,
-    select{
-      font:inherit;
-    }
-
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:50;
-      background:rgba(4,10,17,0.92);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(255,255,255,0.04);
-    }
-
-    .topbar-inner{
-      width:min(calc(100% - 32px), var(--max));
-      margin:0 auto;
-      min-height:78px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:20px;
-    }
-
-    .logo{
-      font-size:2rem;
-      font-weight:800;
-      letter-spacing:-0.04em;
-      color:#e9f5ff;
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size:26px 26px;
+      pointer-events:none;
+      mask-image:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+      z-index:0;
     }
 
     .nav{
+      position:sticky;
+      top:0;
+      left:0;
+      width:100%;
+      background:rgba(6,15,26,0.82);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(255,255,255,0.06);
       display:flex;
-      gap:22px;
-      flex-wrap:wrap;
-    }
-
-    .nav a{
-      color:#dcecff;
-      transition:color .18s ease;
-    }
-
-    .nav a:hover{
-      color:var(--accent);
-    }
-
-    .page{
-      width:min(calc(100% - 32px), var(--max));
-      margin:0 auto;
-      padding:30px 0 54px;
-    }
-
-    .admin-head{
-      margin-bottom:22px;
-    }
-
-    .eyebrow{
-      display:inline-flex;
+      justify-content:space-between;
       align-items:center;
-      min-height:34px;
-      padding:0 14px;
-      border-radius:999px;
-      border:1px solid var(--line-strong);
-      background:var(--accent-soft);
+      padding:16px 28px;
+      box-shadow:0 5px 20px rgba(0,0,0,0.25);
+      z-index:100;
+    }
+
+    .nav-logo{
+      font-size:18px;
+      font-weight:bold;
       color:var(--accent);
-      font-size:0.9rem;
-      letter-spacing:0.03em;
-      text-transform:uppercase;
-      margin-bottom:12px;
+      letter-spacing:0.5px;
+      text-decoration:none;
     }
 
-    h1{
-      margin:0 0 10px;
-      font-size:clamp(2rem, 4vw, 3rem);
-      line-height:1.02;
-      letter-spacing:-0.05em;
+    .nav-links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:18px;
     }
 
-    .admin-sub{
-      margin:0;
-      color:var(--muted);
-      max-width:860px;
-      line-height:1.75;
-      font-size:1.03rem;
+    .nav-links a{
+      color:#e6f2ff;
+      text-decoration:none;
+      font-size:14px;
+      white-space:nowrap;
+      transition:0.2s;
     }
 
-    .layout{
-      display:grid;
-      grid-template-columns:1.1fr 0.9fr;
-      gap:22px;
-      align-items:start;
+    .nav-links a:hover,
+    .nav-links a.active{
+      color:var(--accent);
+    }
+
+    .container{
+      width:min(1180px, calc(100% - 32px));
+      margin:0 auto;
+      position:relative;
+      z-index:1;
     }
 
     .panel{
-      background:linear-gradient(180deg, rgba(8,19,32,0.96), rgba(6,16,27,0.98));
+      background:var(--card);
       border:1px solid var(--line);
       border-radius:22px;
       box-shadow:var(--shadow);
     }
 
+    .hero{
+      padding:40px 0 22px;
+    }
+
+    .hero-box{
+      padding:30px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-box::after{
+      content:"";
+      position:absolute;
+      right:-120px;
+      top:-120px;
+      width:320px;
+      height:320px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(33,200,255,0.16), transparent 65%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(33,200,255,0.08);
+      border:1px solid rgba(33,200,255,0.18);
+      color:var(--accent);
+      font-size:12px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+
+    h1{
+      font-size:clamp(34px,5vw,52px);
+      line-height:1.03;
+      margin:0 0 16px;
+      letter-spacing:-1.8px;
+      max-width:14ch;
+    }
+
+    .hero-text{
+      color:var(--muted);
+      font-size:17px;
+      line-height:1.75;
+      max-width:70ch;
+      margin:0;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:1.08fr 0.92fr;
+      gap:18px;
+      margin-bottom:48px;
+    }
+
     .panel-head{
-      padding:20px 20px 0;
+      padding:24px 24px 0;
     }
 
     .panel-head h2{
-      margin:0 0 8px;
-      font-size:1.55rem;
-      color:#fff;
+      margin:0 0 10px;
+      font-size:28px;
+      letter-spacing:-0.8px;
     }
 
     .panel-head p{
@@ -166,32 +187,32 @@
     }
 
     .panel-body{
-      padding:20px;
+      padding:24px;
     }
 
     .status-bar{
       margin-bottom:18px;
       padding:14px 16px;
       border-radius:16px;
-      border:1px solid rgba(92,170,235,0.12);
-      background:rgba(255,255,255,0.02);
-      color:#d8ebff;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.03);
+      color:var(--text);
       line-height:1.6;
     }
 
     .status-bar.success{
-      border-color:rgba(93,216,155,0.22);
-      color:#dcffec;
+      border-color:rgba(123,224,179,0.28);
+      color:#dffff0;
     }
 
     .status-bar.warn{
-      border-color:rgba(255,203,107,0.22);
-      color:#fff1cc;
+      border-color:rgba(255,211,108,0.28);
+      color:#fff4d0;
     }
 
     .status-bar.error{
-      border-color:rgba(255,124,144,0.22);
-      color:#ffe0e5;
+      border-color:rgba(255,128,154,0.28);
+      color:#ffe0e8;
     }
 
     form{
@@ -201,13 +222,13 @@
 
     .grid-2{
       display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
+      grid-template-columns:repeat(2,1fr);
       gap:16px;
     }
 
     .grid-3{
       display:grid;
-      grid-template-columns:repeat(3, minmax(0, 1fr));
+      grid-template-columns:repeat(3,1fr);
       gap:16px;
     }
 
@@ -219,7 +240,7 @@
 
     .field label{
       font-weight:700;
-      color:#f2f8ff;
+      color:var(--text);
     }
 
     .field input,
@@ -229,8 +250,8 @@
       border:none;
       outline:none;
       color:#fff;
-      background:rgba(255,255,255,0.02);
-      border:1px solid rgba(92,170,235,0.12);
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.10);
       border-radius:16px;
       padding:14px 15px;
       transition:border-color .18s ease;
@@ -239,7 +260,7 @@
     .field input:focus,
     .field textarea:focus,
     .field select:focus{
-      border-color:rgba(92,170,235,0.34);
+      border-color:var(--accent);
     }
 
     .field textarea{
@@ -249,9 +270,9 @@
     }
 
     .hint{
-      color:#86a7c8;
-      font-size:0.9rem;
-      line-height:1.55;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
     }
 
     .actions{
@@ -261,38 +282,42 @@
       margin-top:4px;
     }
 
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
+    .btn,
+    .small-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       min-height:42px;
       padding:0 16px;
-      border-radius:999px;
-      font-weight:700;
-      color:#fff;
-      border:1px solid rgba(92,170,235,0.22);
-      background:rgba(48,184,255,0.10);
-      transition:all .18s ease;
+      border-radius:12px;
+      text-decoration:none;
+      color:var(--text);
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.10);
+      transition:.2s;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
     }
 
-    .btn:hover{
-      border-color:rgba(92,170,235,0.42);
-      background:rgba(48,184,255,0.16);
+    .btn:hover,
+    .small-btn:hover{
+      transform:translateY(-2px);
+      border-color:var(--accent);
+      color:var(--accent);
     }
 
     .btn.success{
-      border-color:rgba(93,216,155,0.24);
-      background:rgba(93,216,155,0.12);
+      border-color:rgba(123,224,179,0.28);
     }
 
     .btn.warn{
-      border-color:rgba(255,203,107,0.24);
-      background:rgba(255,203,107,0.12);
+      border-color:rgba(255,211,108,0.28);
     }
 
-    .btn.danger{
-      border-color:rgba(255,124,144,0.24);
-      background:rgba(255,124,144,0.12);
+    .btn.danger,
+    .small-btn.danger{
+      border-color:rgba(255,128,154,0.28);
     }
 
     .list-toolbar{
@@ -305,23 +330,24 @@
     }
 
     .list-count{
-      color:#d9ebff;
-      font-weight:700;
+      color:var(--text);
+      font-weight:600;
+      font-size:14px;
     }
 
     .mini-search{
       width:min(300px, 100%);
       min-height:42px;
       padding:0 14px;
-      border-radius:999px;
-      border:1px solid rgba(92,170,235,0.12);
-      background:rgba(255,255,255,0.02);
-      color:#fff;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.03);
+      color:var(--text);
       outline:none;
     }
 
     .mini-search:focus{
-      border-color:rgba(92,170,235,0.34);
+      border-color:var(--accent);
     }
 
     .post-list{
@@ -330,15 +356,15 @@
     }
 
     .post-item{
-      padding:15px;
-      border-radius:16px;
-      background:rgba(255,255,255,0.02);
-      border:1px solid rgba(92,170,235,0.10);
+      padding:18px;
+      border-radius:18px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.08);
     }
 
     .post-item h3{
-      margin:0 0 8px;
-      font-size:1.08rem;
+      margin:0 0 10px;
+      font-size:20px;
       line-height:1.35;
       color:#fff;
     }
@@ -347,7 +373,7 @@
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
 
     .badge{
@@ -356,16 +382,16 @@
       min-height:30px;
       padding:0 10px;
       border-radius:999px;
-      font-size:0.85rem;
-      color:#d8ebff;
-      border:1px solid rgba(92,170,235,0.14);
-      background:rgba(48,184,255,0.06);
+      background:rgba(33,200,255,0.08);
+      border:1px solid rgba(33,200,255,0.18);
+      color:#dff7ff;
+      font-size:12px;
     }
 
     .post-item p{
-      margin:0 0 12px;
-      color:#d1e2f2;
-      line-height:1.65;
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.7;
     }
 
     .post-actions{
@@ -374,81 +400,87 @@
       flex-wrap:wrap;
     }
 
-    .small-btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      min-height:38px;
-      padding:0 14px;
-      border-radius:999px;
-      font-weight:700;
-      color:#fff;
-      border:1px solid rgba(92,170,235,0.18);
-      background:rgba(48,184,255,0.08);
-    }
-
-    .small-btn.danger{
-      border-color:rgba(255,124,144,0.20);
-      background:rgba(255,124,144,0.10);
-    }
-
     .empty-list{
       padding:18px;
-      border-radius:16px;
+      border-radius:18px;
       text-align:center;
-      color:#cfe2f4;
-      border:1px dashed rgba(92,170,235,0.12);
+      color:var(--muted);
+      border:1px dashed rgba(255,255,255,0.12);
       background:rgba(255,255,255,0.02);
     }
 
-    @media (max-width: 1080px){
+    .footer{
+      padding:24px 0 60px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .footer-line{
+      border-top:1px solid rgba(255,255,255,0.08);
+      padding-top:22px;
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    @media (max-width:1024px){
       .layout{
         grid-template-columns:1fr;
       }
     }
 
-    @media (max-width: 760px){
-      .topbar-inner,
-      .page{
-        width:min(calc(100% - 20px), var(--max));
-      }
-
-      .topbar-inner{
-        min-height:auto;
-        padding:14px 0;
+    @media (max-width:640px){
+      .nav{
+        padding:14px 16px;
         align-items:flex-start;
         flex-direction:column;
+        gap:12px;
+      }
+
+      .hero-box,
+      .panel-head,
+      .panel-body{
+        padding-left:20px;
+        padding-right:20px;
       }
 
       .grid-2,
       .grid-3{
         grid-template-columns:1fr;
       }
+
+      .mini-search{
+        width:100%;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="logo" href="index.html">HausKI</a>
 
-      <nav class="nav">
-        <a href="index.html">Start</a>
-        <a href="blog.html">Blog</a>
-      </nav>
+  <nav class="nav">
+    <a class="nav-logo" href="index.html">HausKI</a>
+    <div class="nav-links">
+      <a href="index.html">Start</a>
+      <a href="blog.html">Blog</a>
+      <a href="admin.html" class="active">Admin</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <div class="panel hero-box">
+        <div class="eyebrow">Intern · Beitragsverwaltung</div>
+        <h1>Beiträge pflegen und exportieren.</h1>
+        <p class="hero-text">
+          Dieser Bereich ist nur für die interne Pflege deiner HausKI-Beiträge gedacht.
+          Hier legst du Blog- oder LinkedIn-Einträge an, bearbeitest sie und exportierst danach die posts.json.
+        </p>
+      </div>
     </div>
   </header>
 
-  <main class="page">
-    <section class="admin-head">
-      <span class="eyebrow">Intern · Admin</span>
-      <h1>Beiträge pflegen und exportieren.</h1>
-      <p class="admin-sub">
-        Dieser Bereich ist nur für die interne Pflege deiner HausKI-Beiträge gedacht.
-        Hier legst du Blog- oder LinkedIn-Einträge an, bearbeitest sie und exportierst anschließend die <strong>posts.json</strong>.
-      </p>
-    </section>
-
+  <main class="container">
     <div class="layout">
       <section class="panel">
         <div class="panel-head">
@@ -462,17 +494,17 @@
           </div>
 
           <form id="postForm">
-            <input type="hidden" id="editingId" value="" />
+            <input type="hidden" id="editingId" value="">
 
             <div class="grid-2">
               <div class="field">
                 <label for="title">Titel</label>
-                <input id="title" type="text" placeholder="z. B. Tedee Smart Lock in HausKI integriert" required />
+                <input id="title" type="text" placeholder="z. B. Tedee Smart Lock in HausKI integriert" required>
               </div>
 
               <div class="field">
                 <label for="slug">ID / Slug</label>
-                <input id="slug" type="text" placeholder="wird automatisch erzeugt" />
+                <input id="slug" type="text" placeholder="wird automatisch erzeugt">
                 <div class="hint">Wird für <code>post.html?id=...</code> verwendet.</div>
               </div>
             </div>
@@ -480,7 +512,7 @@
             <div class="grid-3">
               <div class="field">
                 <label for="date">Datum</label>
-                <input id="date" type="date" />
+                <input id="date" type="date">
               </div>
 
               <div class="field">
@@ -493,20 +525,20 @@
 
               <div class="field">
                 <label for="category">Kategorie</label>
-                <input id="category" type="text" placeholder="z. B. Automation" />
+                <input id="category" type="text" placeholder="z. B. Automation">
               </div>
             </div>
 
             <div class="grid-2">
               <div class="field">
                 <label for="tags">Tags</label>
-                <input id="tags" type="text" placeholder="z. B. Tedee, Sicherheit, Einbau" />
+                <input id="tags" type="text" placeholder="z. B. Tedee, Sicherheit, Einbau">
                 <div class="hint">Mehrere Tags mit Beistrich trennen.</div>
               </div>
 
               <div class="field">
                 <label for="image">Bildpfad</label>
-                <input id="image" type="text" placeholder="z. B. blog-images/tedee-smart-lock.jpg" />
+                <input id="image" type="text" placeholder="z. B. blog-images/tedee-smart-lock.jpg">
               </div>
             </div>
 
@@ -517,7 +549,7 @@
 
             <div class="field">
               <label for="material">Verwendetes Material</label>
-              <input id="material" type="text" placeholder="z. B. Tedee 2 Go, Keypad, Türkontakt" />
+              <input id="material" type="text" placeholder="z. B. Tedee 2 Go, Keypad, Türkontakt">
             </div>
 
             <div class="field">
@@ -545,7 +577,7 @@
         <div class="panel-body">
           <div class="list-toolbar">
             <div class="list-count" id="listCount">0 Beiträge lokal gespeichert</div>
-            <input id="listSearch" class="mini-search" type="text" placeholder="Beiträge filtern ..." />
+            <input id="listSearch" class="mini-search" type="text" placeholder="Beiträge filtern ...">
           </div>
 
           <div id="postList" class="post-list"></div>
@@ -553,6 +585,13 @@
       </section>
     </div>
   </main>
+
+  <footer class="footer container">
+    <div class="footer-line">
+      <div>© 2026 HausKI • Günther Hochreiter</div>
+      <div>Interner Bereich • Beitragsverwaltung</div>
+    </div>
+  </footer>
 
   <script>
     const STORAGE_KEY = "hauski_posts";
