@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HausKI Admin</title>
-  <meta name="description" content="HausKI Blog Adminbereich" />
+  <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png" />
 
   <style>
@@ -13,24 +13,23 @@
     }
 
     :root{
-      --bg:#04111d;
-      --bg2:#081c30;
-      --card:rgba(8,21,36,0.94);
-      --card-2:rgba(10,25,43,0.96);
-      --line:rgba(78,170,255,0.18);
-      --line-strong:rgba(95,185,255,0.42);
-      --text:#eef7ff;
-      --muted:#9cbddb;
-      --soft:#d8ebff;
-      --accent:#4aa8ff;
-      --accent-2:#84d6ff;
-      --danger:#ff6b81;
-      --danger-2:#ff8e9d;
-      --success:#61d69c;
+      --bg:#040b14;
+      --bg2:#07111d;
+      --panel:#081320;
+      --panel-soft:#0d1826;
+      --card:#0a1624;
+      --line:rgba(70,150,220,0.16);
+      --line-strong:rgba(74,170,255,0.28);
+      --text:#eaf4ff;
+      --muted:#9fb5cc;
+      --accent:#30b8ff;
+      --accent-soft:rgba(48,184,255,0.12);
+      --success:#5dd89b;
       --warning:#ffcb6b;
-      --radius:24px;
+      --danger:#ff7c90;
       --shadow:0 18px 40px rgba(0,0,0,0.28);
-      --max:1380px;
+      --radius:20px;
+      --max:1280px;
     }
 
     body{
@@ -38,9 +37,8 @@
       font-family:Arial, Helvetica, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(27,93,163,0.24), transparent 28%),
-        radial-gradient(circle at top right, rgba(0,186,255,0.10), transparent 20%),
-        linear-gradient(180deg, #04111d 0%, #020914 100%);
+        radial-gradient(circle at top center, rgba(26,107,173,0.16), transparent 34%),
+        linear-gradient(180deg, #040b14 0%, #020812 100%);
       min-height:100vh;
     }
 
@@ -56,170 +54,144 @@
       font:inherit;
     }
 
-    .page-shell{
-      width:min(calc(100% - 32px), var(--max));
-      margin:0 auto;
-      padding:28px 0 60px;
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:rgba(4,10,17,0.92);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,0.04);
     }
 
-    .topbar{
+    .topbar-inner{
+      width:min(calc(100% - 32px), var(--max));
+      margin:0 auto;
+      min-height:78px;
       display:flex;
-      justify-content:space-between;
       align-items:center;
-      gap:16px;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .logo{
+      font-size:2rem;
+      font-weight:800;
+      letter-spacing:-0.04em;
+      color:#e9f5ff;
+    }
+
+    .nav{
+      display:flex;
+      gap:22px;
       flex-wrap:wrap;
+    }
+
+    .nav a{
+      color:#dcecff;
+      transition:color .18s ease;
+    }
+
+    .nav a:hover{
+      color:var(--accent);
+    }
+
+    .page{
+      width:min(calc(100% - 32px), var(--max));
+      margin:0 auto;
+      padding:30px 0 54px;
+    }
+
+    .admin-head{
       margin-bottom:22px;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
-
-    .brand-logo{
-      width:54px;
-      height:54px;
-      border-radius:16px;
-      background:
-        linear-gradient(135deg, rgba(69,182,255,0.18), rgba(0,0,0,0)),
-        rgba(8,20,35,0.96);
-      border:1px solid rgba(89,181,255,0.28);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      box-shadow:0 0 20px rgba(39,130,210,0.16);
-      flex-shrink:0;
-    }
-
-    .brand-logo img{
-      width:74%;
-      height:74%;
-      object-fit:contain;
-    }
-
-    .brand-text strong{
-      display:block;
-      font-size:1.2rem;
-      margin-bottom:4px;
-    }
-
-    .brand-text span{
-      color:var(--muted);
-      font-size:0.96rem;
-    }
-
-    .top-actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
+    .eyebrow{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      min-height:46px;
-      padding:0 18px;
+      min-height:34px;
+      padding:0 14px;
       border-radius:999px;
-      font-weight:700;
-      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease;
-      color:#fff;
-      border:1px solid rgba(105,193,255,0.24);
-      background:linear-gradient(180deg, rgba(15,41,67,0.95), rgba(8,24,40,0.96));
+      border:1px solid var(--line-strong);
+      background:var(--accent-soft);
+      color:var(--accent);
+      font-size:0.9rem;
+      letter-spacing:0.03em;
+      text-transform:uppercase;
+      margin-bottom:12px;
     }
 
-    .btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 12px 24px rgba(0,0,0,0.22);
-      border-color:rgba(136,212,255,0.44);
+    h1{
+      margin:0 0 10px;
+      font-size:clamp(2rem, 4vw, 3rem);
+      line-height:1.02;
+      letter-spacing:-0.05em;
     }
 
-    .btn.primary{
-      background:linear-gradient(180deg, rgba(21,96,159,0.96), rgba(9,60,106,0.96));
-      border-color:rgba(121,204,255,0.44);
-    }
-
-    .btn.success{
-      background:linear-gradient(180deg, rgba(30,116,79,0.96), rgba(14,80,53,0.96));
-      border-color:rgba(105,223,163,0.40);
-    }
-
-    .btn.warn{
-      background:linear-gradient(180deg, rgba(138,96,18,0.96), rgba(98,66,10,0.96));
-      border-color:rgba(255,210,104,0.36);
-    }
-
-    .btn.danger{
-      background:linear-gradient(180deg, rgba(148,47,69,0.96), rgba(108,28,44,0.96));
-      border-color:rgba(255,143,157,0.36);
+    .admin-sub{
+      margin:0;
+      color:var(--muted);
+      max-width:860px;
+      line-height:1.75;
+      font-size:1.03rem;
     }
 
     .layout{
       display:grid;
-      grid-template-columns:1.05fr 0.95fr;
-      gap:24px;
+      grid-template-columns:1.1fr 0.9fr;
+      gap:22px;
       align-items:start;
     }
 
-    .card{
-      background:linear-gradient(180deg, rgba(7,20,35,0.95), rgba(5,16,28,0.98));
+    .panel{
+      background:linear-gradient(180deg, rgba(8,19,32,0.96), rgba(6,16,27,0.98));
       border:1px solid var(--line);
-      border-radius:28px;
+      border-radius:22px;
       box-shadow:var(--shadow);
-      overflow:hidden;
     }
 
-    .card-head{
-      padding:22px 24px 0;
+    .panel-head{
+      padding:20px 20px 0;
     }
 
-    .card-head h2{
+    .panel-head h2{
       margin:0 0 8px;
-      font-size:1.5rem;
+      font-size:1.55rem;
       color:#fff;
     }
 
-    .card-head p{
+    .panel-head p{
       margin:0;
       color:var(--muted);
       line-height:1.7;
     }
 
-    .card-body{
-      padding:24px;
+    .panel-body{
+      padding:20px;
     }
 
     .status-bar{
-      margin-bottom:20px;
+      margin-bottom:18px;
       padding:14px 16px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,0.08);
-      background:rgba(9,23,38,0.76);
-      color:#dceeff;
+      border-radius:16px;
+      border:1px solid rgba(92,170,235,0.12);
+      background:rgba(255,255,255,0.02);
+      color:#d8ebff;
       line-height:1.6;
     }
 
     .status-bar.success{
-      border-color:rgba(105,223,163,0.28);
-      color:#d9ffe9;
-      background:rgba(18,52,37,0.52);
+      border-color:rgba(93,216,155,0.22);
+      color:#dcffec;
     }
 
     .status-bar.warn{
-      border-color:rgba(255,210,104,0.28);
-      color:#fff0c9;
-      background:rgba(66,49,15,0.48);
+      border-color:rgba(255,203,107,0.22);
+      color:#fff1cc;
     }
 
     .status-bar.error{
-      border-color:rgba(255,143,157,0.28);
-      color:#ffe1e6;
-      background:rgba(69,20,30,0.46);
+      border-color:rgba(255,124,144,0.22);
+      color:#ffe0e5;
     }
 
     form{
@@ -257,18 +229,17 @@
       border:none;
       outline:none;
       color:#fff;
-      background:rgba(8,21,35,0.96);
-      border:1px solid rgba(87,174,255,0.16);
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(92,170,235,0.12);
       border-radius:16px;
       padding:14px 15px;
-      transition:border-color .18s ease, box-shadow .18s ease;
+      transition:border-color .18s ease;
     }
 
     .field input:focus,
     .field textarea:focus,
     .field select:focus{
-      border-color:rgba(115,199,255,0.50);
-      box-shadow:0 0 0 3px rgba(59,147,220,0.12);
+      border-color:rgba(92,170,235,0.34);
     }
 
     .field textarea{
@@ -278,25 +249,59 @@
     }
 
     .hint{
-      color:#84a9ca;
+      color:#86a7c8;
       font-size:0.9rem;
-      line-height:1.6;
+      line-height:1.55;
     }
 
-    .inline-actions{
+    .actions{
       display:flex;
-      gap:12px;
       flex-wrap:wrap;
-      margin-top:8px;
+      gap:10px;
+      margin-top:4px;
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      min-height:42px;
+      padding:0 16px;
+      border-radius:999px;
+      font-weight:700;
+      color:#fff;
+      border:1px solid rgba(92,170,235,0.22);
+      background:rgba(48,184,255,0.10);
+      transition:all .18s ease;
+    }
+
+    .btn:hover{
+      border-color:rgba(92,170,235,0.42);
+      background:rgba(48,184,255,0.16);
+    }
+
+    .btn.success{
+      border-color:rgba(93,216,155,0.24);
+      background:rgba(93,216,155,0.12);
+    }
+
+    .btn.warn{
+      border-color:rgba(255,203,107,0.24);
+      background:rgba(255,203,107,0.12);
+    }
+
+    .btn.danger{
+      border-color:rgba(255,124,144,0.24);
+      background:rgba(255,124,144,0.12);
     }
 
     .list-toolbar{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:16px;
+      gap:14px;
       flex-wrap:wrap;
-      margin-bottom:18px;
+      margin-bottom:16px;
     }
 
     .list-count{
@@ -305,75 +310,65 @@
     }
 
     .mini-search{
-      width:min(100%, 320px);
-      padding:13px 15px;
-      border:none;
-      outline:none;
-      color:#fff;
-      background:rgba(8,21,35,0.96);
-      border:1px solid rgba(87,174,255,0.16);
+      width:min(300px, 100%);
+      min-height:42px;
+      padding:0 14px;
       border-radius:999px;
+      border:1px solid rgba(92,170,235,0.12);
+      background:rgba(255,255,255,0.02);
+      color:#fff;
+      outline:none;
     }
 
     .mini-search:focus{
-      border-color:rgba(115,199,255,0.50);
-      box-shadow:0 0 0 3px rgba(59,147,220,0.12);
+      border-color:rgba(92,170,235,0.34);
     }
 
     .post-list{
       display:grid;
-      gap:14px;
+      gap:12px;
     }
 
     .post-item{
-      padding:16px;
-      border-radius:18px;
-      background:linear-gradient(180deg, rgba(10,25,43,0.86), rgba(7,18,32,0.94));
-      border:1px solid rgba(90,179,255,0.14);
-    }
-
-    .post-item-top{
-      display:flex;
-      justify-content:space-between;
-      gap:14px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-      margin-bottom:10px;
+      padding:15px;
+      border-radius:16px;
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(92,170,235,0.10);
     }
 
     .post-item h3{
-      margin:0;
+      margin:0 0 8px;
       font-size:1.08rem;
       line-height:1.35;
       color:#fff;
     }
 
-    .post-badges{
+    .badges{
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-      margin-top:8px;
+      margin-bottom:10px;
     }
 
     .badge{
       display:inline-flex;
       align-items:center;
-      padding:8px 11px;
+      min-height:30px;
+      padding:0 10px;
       border-radius:999px;
-      background:rgba(34,102,158,0.18);
-      border:1px solid rgba(100,184,255,0.24);
-      color:#d9edff;
-      font-size:0.88rem;
-      line-height:1;
+      font-size:0.85rem;
+      color:#d8ebff;
+      border:1px solid rgba(92,170,235,0.14);
+      background:rgba(48,184,255,0.06);
     }
 
     .post-item p{
       margin:0 0 12px;
-      color:#d6e8f8;
+      color:#d1e2f2;
       line-height:1.65;
     }
 
-    .post-item-actions{
+    .post-actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
@@ -383,89 +378,85 @@
       appearance:none;
       border:none;
       cursor:pointer;
-      min-height:40px;
+      min-height:38px;
       padding:0 14px;
       border-radius:999px;
       font-weight:700;
       color:#fff;
-      background:linear-gradient(180deg, rgba(14,69,114,0.96), rgba(9,46,77,0.96));
-      border:1px solid rgba(106,192,255,0.26);
+      border:1px solid rgba(92,170,235,0.18);
+      background:rgba(48,184,255,0.08);
     }
 
     .small-btn.danger{
-      background:linear-gradient(180deg, rgba(144,45,67,0.96), rgba(104,27,42,0.96));
-      border-color:rgba(255,143,157,0.32);
-    }
-
-    .small-btn:hover{
-      transform:translateY(-1px);
+      border-color:rgba(255,124,144,0.20);
+      background:rgba(255,124,144,0.10);
     }
 
     .empty-list{
       padding:18px;
-      border-radius:18px;
-      border:1px dashed rgba(106,192,255,0.18);
-      color:#cfe4fa;
+      border-radius:16px;
       text-align:center;
-      background:rgba(8,20,34,0.48);
+      color:#cfe2f4;
+      border:1px dashed rgba(92,170,235,0.12);
+      background:rgba(255,255,255,0.02);
     }
 
-    @media (max-width: 1100px){
+    @media (max-width: 1080px){
       .layout{
         grid-template-columns:1fr;
       }
     }
 
     @media (max-width: 760px){
-      .page-shell{
+      .topbar-inner,
+      .page{
         width:min(calc(100% - 20px), var(--max));
-        padding:18px 0 38px;
+      }
+
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        align-items:flex-start;
+        flex-direction:column;
       }
 
       .grid-2,
       .grid-3{
         grid-template-columns:1fr;
       }
-
-      .card-head,
-      .card-body{
-        padding-left:18px;
-        padding-right:18px;
-      }
     }
   </style>
 </head>
 <body>
-  <div class="page-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="logo" href="index.html">HausKI</a>
 
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-logo">
-          <img src="bilder/New_Home_Assistant_logo.svg.png" alt="HausKI Logo">
-        </div>
-        <div class="brand-text">
-          <strong>HausKI Admin</strong>
-          <span>Beiträge anlegen, bearbeiten, exportieren</span>
-        </div>
-      </div>
-
-      <div class="top-actions">
-        <a class="btn" href="blog.html">Zum Blog</a>
-        <a class="btn" href="index.html">Zur Startseite</a>
-      </div>
+      <nav class="nav">
+        <a href="index.html">Start</a>
+        <a href="blog.html">Blog</a>
+      </nav>
     </div>
+  </header>
+
+  <main class="page">
+    <section class="admin-head">
+      <span class="eyebrow">Intern · Admin</span>
+      <h1>Beiträge pflegen und exportieren.</h1>
+      <p class="admin-sub">
+        Dieser Bereich ist nur für die interne Pflege deiner HausKI-Beiträge gedacht.
+        Hier legst du Blog- oder LinkedIn-Einträge an, bearbeitest sie und exportierst anschließend die <strong>posts.json</strong>.
+      </p>
+    </section>
 
     <div class="layout">
-      <section class="card">
-        <div class="card-head">
+      <section class="panel">
+        <div class="panel-head">
           <h2>Beitrag anlegen oder bearbeiten</h2>
-          <p>
-            Hier pflegst du Blog- und LinkedIn-Beiträge. Nach dem Speichern liegen die Daten lokal im Browser.
-            Anschließend kannst du mit einem Klick die <strong>posts.json</strong> exportieren.
-          </p>
+          <p>Neue Beiträge anlegen, bestehende überarbeiten und für die Website vorbereiten.</p>
         </div>
 
-        <div class="card-body">
+        <div class="panel-body">
           <div id="statusBar" class="status-bar">
             Bereit. Du kannst einen neuen Beitrag anlegen.
           </div>
@@ -534,8 +525,8 @@
               <textarea id="content" placeholder="Hier kommt dein ganzer Beitrag rein. Markdown leicht unterstützt: ## Überschrift, - Liste, **fett**, *kursiv*"></textarea>
             </div>
 
-            <div class="inline-actions">
-              <button class="btn primary" type="submit">Beitrag speichern</button>
+            <div class="actions">
+              <button class="btn" type="submit">Beitrag speichern</button>
               <button class="btn" type="button" id="resetBtn">Formular leeren</button>
               <button class="btn warn" type="button" id="demoBtn">Beispieldaten laden</button>
               <button class="btn success" type="button" id="exportBtn">posts.json exportieren</button>
@@ -545,15 +536,13 @@
         </div>
       </section>
 
-      <section class="card">
-        <div class="card-head">
+      <section class="panel">
+        <div class="panel-head">
           <h2>Vorhandene Beiträge</h2>
-          <p>
-            Hier siehst du alle lokal gespeicherten Einträge. Du kannst sie direkt laden, bearbeiten oder löschen.
-          </p>
+          <p>Lokal gespeicherte Beiträge laden, prüfen und weiterbearbeiten.</p>
         </div>
 
-        <div class="card-body">
+        <div class="panel-body">
           <div class="list-toolbar">
             <div class="list-count" id="listCount">0 Beiträge lokal gespeichert</div>
             <input id="listSearch" class="mini-search" type="text" placeholder="Beiträge filtern ..." />
@@ -563,7 +552,7 @@
         </div>
       </section>
     </div>
-  </div>
+  </main>
 
   <script>
     const STORAGE_KEY = "hauski_posts";
@@ -596,9 +585,7 @@
 
     function setStatus(message, type = "") {
       statusBar.className = "status-bar";
-      if (type) {
-        statusBar.classList.add(type);
-      }
+      if (type) statusBar.classList.add(type);
       statusBar.textContent = message;
     }
 
@@ -660,6 +647,7 @@
       dateInput.value = new Date().toISOString().split("T")[0];
       sourceInput.value = "blog";
       slugInput.value = "";
+      slugInput.dataset.manual = "";
       setStatus("Bereit. Du kannst einen neuen Beitrag anlegen.");
     }
 
@@ -667,6 +655,7 @@
       editingId.value = post.id || "";
       titleInput.value = post.title || "";
       slugInput.value = post.id || "";
+      slugInput.dataset.manual = "1";
       dateInput.value = post.date || "";
       sourceInput.value = post.source || "blog";
       categoryInput.value = post.category || "";
@@ -684,8 +673,7 @@
       const post = posts.find(item => item.id === id);
       if (!post) return;
 
-      const ok = confirm(`Beitrag "${post.title}" wirklich löschen?`);
-      if (!ok) return;
+      if (!confirm(`Beitrag "${post.title}" wirklich löschen?`)) return;
 
       posts = posts.filter(item => item.id !== id);
       savePosts();
@@ -723,21 +711,18 @@
 
       postList.innerHTML = filtered.map(post => `
         <article class="post-item">
-          <div class="post-item-top">
-            <div>
-              <h3>${escapeHtml(post.title || "Ohne Titel")}</h3>
-              <div class="post-badges">
-                <span class="badge">${escapeHtml(post.source || "blog")}</span>
-                ${post.date ? `<span class="badge">${escapeHtml(formatDate(post.date))}</span>` : ""}
-                ${post.category ? `<span class="badge">${escapeHtml(post.category)}</span>` : ""}
-                <span class="badge">${escapeHtml(post.id || "-")}</span>
-              </div>
-            </div>
+          <h3>${escapeHtml(post.title || "Ohne Titel")}</h3>
+
+          <div class="badges">
+            <span class="badge">${escapeHtml(post.source || "blog")}</span>
+            ${post.date ? `<span class="badge">${escapeHtml(formatDate(post.date))}</span>` : ""}
+            ${post.category ? `<span class="badge">${escapeHtml(post.category)}</span>` : ""}
+            <span class="badge">${escapeHtml(post.id || "-")}</span>
           </div>
 
           <p>${escapeHtml(post.excerpt || "Kein Kurztext vorhanden.")}</p>
 
-          <div class="post-item-actions">
+          <div class="post-actions">
             <button class="small-btn" type="button" onclick="editPost('${encodeURIComponent(post.id)}')">Bearbeiten</button>
             <button class="small-btn" type="button" onclick="openPostPreview('${encodeURIComponent(post.id)}')">Vorschau</button>
             <button class="small-btn danger" type="button" onclick="deletePost('${encodeURIComponent(post.id)}')">Löschen</button>
@@ -773,7 +758,7 @@
           image: "blog-images/tedee-smart-lock.jpg",
           excerpt: "Tedee Smart Lock in HausKI integriert – Tür, Alarm und Automationen im Griff.",
           material: "Tedee 2 Go, Keypad, Moes Zigbee Türkontakt",
-          content: "## Ausgangslage\nIch wollte die Haustür sauber in HausKI einbinden.\n\n## Ziel\n- automatisches Sperren nach definierter Zeit\n- Zusammenspiel mit Alarmo\n- Status sauber im HUD sichtbar\n\n## Umsetzung\nDie Tür ist über den Kontaktsensor und das Tedee Schloss in Home Assistant eingebunden.\n\n> Besonders wichtig war mir, dass die Lösung alltagstauglich bleibt.\n\n## Fazit\nDie Integration funktioniert sauber und bringt deutlich mehr Übersicht und Sicherheit."
+          content: "## Ausgangslage\nIch wollte die Haustür sauber in HausKI einbinden.\n\n## Ziel\n- automatisches Sperren nach definierter Zeit\n- Zusammenspiel mit Alarmo\n- Status sauber im HUD sichtbar\n\n## Umsetzung\nDie Tür ist über den Kontaktsensor und das Tedee Schloss in Home Assistant eingebunden.\n\n## Fazit\nDie Integration funktioniert sauber und bringt deutlich mehr Übersicht und Sicherheit."
         },
         {
           id: "gong-installation",
@@ -785,24 +770,11 @@
           image: "",
           excerpt: "Wie ich den Gong sauber in HausKI eingebunden habe und welche Erkenntnisse daraus entstanden sind.",
           material: "Shelly i4, vorhandener Gong, Home Assistant",
-          content: "## Idee\nDer Gong sollte nicht nur läuten, sondern ein Event in HausKI auslösen.\n\n## Umsetzung\nDer Trigger läuft über den Shelly i4.\n\n## Mehrwert\n- Benachrichtigung am Handy\n- Snapshot der Kamera\n- spätere Erweiterung mit QVR Pro"
-        },
-        {
-          id: "linkedin-hauski-energie-dashboard",
-          title: "HausKI Energiedashboard – Live Blick auf Verbrauch und Leistung",
-          date: "2026-03-18",
-          category: "Energie",
-          tags: ["Dashboard", "Grafana", "Home Assistant"],
-          source: "linkedin",
-          image: "",
-          excerpt: "Ein kurzer LinkedIn-Einblick in mein HausKI-Energiedashboard und die Visualisierung von Live-Daten.",
-          material: "Home Assistant, Grafana, Solax, BKW",
-          content: "## LinkedIn Beitrag\nIch arbeite laufend daran, Energieflüsse nicht nur zu messen, sondern verständlich sichtbar zu machen."
+          content: "## Idee\nDer Gong sollte nicht nur läuten, sondern ein Event in HausKI auslösen."
         }
       ];
 
-      const ok = confirm("Beispieldaten laden und vorhandene lokale Beiträge ersetzen?");
-      if (!ok) return;
+      if (!confirm("Beispieldaten laden und vorhandene lokale Beiträge ersetzen?")) return;
 
       posts = demoPosts;
       savePosts();
@@ -817,8 +789,7 @@
         return;
       }
 
-      const ok = confirm("Wirklich alle lokal gespeicherten Beiträge löschen?");
-      if (!ok) return;
+      if (!confirm("Wirklich alle lokal gespeicherten Beiträge löschen?")) return;
 
       posts = [];
       savePosts();
@@ -912,11 +883,7 @@
       slugInput.dataset.manual = slugInput.value.trim() ? "1" : "";
     });
 
-    resetBtn.addEventListener("click", () => {
-      resetForm();
-      slugInput.dataset.manual = "";
-    });
-
+    resetBtn.addEventListener("click", resetForm);
     demoBtn.addEventListener("click", loadDemoData);
     exportBtn.addEventListener("click", exportPostsJson);
     clearAllBtn.addEventListener("click", clearAllPosts);
