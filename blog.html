@@ -1,937 +1,622 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HausKI – Blog</title>
-  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png">
-  <meta name="description" content="HausKI Blog mit LinkedIn-Beiträgen und eigenen Blogartikeln zu Smart Home, Energie, Automationen und Systemlogik.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HausKI Blog</title>
+  <meta
+    name="description"
+    content="Blog und LinkedIn-Updates rund um HausKI – Smart Home, Energie, Automatisierung und echte Praxisberichte."
+  />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
   <style>
-    *{
-      box-sizing:border-box;
+    * {
+      box-sizing: border-box;
     }
 
-    :root{
-      --bg:#040911;
-      --card:rgba(11,22,37,0.85);
-      --line:rgba(33,200,255,0.18);
-      --text:#ecf6ff;
-      --muted:#9db2c9;
-      --accent:#21c8ff;
-      --accent2:#6af0c7;
-      --shadow:0 20px 60px rgba(0,0,0,0.35);
-      --danger:#ff6b6b;
+    :root {
+      --bg: #040911;
+      --bg2: #0a1320;
+      --panel: rgba(10, 20, 34, 0.88);
+      --panel-strong: rgba(8, 16, 28, 0.96);
+      --line: rgba(69, 182, 255, 0.18);
+      --line-strong: rgba(69, 182, 255, 0.34);
+      --text: #eaf4ff;
+      --muted: #9cb6cf;
+      --blue: #45b6ff;
+      --blue-soft: rgba(69, 182, 255, 0.14);
+      --cyan: #74ecff;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --max: 1240px;
     }
 
-    html{
-      scroll-behavior:smooth;
+    html {
+      scroll-behavior: smooth;
     }
 
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(circle at 20% 10%, rgba(33,200,255,0.14), transparent 24%),
-        radial-gradient(circle at 80% 0%, rgba(106,240,199,0.08), transparent 20%),
-        linear-gradient(180deg,#050911 0%,#09111d 45%,#050911 100%);
-      color:var(--text);
+        radial-gradient(circle at top left, rgba(69, 182, 255, 0.16), transparent 22%),
+        radial-gradient(circle at top right, rgba(0, 220, 255, 0.1), transparent 18%),
+        linear-gradient(180deg, #040911 0%, #09111d 45%, #07111c 100%);
+      min-height: 100vh;
     }
 
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size:26px 26px;
-      pointer-events:none;
-      mask-image:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
-      z-index:0;
+    a {
+      color: inherit;
+      text-decoration: none;
     }
 
-    .nav{
-      position:sticky;
-      top:0;
-      left:0;
-      width:100%;
-      background:rgba(6,15,26,0.82);
-      backdrop-filter:blur(12px);
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:16px 28px;
-      box-shadow:0 5px 20px rgba(0,0,0,0.25);
-      z-index:100;
+    img {
+      max-width: 100%;
+      display: block;
     }
 
-    .nav-logo{
-      font-size:18px;
-      font-weight:bold;
-      color:var(--accent);
-      letter-spacing:0.5px;
+    .container {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
     }
 
-    .nav-links{
-      display:flex;
-      flex-wrap:wrap;
-      gap:18px;
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(4, 10, 18, 0.74);
+      border-bottom: 1px solid rgba(110, 180, 255, 0.12);
     }
 
-    .nav-links a{
-      color:#e6f2ff;
-      text-decoration:none;
-      font-size:14px;
-      white-space:nowrap;
-      transition:0.2s;
+    .nav {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 12px rgba(69, 182, 255, 0.24));
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.05;
+      min-width: 0;
+    }
+
+    .brand-text strong {
+      font-size: 1.06rem;
+      color: #f3faff;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-text span {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      transition: 0.2s ease;
+      font-size: 0.95rem;
+      font-weight: 600;
     }
 
     .nav-links a:hover,
-    .nav-links a.active{
-      color:var(--accent);
+    .nav-links a.active {
+      color: #fff;
+      background: rgba(69, 182, 255, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(69, 182, 255, 0.2);
     }
 
-    .container{
-      width:min(1180px, calc(100% - 32px));
-      margin:0 auto;
-      position:relative;
-      z-index:1;
+    .hero {
+      padding: 52px 0 28px;
     }
 
-    .hero{
-      padding:72px 0 30px;
+    .hero-box {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(11, 23, 39, 0.96), rgba(7, 16, 28, 0.96));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: clamp(28px, 5vw, 48px);
     }
 
-    .hero-box{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:40px;
-      position:relative;
-      overflow:hidden;
+    .hero-box::before {
+      content: "";
+      position: absolute;
+      right: -70px;
+      bottom: -70px;
+      width: 230px;
+      height: 230px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(69, 182, 255, 0.2), transparent 70%);
+      pointer-events: none;
     }
 
-    .hero-box::after{
-      content:"";
-      position:absolute;
-      right:-120px;
-      top:-120px;
-      width:320px;
-      height:320px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(33,200,255,0.16), transparent 65%);
-      pointer-events:none;
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(69, 182, 255, 0.12);
+      color: #c7eeff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      border: 1px solid rgba(69, 182, 255, 0.16);
     }
 
-    .eyebrow{
-      display:inline-block;
-      padding:10px 14px;
-      border-radius:999px;
-      background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.18);
-      color:var(--accent);
-      font-size:12px;
-      letter-spacing:1px;
-      text-transform:uppercase;
-      margin-bottom:18px;
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 0.98;
+      letter-spacing: -1.5px;
+      max-width: 12ch;
     }
 
-    h1{
-      font-size:clamp(34px,5vw,52px);
-      line-height:1.04;
-      margin:0 0 18px;
-      letter-spacing:-1.8px;
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1.04rem;
+      line-height: 1.7;
     }
 
-    .hero-box p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.8;
-      max-width:70ch;
-      font-size:18px;
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding: 14px 0 10px;
     }
 
-    .section{
-      padding:18px 0 0;
-      margin-bottom:56px;
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .section-head{
-      margin-bottom:22px;
+    .filter-btn {
+      border: 1px solid rgba(110, 180, 255, 0.16);
+      background: rgba(10, 19, 32, 0.9);
+      color: var(--muted);
+      padding: 11px 16px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
     }
 
-    .section-badge{
-      display:inline-block;
-      padding:8px 14px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      color:var(--accent);
-      font-size:0.78rem;
-      font-weight:700;
-      letter-spacing:0.04em;
-      text-transform:uppercase;
-      background:rgba(33,200,255,0.08);
-      margin-bottom:14px;
+    .filter-btn:hover {
+      color: #fff;
+      border-color: rgba(69, 182, 255, 0.26);
+      background: rgba(12, 26, 43, 0.96);
     }
 
-    .section-head h2{
-      margin:0;
-      font-size:clamp(28px,4vw,38px);
-      letter-spacing:-1px;
+    .filter-btn.active {
+      color: #fff;
+      background: linear-gradient(180deg, rgba(69, 182, 255, 0.22), rgba(69, 182, 255, 0.1));
+      border-color: rgba(69, 182, 255, 0.32);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
     }
 
-    .section-head p{
-      margin:10px 0 0;
-      color:var(--muted);
-      line-height:1.75;
-      max-width:80ch;
+    .count-info {
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
-    .blog-tabs{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin:8px 0 22px;
+    .post-section {
+      padding: 8px 0 70px;
     }
 
-    .tab-btn{
-      border:none;
-      cursor:pointer;
-      min-height:44px;
-      padding:0 18px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.10);
-      color:var(--text);
-      font-weight:700;
-      font-size:14px;
-      transition:.2s;
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
     }
 
-    .tab-btn:hover{
-      transform:translateY(-2px);
-      border-color:var(--accent);
-      color:var(--accent);
+    .post-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      overflow: hidden;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(11, 23, 39, 0.96), rgba(7, 15, 27, 0.96));
+      border: 1px solid rgba(110, 180, 255, 0.14);
+      box-shadow: var(--shadow);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
     }
 
-    .tab-btn.active{
-      background:rgba(33,200,255,0.10);
-      border-color:rgba(33,200,255,0.25);
-      color:var(--accent);
+    .post-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(69, 182, 255, 0.28);
+      box-shadow: 0 22px 42px rgba(0, 0, 0, 0.42);
     }
 
-    .tab-panel{
-      display:none;
+    .post-image-wrap {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #09111d;
+      overflow: hidden;
     }
 
-    .tab-panel.active{
-      display:block;
+    .post-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .blog-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
+    .post-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      backdrop-filter: blur(8px);
     }
 
-    .post-cover{
-      width:100%;
-      height:auto;
-      object-fit:contain;
-      border-radius:16px;
-      margin-bottom:16px;
-      border:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 10px 24px rgba(0,0,0,0.28);
-      display:block;
-      background:#09111d;
-    }
-    
-
-    .post-card:hover{
-      transform:translateY(-4px);
-      box-shadow:0 16px 40px rgba(0,0,0,0.32);
+    .badge-blog {
+      background: rgba(88, 225, 255, 0.16);
+      color: #d7f7ff;
+      border: 1px solid rgba(88, 225, 255, 0.26);
     }
 
-    .post-cover{
-      width:100%;
-      aspect-ratio:16 / 9;
-      object-fit:cover;
-      border-radius:16px;
-      margin-bottom:16px;
-      border:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 10px 24px rgba(0,0,0,0.28);
-      display:block;
-      background:#09111d;
+    .badge-linkedin {
+      background: rgba(76, 144, 255, 0.2);
+      color: #d9ebff;
+      border: 1px solid rgba(76, 144, 255, 0.28);
     }
 
-    .post-top{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:flex-start;
-      margin-bottom:14px;
-      flex-wrap:wrap;
+    .post-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px 20px 22px;
+      flex: 1;
     }
 
-    .post-source{
-      display:inline-flex;
-      align-items:center;
-      min-height:28px;
-      padding:0 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.10);
-      color:var(--text);
-      font-size:12px;
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:.05em;
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.88rem;
     }
 
-    .post-source.linkedin{
-      color:#8fd9ff;
-      border-color:rgba(143,217,255,0.18);
-      background:rgba(143,217,255,0.08);
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .post-source.blog{
-      color:#9ff3cf;
-      border-color:rgba(159,243,207,0.18);
-      background:rgba(159,243,207,0.08);
+    .post-title {
+      margin: 0;
+      font-size: 1.24rem;
+      line-height: 1.28;
+      letter-spacing: -0.3px;
     }
 
-    .post-date{
-      color:var(--muted);
-      font-size:13px;
+    .post-excerpt {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 0.98rem;
+      flex: 1;
     }
 
-    .post-card h3{
-      margin:0 0 12px;
-      font-size:1.2rem;
-      line-height:1.35;
+    .material-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.55;
     }
 
-    .post-card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.75;
-      flex:1;
+    .material-box strong {
+      color: #dff4ff;
     }
 
-    .post-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:18px;
+    .post-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: auto;
     }
 
-    .read-more{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:40px;
-      padding:0 14px;
-      border-radius:12px;
-      text-decoration:none;
-      font-weight:700;
-      font-size:14px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.10);
-      color:var(--text);
-      transition:.2s;
-      cursor:pointer;
+    .read-more {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(69, 182, 255, 0.22), rgba(69, 182, 255, 0.1));
+      border: 1px solid rgba(69, 182, 255, 0.26);
+      color: #f4fbff;
+      font-weight: 700;
+      transition: 0.2s ease;
     }
 
-    .read-more:hover{
-      border-color:var(--accent);
-      color:var(--accent);
-      transform:translateY(-2px);
+    .read-more:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
     }
 
-    .empty-state{
-      background:var(--card);
-      border:1px dashed rgba(255,255,255,0.12);
-      border-radius:22px;
-      padding:28px;
-      color:var(--muted);
-      line-height:1.8;
+    .source-label {
+      color: var(--muted);
+      font-size: 0.88rem;
     }
 
-    .footer{
-      padding:24px 0 60px;
-      color:var(--muted);
-      font-size:14px;
+    .empty-state {
+      display: none;
+      margin-top: 12px;
+      padding: 34px 22px;
+      border-radius: 22px;
+      border: 1px dashed rgba(110, 180, 255, 0.18);
+      background: rgba(10, 21, 35, 0.82);
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
     }
 
-    .footer-line{
-      border-top:1px solid rgba(255,255,255,0.08);
-      padding-top:22px;
-      display:flex;
-      justify-content:space-between;
-      gap:20px;
-      flex-wrap:wrap;
+    .site-footer {
+      padding: 26px 0 40px;
+      border-top: 1px solid rgba(110, 180, 255, 0.08);
+      color: var(--muted);
+      font-size: 0.94rem;
     }
 
-    /* Modal */
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(2,8,16,0.78);
-      backdrop-filter:blur(10px);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      z-index:999;
-    }
-
-    .modal.active{
-      display:flex;
-    }
-
-    .modal-panel{
-      width:min(980px, 100%);
-      max-height:90vh;
-      overflow:auto;
-      background:linear-gradient(180deg, rgba(11,22,37,0.98), rgba(7,15,26,0.98));
-      border:1px solid rgba(33,200,255,0.18);
-      border-radius:24px;
-      box-shadow:0 30px 80px rgba(0,0,0,0.45);
-      padding:22px;
-      position:relative;
-    }
-
-    .modal-close{
-      position:sticky;
-      top:0;
-      margin-left:auto;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      width:42px;
-      height:42px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.10);
-      background:rgba(255,255,255,0.04);
-      color:var(--text);
-      cursor:pointer;
-      font-size:20px;
-      z-index:5;
-    }
-
-    .modal-close:hover{
-      border-color:var(--accent);
-      color:var(--accent);
-    }
-
-    .modal-cover{
-      width:100%;
-      aspect-ratio:16 / 8;
-      object-fit:cover;
-      border-radius:18px;
-      margin:8px 0 22px;
-      border:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 18px 35px rgba(0,0,0,0.28);
-      background:#09111d;
-    }
-
-    .modal-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-
-    .modal-title{
-      margin:0;
-      font-size:clamp(28px,4vw,40px);
-      line-height:1.08;
-      letter-spacing:-1.2px;
-    }
-
-    .modal-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin:0 0 24px;
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .meta-pill{
-      display:inline-flex;
-      align-items:center;
-      min-height:32px;
-      padding:0 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.08);
-    }
-
-    .project-box{
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(33,200,255,0.16);
-      border-radius:18px;
-      padding:18px;
-      margin:0 0 24px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.18);
-    }
-
-    .project-box h3{
-      margin:0 0 14px;
-      font-size:1rem;
-      color:var(--accent);
-      letter-spacing:0.02em;
-    }
-
-    .project-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-    }
-
-    .project-item{
-      background:rgba(255,255,255,0.02);
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:14px;
-      padding:12px 14px;
-    }
-
-    .project-label{
-      display:block;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:0.05em;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .project-value{
-      color:var(--text);
-      line-height:1.5;
-      font-size:14px;
-    }
-
-    .modal-content{
-      color:var(--text);
-      line-height:1.9;
-      font-size:17px;
-    }
-
-    .modal-content p{
-      margin:0 0 18px;
-      color:#dceaf7;
-    }
-
-    .modal-content h2,
-    .modal-content h3{
-      margin:28px 0 14px;
-      line-height:1.2;
-    }
-
-    .modal-content ul,
-    .modal-content ol{
-      margin:0 0 18px 22px;
-      color:#dceaf7;
-      line-height:1.8;
-    }
-
-    .modal-content li{
-      margin-bottom:8px;
-    }
-
-    .modal-actions{
-      margin-top:26px;
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    @media (max-width:1024px){
-      .blog-grid{
-        grid-template-columns:repeat(2,1fr);
+    @media (max-width: 1050px) {
+      .post-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width:700px){
-      .blog-grid{
-        grid-template-columns:1fr;
+    @media (max-width: 760px) {
+      .nav {
+        padding: 14px 0;
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      .nav{
-        padding:14px 16px;
-        align-items:flex-start;
-        flex-direction:column;
-        gap:12px;
+      .nav-links {
+        width: 100%;
+        justify-content: flex-start;
       }
 
-      .hero-box{
-        padding:22px;
+      .hero h1 {
+        max-width: none;
       }
 
-      .tab-btn{
-        width:100%;
+      .post-grid {
+        grid-template-columns: 1fr;
       }
 
-      .modal{
-        padding:12px;
-      }
-
-      .modal-panel{
-        padding:16px;
-        border-radius:18px;
-      }
-
-      .project-grid{
-        grid-template-columns:1fr;
+      .toolbar {
+        align-items: flex-start;
       }
     }
   </style>
 </head>
 <body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="brand-logo" src="bilder/New_Home_Assistant_logo.svg.png" alt="HausKI Logo" />
+        <div class="brand-text">
+          <strong>HausKI</strong>
+          <span>Mein intelligentes Zuhause</span>
+        </div>
+      </a>
 
-  <nav class="nav">
-    <div class="nav-logo">HausKI</div>
-    <div class="nav-links">
-      <a href="index.html">Start</a>
-      <a href="architektur.html">Architektur</a>
-      <a href="blog.html" class="active">Blog</a>
-      <a href="roadmap.html">Roadmap</a>
-      <a href="dashboard.html">Live Dashboard</a>
-      <a href="ueber.html">Über</a>
-    </div>
-  </nav>
-
-  <header class="hero">
-    <div class="container">
-      <div class="hero-box">
-        <div class="eyebrow">HausKI Inhalte</div>
-        <h1>LinkedIn und Blog an einem Ort</h1>
-        <p>
-          Hier erscheinen sowohl freigegebene HausKI-Beiträge aus LinkedIn als auch
-          eigenständige Blogartikel. So bleiben kurze Updates und längere Inhalte klar getrennt,
-          aber trotzdem an einem Ort gesammelt.
-        </p>
-      </div>
+      <nav class="nav-links">
+        <a href="index.html">Start</a>
+        <a href="ueber.html">Über</a>
+        <a href="blog.html" class="active">Blog</a>
+        <a href="roadmap.html">Roadmap</a>
+      </nav>
     </div>
   </header>
 
-  <main class="container">
-    <section class="section">
-      <div class="section-head">
-        <span class="section-badge">Inhalte</span>
-        <h2>Was du lesen willst</h2>
-        <p>
-          Im Bereich LinkedIn findest du freigegebene HausKI-Posts. Im Bereich Blog
-          erscheinen ausführlichere Artikel, die unabhängig von Social Media entstehen können.
-        </p>
-      </div>
-
-      <div class="blog-tabs">
-        <button class="tab-btn active" data-tab="linkedin" type="button">LinkedIn</button>
-        <button class="tab-btn" data-tab="blog" type="button">Blog</button>
-      </div>
-
-      <div id="tab-linkedin" class="tab-panel active">
-        <div id="linkedin-grid" class="blog-grid">
-          <div class="empty-state">LinkedIn-Beiträge werden geladen …</div>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-box">
+          <div class="eyebrow">HausKI Updates &amp; Artikel</div>
+          <h1>Blog und LinkedIn an einem Ort</h1>
+          <p>
+            Hier sammle ich Projektberichte, echte Praxiserfahrungen, Dashboard-Updates,
+            Automationen, Fehleranalysen und Gedanken rund um Smart Home, Energie und HausKI.
+            Kurze Updates erscheinen im LinkedIn-Stil, ausführlichere Inhalte als Blogartikel.
+          </p>
         </div>
       </div>
+    </section>
 
-      <div id="tab-blog" class="tab-panel">
-        <div id="blog-grid" class="blog-grid">
-          <div class="empty-state">Blogartikel werden geladen …</div>
+    <section class="post-section">
+      <div class="container">
+        <div class="toolbar">
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">Alle</button>
+            <button class="filter-btn" data-filter="linkedin">LinkedIn</button>
+            <button class="filter-btn" data-filter="blog">Blog</button>
+          </div>
+
+          <div class="count-info" id="countInfo">0 Beiträge</div>
+        </div>
+
+        <div class="post-grid" id="postGrid"></div>
+
+        <div class="empty-state" id="emptyState">
+          Für diesen Bereich sind aktuell noch keine Beiträge vorhanden.
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer container">
-    <div class="footer-line">
-      <div>© 2026 HausKI • Günther Hochreiter</div>
-      <div>Blog • LinkedIn • Artikel • HausKI</div>
+  <footer class="site-footer">
+    <div class="container">
+      © 2026 HausKI – Smart Home, Energie und echte Praxis.
     </div>
   </footer>
 
-  <!-- Modal -->
-  <div id="article-modal" class="modal" aria-hidden="true">
-    <div class="modal-panel">
-      <button id="modal-close" class="modal-close" type="button" aria-label="Schließen">×</button>
-      <div id="modal-body"></div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
   <script>
-    const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let posts = [];
 
-    const tabs = document.querySelectorAll(".tab-btn");
-    const panels = {
-      linkedin: document.getElementById("tab-linkedin"),
-      blog: document.getElementById("tab-blog")
-    };
+    const grid = document.getElementById("postGrid");
+    const countInfo = document.getElementById("countInfo");
+    const emptyState = document.getElementById("emptyState");
+    const filterButtons = document.querySelectorAll(".filter-btn");
 
-    const modal = document.getElementById("article-modal");
-    const modalBody = document.getElementById("modal-body");
-    const modalClose = document.getElementById("modal-close");
-
-    tabs.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        tabs.forEach((b) => b.classList.remove("active"));
-        Object.values(panels).forEach((panel) => panel.classList.remove("active"));
-        btn.classList.add("active");
-        panels[btn.dataset.tab].classList.add("active");
-      });
-    });
+    let activeFilter = "all";
 
     function formatDate(dateString) {
-      if (!dateString) return "";
       const date = new Date(dateString);
-      if (Number.isNaN(date.getTime())) return "";
-      return date.toLocaleDateString("de-DE", {
+      return date.toLocaleDateString("de-AT", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric"
       });
     }
 
-    function escapeHtml(text) {
-      if (text === null || text === undefined) return "";
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    function getTypeLabel(type) {
+      return type === "linkedin" ? "LinkedIn" : "Blog";
     }
 
-    function nl2p(text) {
-      if (!text) return "<p>Kein Inhalt vorhanden.</p>";
-
-      const safe = escapeHtml(text);
-      const blocks = safe
-        .split(/\n\s*\n/)
-        .map(block => block.trim())
-        .filter(Boolean);
-
-      return blocks.map(block => {
-        if (block.startsWith("- ")) {
-          const items = block
-            .split("\n")
-            .map(line => line.replace(/^- /, "").trim())
-            .filter(Boolean)
-            .map(item => `<li>${item}</li>`)
-            .join("");
-          return `<ul>${items}</ul>`;
-        }
-
-        return `<p>${block.replace(/\n/g, "<br>")}</p>`;
-      }).join("");
+    function getTypeBadgeClass(type) {
+      return type === "linkedin" ? "badge-linkedin" : "badge-blog";
     }
-
-    function buildProjectInfoBox(post) {
-      const typeLabel = post.post_type === "linkedin" ? "LinkedIn" : "Blog";
-      const coverStatus = post.cover_image ? "Ja" : "Nein";
-      const projectName = post.title || "HausKI Artikel";
-      const excerptText = post.excerpt || "Kein Auszug hinterlegt.";
-
-      return `
-        <div class="project-box">
-          <h3>Projektübersicht</h3>
-          <div class="project-grid">
-            <div class="project-item">
-              <span class="project-label">Projekt</span>
-              <div class="project-value">${escapeHtml(projectName)}</div>
-            </div>
-            <div class="project-item">
-              <span class="project-label">Typ</span>
-              <div class="project-value">${escapeHtml(typeLabel)}</div>
-            </div>
-            <div class="project-item">
-              <span class="project-label">Veröffentlicht</span>
-              <div class="project-value">${escapeHtml(formatDate(post.published_at) || "Nicht gesetzt")}</div>
-            </div>
-            <div class="project-item">
-              <span class="project-label">Coverbild</span>
-              <div class="project-value">${escapeHtml(coverStatus)}</div>
-            </div>
-            <div class="project-item" style="grid-column:1 / -1;">
-              <span class="project-label">Kurzbeschreibung</span>
-              <div class="project-value">${escapeHtml(excerptText)}</div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function openModal(post) {
-      const safeTitle = escapeHtml(post.title || "Ohne Titel");
-      const date = formatDate(post.published_at);
-      const source = post.post_type === "linkedin" ? "LinkedIn" : "Blog";
-      const coverHtml = post.cover_image
-        ? `<img src="${post.cover_image}" alt="${safeTitle}" class="modal-cover">`
-        : "";
-
-      const externalLink = post.linkedin_url
-        ? `<a href="${post.linkedin_url}" target="_blank" rel="noopener noreferrer" class="read-more">Auf LinkedIn öffnen</a>`
-        : "";
-
-      modalBody.innerHTML = `
-        <div class="modal-top">
-          <div>
-            <h2 class="modal-title">${safeTitle}</h2>
-          </div>
-        </div>
-
-        <div class="modal-meta">
-          <span class="meta-pill">${escapeHtml(source)}</span>
-          <span class="meta-pill">${escapeHtml(date || "Kein Datum")}</span>
-        </div>
-
-        ${coverHtml}
-        ${buildProjectInfoBox(post)}
-
-        <div class="modal-content">
-          ${nl2p(post.content || post.excerpt)}
-        </div>
-
-        <div class="modal-actions">
-          ${externalLink}
-          <button type="button" class="read-more" id="modal-close-bottom">Schließen</button>
-        </div>
-      `;
-
-      modal.classList.add("active");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-
-      const closeBottom = document.getElementById("modal-close-bottom");
-      if (closeBottom) {
-        closeBottom.addEventListener("click", closeModal);
-      }
-    }
-
-    function closeModal() {
-      modal.classList.remove("active");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
-    modalClose.addEventListener("click", closeModal);
-
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("active")) {
-        closeModal();
-      }
-    });
 
     function createPostCard(post) {
-      const article = document.createElement("article");
-      article.className = "post-card";
+      const card = document.createElement("article");
+      card.className = "post-card";
 
-      const safeTitle = escapeHtml(post.title || "Ohne Titel");
-      const safeExcerpt = escapeHtml(post.excerpt || "");
-      const date = formatDate(post.published_at);
-      const postTypeClass = post.post_type === "linkedin" ? "linkedin" : "blog";
-      const postTypeLabel = post.post_type === "linkedin" ? "LinkedIn" : "Blog";
-
-      const coverImageHtml = post.cover_image
-        ? `<img src="${post.cover_image}" alt="${safeTitle}" class="post-cover">`
-        : "";
-
-      article.innerHTML = `
-        ${coverImageHtml}
-        <div class="post-top">
-          <span class="post-source ${postTypeClass}">${postTypeLabel}</span>
-          <span class="post-date">${date}</span>
+      card.innerHTML = `
+        <div class="post-image-wrap">
+          <img class="post-image" src="${post.image}" alt="${post.title}">
+          <div class="post-badge ${getTypeBadgeClass(post.type)}">${getTypeLabel(post.type)}</div>
         </div>
-        <h3>${safeTitle}</h3>
-        <p>${safeExcerpt}</p>
-        <div class="post-actions"></div>
+
+        <div class="post-content">
+          <div class="meta-row">
+            <span class="meta-pill">${formatDate(post.date)}</span>
+            <span class="meta-pill">${post.category || "Allgemein"}</span>
+          </div>
+
+          <h2 class="post-title">${post.title}</h2>
+          <p class="post-excerpt">${post.excerpt || ""}</p>
+
+          <div class="material-box">
+            <strong>Verwendetes Material:</strong><br>
+            ${post.material || "-"}
+          </div>
+
+          <div class="post-footer">
+            <a class="read-more" href="post.html?id=${post.id}">Mehr lesen</a>
+            <span class="source-label">
+              ${post.source === "linkedin" ? "Quelle: LinkedIn" : "HausKI Blog"}
+            </span>
+          </div>
+        </div>
       `;
 
-      const actions = article.querySelector(".post-actions");
-
-      if (post.post_type === "linkedin" && post.linkedin_url) {
-        const link = document.createElement("a");
-        link.href = post.linkedin_url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.className = "read-more";
-        link.textContent = "Auf LinkedIn öffnen";
-        actions.appendChild(link);
-      }
-
-      if (post.post_type === "blog") {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "read-more";
-        button.textContent = "Artikel lesen";
-        button.addEventListener("click", () => openModal(post));
-        actions.appendChild(button);
-      }
-
-      return article;
+      return card;
     }
 
-    function renderPosts(posts, containerId, type) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = "";
+    function renderPosts() {
+      grid.innerHTML = "";
 
-      const filteredPosts = posts.filter((post) => post.post_type === type);
+      const visiblePosts = posts
+        .filter(post => post.published !== false)
+        .filter(post => activeFilter === "all" ? true : post.type === activeFilter)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      if (!filteredPosts.length) {
-        container.innerHTML = `
-          <div class="empty-state">
-            Noch keine ${type === "linkedin" ? "LinkedIn-Beiträge" : "Blogartikel"} vorhanden.
-          </div>
-        `;
+      countInfo.textContent = `${visiblePosts.length} ${visiblePosts.length === 1 ? "Beitrag" : "Beiträge"}`;
+
+      if (visiblePosts.length === 0) {
+        emptyState.style.display = "block";
         return;
       }
 
-      filteredPosts.forEach((post) => {
-        container.appendChild(createPostCard(post));
+      emptyState.style.display = "none";
+
+      visiblePosts.forEach(post => {
+        grid.appendChild(createPostCard(post));
       });
     }
 
     async function loadPosts() {
-      const linkedinGrid = document.getElementById("linkedin-grid");
-      const blogGrid = document.getElementById("blog-grid");
+      try {
+        const response = await fetch("posts.json");
 
-      linkedinGrid.innerHTML = `<div class="empty-state">LinkedIn-Beiträge werden geladen …</div>`;
-      blogGrid.innerHTML = `<div class="empty-state">Blogartikel werden geladen …</div>`;
+        if (!response.ok) {
+          throw new Error("posts.json konnte nicht geladen werden");
+        }
 
-      const { data, error } = await supabaseClient
-        .from("posts")
-        .select("*")
-        .eq("visible", true)
-        .order("published_at", { ascending: false });
-
-      if (error) {
+        posts = await response.json();
+        renderPosts();
+      } catch (error) {
         console.error("Fehler beim Laden der Beiträge:", error);
-        linkedinGrid.innerHTML = `<div class="empty-state">Fehler beim Laden der LinkedIn-Beiträge.</div>`;
-        blogGrid.innerHTML = `<div class="empty-state">Fehler beim Laden der Blogartikel.</div>`;
-        return;
+        countInfo.textContent = "0 Beiträge";
+        emptyState.style.display = "block";
+        emptyState.textContent = "Die Beiträge konnten gerade nicht geladen werden.";
       }
-
-      const posts = Array.isArray(data) ? data : [];
-      renderPosts(posts, "linkedin-grid", "linkedin");
-      renderPosts(posts, "blog-grid", "blog");
     }
+
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        filterButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        activeFilter = button.dataset.filter;
+        renderPosts();
+      });
+    });
 
     loadPosts();
   </script>
