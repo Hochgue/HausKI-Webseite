@@ -275,6 +275,77 @@
       line-height:1.6;
     }
 
+    .upload-box{
+      padding:16px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.03);
+    }
+
+    .upload-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .upload-btn,
+    .remove-image-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:0 16px;
+      border-radius:12px;
+      text-decoration:none;
+      color:var(--text);
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.10);
+      transition:.2s;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .upload-btn:hover,
+    .remove-image-btn:hover{
+      transform:translateY(-2px);
+      border-color:var(--accent);
+      color:var(--accent);
+    }
+
+    .remove-image-btn{
+      border-color:rgba(255,128,154,0.28);
+    }
+
+    .file-input{
+      display:none;
+    }
+
+    .image-preview-wrap{
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.02);
+      min-height:180px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .image-preview-wrap.empty{
+      color:var(--muted);
+      text-align:center;
+      padding:20px;
+    }
+
+    .image-preview{
+      display:block;
+      width:100%;
+      max-height:320px;
+      object-fit:cover;
+    }
+
     .actions{
       display:flex;
       flex-wrap:wrap;
@@ -463,18 +534,17 @@
     <div class="nav-links">
       <a href="index.html">Start</a>
       <a href="blog.html">Blog</a>
-      <a href="admin.html" class="active">Admin</a>
     </div>
   </nav>
 
   <header class="hero">
     <div class="container">
       <div class="panel hero-box">
-        <div class="eyebrow">Intern · Beitragsverwaltung</div>
+        <div class="eyebrow">Intern · Admin</div>
         <h1>Beiträge pflegen und exportieren.</h1>
         <p class="hero-text">
           Dieser Bereich ist nur für die interne Pflege deiner HausKI-Beiträge gedacht.
-          Hier legst du Blog- oder LinkedIn-Einträge an, bearbeitest sie und exportierst danach die posts.json.
+          Hier legst du Blog- oder LinkedIn-Einträge an, bearbeitest sie und exportierst anschließend die posts.json.
         </p>
       </div>
     </div>
@@ -495,6 +565,7 @@
 
           <form id="postForm">
             <input type="hidden" id="editingId" value="">
+            <input type="hidden" id="imageData" value="">
 
             <div class="grid-2">
               <div class="field">
@@ -537,8 +608,24 @@
               </div>
 
               <div class="field">
-                <label for="image">Bildpfad</label>
-                <input id="image" type="text" placeholder="z. B. blog-images/tedee-smart-lock.jpg">
+                <label for="imagePath">Bildpfad oder Bild-URL</label>
+                <input id="imagePath" type="text" placeholder="z. B. blog-images/tedee-smart-lock.jpg">
+                <div class="hint">Optional. Oder unten direkt ein Foto auswählen.</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Beitragsbild</label>
+              <div class="upload-box">
+                <div class="upload-actions">
+                  <label class="upload-btn" for="imageFile">Foto auswählen</label>
+                  <button class="remove-image-btn" type="button" id="removeImageBtn">Bild entfernen</button>
+                  <input class="file-input" id="imageFile" type="file" accept="image/*">
+                </div>
+
+                <div id="imagePreviewWrap" class="image-preview-wrap empty">
+                  Noch kein Bild ausgewählt.
+                </div>
               </div>
             </div>
 
@@ -604,7 +691,11 @@
     const sourceInput = document.getElementById("source");
     const categoryInput = document.getElementById("category");
     const tagsInput = document.getElementById("tags");
-    const imageInput = document.getElementById("image");
+    const imagePathInput = document.getElementById("imagePath");
+    const imageDataInput = document.getElementById("imageData");
+    const imageFileInput = document.getElementById("imageFile");
+    const imagePreviewWrap = document.getElementById("imagePreviewWrap");
+    const removeImageBtn = document.getElementById("removeImageBtn");
     const excerptInput = document.getElementById("excerpt");
     const materialInput = document.getElementById("material");
     const contentInput = document.getElementById("content");
@@ -680,6 +771,17 @@
       });
     }
 
+    function renderImagePreview(imageValue) {
+      if (!imageValue) {
+        imagePreviewWrap.className = "image-preview-wrap empty";
+        imagePreviewWrap.innerHTML = "Noch kein Bild ausgewählt.";
+        return;
+      }
+
+      imagePreviewWrap.className = "image-preview-wrap";
+      imagePreviewWrap.innerHTML = `<img class="image-preview" src="${imageValue}" alt="Bildvorschau">`;
+    }
+
     function resetForm() {
       editingId.value = "";
       postForm.reset();
@@ -687,6 +789,9 @@
       sourceInput.value = "blog";
       slugInput.value = "";
       slugInput.dataset.manual = "";
+      imageDataInput.value = "";
+      imageFileInput.value = "";
+      renderImagePreview("");
       setStatus("Bereit. Du kannst einen neuen Beitrag anlegen.");
     }
 
@@ -699,10 +804,14 @@
       sourceInput.value = post.source || "blog";
       categoryInput.value = post.category || "";
       tagsInput.value = Array.isArray(post.tags) ? post.tags.join(", ") : "";
-      imageInput.value = post.image || "";
+      imagePathInput.value = (post.image && !String(post.image).startsWith("data:image")) ? post.image : "";
+      imageDataInput.value = (post.image && String(post.image).startsWith("data:image")) ? post.image : "";
+      imageFileInput.value = "";
       excerptInput.value = post.excerpt || "";
       materialInput.value = post.material || "";
       contentInput.value = post.content || "";
+
+      renderImagePreview(imageDataInput.value || imagePathInput.value || "");
 
       window.scrollTo({ top: 0, behavior: "smooth" });
       setStatus(`Beitrag "${post.title}" zum Bearbeiten geladen.`, "warn");
@@ -794,7 +903,7 @@
           category: "Automation",
           tags: ["Einbau", "Tedee", "Sicherheit"],
           source: "blog",
-          image: "blog-images/tedee-smart-lock.jpg",
+          image: "",
           excerpt: "Tedee Smart Lock in HausKI integriert – Tür, Alarm und Automationen im Griff.",
           material: "Tedee 2 Go, Keypad, Moes Zigbee Türkontakt",
           content: "## Ausgangslage\nIch wollte die Haustür sauber in HausKI einbinden.\n\n## Ziel\n- automatisches Sperren nach definierter Zeit\n- Zusammenspiel mit Alarmo\n- Status sauber im HUD sichtbar\n\n## Umsetzung\nDie Tür ist über den Kontaktsensor und das Tedee Schloss in Home Assistant eingebunden.\n\n## Fazit\nDie Integration funktioniert sauber und bringt deutlich mehr Übersicht und Sicherheit."
@@ -855,6 +964,8 @@
         .map(item => item.trim())
         .filter(Boolean);
 
+      const imageValue = imageDataInput.value.trim() || imagePathInput.value.trim();
+
       return {
         id,
         title,
@@ -862,12 +973,41 @@
         category: categoryInput.value.trim(),
         tags: rawTags,
         source: sourceInput.value,
-        image: imageInput.value.trim(),
+        image: imageValue,
         excerpt: excerptInput.value.trim(),
         material: materialInput.value.trim(),
         content: contentInput.value.trim()
       };
     }
+
+    imageFileInput.addEventListener("change", (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const result = e.target.result;
+        imageDataInput.value = result;
+        imagePathInput.value = "";
+        renderImagePreview(result);
+        setStatus(`Bild "${file.name}" wurde geladen.`, "success");
+      };
+      reader.readAsDataURL(file);
+    });
+
+    removeImageBtn.addEventListener("click", () => {
+      imageFileInput.value = "";
+      imageDataInput.value = "";
+      imagePathInput.value = "";
+      renderImagePreview("");
+      setStatus("Bild wurde entfernt.", "warn");
+    });
+
+    imagePathInput.addEventListener("input", () => {
+      if (!imageDataInput.value.trim()) {
+        renderImagePreview(imagePathInput.value.trim());
+      }
+    });
 
     postForm.addEventListener("submit", (event) => {
       event.preventDefault();
