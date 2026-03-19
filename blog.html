@@ -282,6 +282,18 @@
       object-fit: cover;
     }
 
+    .post-image-fallback {
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
+      background: linear-gradient(135deg, rgba(69, 182, 255, 0.12), transparent);
+    }
+
     .post-badge {
       position: absolute;
       top: 14px;
@@ -292,6 +304,7 @@
       font-weight: 800;
       letter-spacing: 0.2px;
       backdrop-filter: blur(8px);
+      z-index: 2;
     }
 
     .badge-blog {
@@ -460,6 +473,7 @@
         <a href="ueber.html">Über</a>
         <a href="blog.html" class="active">Blog</a>
         <a href="roadmap.html">Roadmap</a>
+        <a href="admin.html">Admin</a>
       </nav>
     </div>
   </header>
@@ -494,7 +508,7 @@
         <div class="post-grid" id="postGrid"></div>
 
         <div class="empty-state" id="emptyState">
-          Für diesen Bereich sind aktuell noch keine Beiträge vorhanden.
+          Die Beiträge konnten gerade nicht geladen werden.
         </div>
       </div>
     </section>
@@ -505,6 +519,9 @@
       © 2026 HausKI – Smart Home, Energie und echte Praxis.
     </div>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
 
   <script>
     let posts = [];
@@ -517,7 +534,9 @@
     let activeFilter = "all";
 
     function formatDate(dateString) {
+      if (!dateString) return "";
       const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return dateString;
       return date.toLocaleDateString("de-AT", {
         day: "2-digit",
         month: "2-digit",
@@ -537,10 +556,19 @@
       const card = document.createElement("article");
       card.className = "post-card";
 
+      const imageHtml = post.image
+        ? `
+          <img class="post-image" src="${post.image}" alt="${post.title}">
+          <div class="post-image-fallback">Bild konnte nicht geladen werden.</div>
+        `
+        : `
+          <div class="post-image-fallback" style="display:flex;">Noch kein Bild hinterlegt.</div>
+        `;
+
       card.innerHTML = `
         <div class="post-image-wrap">
-          <img class="post-image" src="${post.image}" alt="${post.title}">
           <div class="post-badge ${getTypeBadgeClass(post.type)}">${getTypeLabel(post.type)}</div>
+          ${imageHtml}
         </div>
 
         <div class="post-content">
@@ -549,7 +577,7 @@
             <span class="meta-pill">${post.category || "Allgemein"}</span>
           </div>
 
-          <h2 class="post-title">${post.title}</h2>
+          <h2 class="post-title">${post.title || ""}</h2>
           <p class="post-excerpt">${post.excerpt || ""}</p>
 
           <div class="material-box">
@@ -566,6 +594,16 @@
         </div>
       `;
 
+      const image = card.querySelector(".post-image");
+      const fallback = card.querySelector(".post-image-fallback");
+
+      if (image && fallback) {
+        image.onerror = () => {
+          image.style.display = "none";
+          fallback.style.display = "flex";
+        };
+      }
+
       return card;
     }
 
@@ -581,6 +619,7 @@
 
       if (visiblePosts.length === 0) {
         emptyState.style.display = "block";
+        emptyState.textContent = "Aktuell sind noch keine Beiträge vorhanden.";
         return;
       }
 
@@ -593,19 +632,26 @@
 
     async function loadPosts() {
       try {
-        const response = await fetch("posts.json");
-
-        if (!response.ok) {
-          throw new Error("posts.json konnte nicht geladen werden");
+        if (!window.supabaseClient) {
+          throw new Error("Supabase Client wurde nicht geladen.");
         }
 
-        posts = await response.json();
+        const { data, error } = await window.supabaseClient
+          .from("posts")
+          .select("*")
+          .order("date", { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        posts = Array.isArray(data) ? data : [];
         renderPosts();
       } catch (error) {
         console.error("Fehler beim Laden der Beiträge:", error);
         countInfo.textContent = "0 Beiträge";
         emptyState.style.display = "block";
-        emptyState.textContent = "Die Beiträge konnten gerade nicht geladen werden.";
+        emptyState.textContent = `Die Beiträge konnten gerade nicht geladen werden. (${error.message})`;
       }
     }
 
