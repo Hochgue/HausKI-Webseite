@@ -1,274 +1,1191 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HausKI Admin</title>
-  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
   <style>
     * {
       box-sizing: border-box;
     }
 
+    :root {
+      --bg: #040911;
+      --bg2: #091321;
+      --panel: rgba(10, 21, 36, 0.92);
+      --panel-strong: rgba(8, 18, 31, 0.96);
+      --line: rgba(76, 177, 255, 0.16);
+      --line-strong: rgba(76, 177, 255, 0.28);
+      --text: #eaf4ff;
+      --muted: #96afc8;
+      --blue: #45b6ff;
+      --blue-soft: rgba(69, 182, 255, 0.14);
+      --cyan: #78ecff;
+      --success: #6ee7b7;
+      --warn: #ffd166;
+      --danger: #ff7b7b;
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --shadow: 0 22px 46px rgba(0, 0, 0, 0.34);
+      --max: 1440px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
-      padding: 40px 20px;
       font-family: Arial, Helvetica, sans-serif;
-      background: #081320;
-      color: #ffffff;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(69, 182, 255, 0.16), transparent 24%),
+        radial-gradient(circle at top right, rgba(0, 224, 255, 0.10), transparent 20%),
+        linear-gradient(180deg, #040911 0%, #08111c 50%, #06101a 100%);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
     }
 
     .container {
-      max-width: 800px;
+      width: min(var(--max), calc(100% - 32px));
       margin: 0 auto;
     }
 
-    h1 {
-      margin: 0 0 30px;
-      font-size: 2rem;
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(4, 10, 18, 0.78);
+      border-bottom: 1px solid rgba(110, 180, 255, 0.12);
     }
 
-    form {
-      background: #0f1f33;
-      padding: 30px;
+    .nav {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
       border-radius: 12px;
+      filter: drop-shadow(0 0 12px rgba(69, 182, 255, 0.24));
+      flex-shrink: 0;
     }
 
-    label {
-      display: block;
-      margin-bottom: 8px;
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.05;
+    }
+
+    .brand-text strong {
+      font-size: 1.08rem;
+      color: #f3faff;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-text span {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      transition: 0.2s ease;
+      font-size: 0.95rem;
       font-weight: 600;
     }
 
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: #fff;
+      background: rgba(69, 182, 255, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(69, 182, 255, 0.2);
+    }
+
+    .page {
+      padding: 34px 0 60px;
+    }
+
+    .hero-box {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(12, 25, 42, 0.96), rgba(7, 17, 30, 0.96));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: clamp(26px, 4vw, 42px);
+      margin-bottom: 24px;
+    }
+
+    .hero-box::before {
+      content: "";
+      position: absolute;
+      right: -70px;
+      bottom: -70px;
+      width: 230px;
+      height: 230px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(69, 182, 255, 0.18), transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(69, 182, 255, 0.12);
+      color: #c7eeff;
+      border: 1px solid rgba(69, 182, 255, 0.18);
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .hero-box h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1;
+      letter-spacing: -1.2px;
+    }
+
+    .hero-box p {
+      margin: 0;
+      max-width: 860px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1.02rem;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(11, 23, 39, 0.94), rgba(7, 16, 28, 0.96));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid rgba(110, 180, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 1.18rem;
+      letter-spacing: -0.3px;
+    }
+
+    .panel-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .panel-body {
+      padding: 22px;
+    }
+
+    .section {
+      padding: 18px 0 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .section:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      color: #dff3ff;
+      letter-spacing: 0.2px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field-grid.single {
+      grid-template-columns: 1fr;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 0.93rem;
+      font-weight: 700;
+      color: #e8f4ff;
+    }
+
+    .field small {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
     input,
-    textarea,
-    select {
+    select,
+    textarea {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 18px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-family: inherit;
+      border: 1px solid rgba(110, 180, 255, 0.14);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 14px 14px;
+      font: inherit;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #7f9ab5;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(69, 182, 255, 0.34);
+      box-shadow: 0 0 0 3px rgba(69, 182, 255, 0.08);
+      background: rgba(255, 255, 255, 0.05);
     }
 
     textarea {
-      min-height: 110px;
+      min-height: 130px;
       resize: vertical;
     }
 
-    input[type="file"] {
-      background: #ffffff;
-      color: #081320;
-      cursor: pointer;
+    .type-switch {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
 
-    button {
-      background: #21c8ff;
-      color: #081320;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: bold;
+    .type-option {
+      position: relative;
+    }
+
+    .type-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .type-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+      min-height: 110px;
+      border-radius: 18px;
+      border: 1px solid rgba(110, 180, 255, 0.14);
+      background: rgba(255, 255, 255, 0.03);
       cursor: pointer;
       transition: 0.2s ease;
     }
 
-    button:hover {
-      opacity: 0.92;
+    .type-card strong {
+      font-size: 1rem;
+      color: #f1f8ff;
     }
 
-    #message {
-      margin-top: 18px;
+    .type-card span {
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.9rem;
     }
 
-    .success {
-      color: #6af0c7;
-      font-weight: 600;
+    .type-option input:checked + .type-card {
+      border-color: rgba(69, 182, 255, 0.36);
+      background: linear-gradient(180deg, rgba(69, 182, 255, 0.16), rgba(69, 182, 255, 0.06));
+      box-shadow: inset 0 0 0 1px rgba(69, 182, 255, 0.10), 0 14px 28px rgba(0, 0, 0, 0.18);
     }
 
-    .error {
-      color: #ff6b6b;
-      font-weight: 600;
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border: 1px solid rgba(110, 180, 255, 0.14);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 18px;
+      padding: 14px 16px;
     }
 
-    .image-preview-wrap {
-      margin: -6px 0 18px;
+    .toggle-row .copy strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
     }
 
-    .image-preview {
+    .toggle-row .copy span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .switch {
+      position: relative;
+      width: 56px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #f6fbff;
+      transition: 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+    }
+
+    .switch input:checked + .slider {
+      background: rgba(69, 182, 255, 0.3);
+      border-color: rgba(69, 182, 255, 0.38);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(24px);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      color: #04111d;
+      background: linear-gradient(180deg, #6bdcff, #45b6ff);
+      box-shadow: 0 12px 24px rgba(69, 182, 255, 0.18);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      color: #eaf4ff;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .status-box {
+      margin-top: 16px;
       display: none;
-      width: 100%;
-      max-width: 420px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 0.94rem;
+      line-height: 1.55;
     }
 
-    .hint {
-      font-size: 13px;
-      color: #a9bfd3;
-      margin-top: -10px;
-      margin-bottom: 18px;
+    .status-box.success {
+      display: block;
+      background: rgba(110, 231, 183, 0.08);
+      border: 1px solid rgba(110, 231, 183, 0.18);
+      color: #d9fff0;
+    }
+
+    .status-box.error {
+      display: block;
+      background: rgba(255, 123, 123, 0.08);
+      border: 1px solid rgba(255, 123, 123, 0.18);
+      color: #ffe4e4;
+    }
+
+    .preview-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: sticky;
+      top: 98px;
+    }
+
+    .preview-card {
+      overflow: hidden;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(11, 23, 39, 0.96), rgba(7, 15, 27, 0.96));
+      border: 1px solid rgba(110, 180, 255, 0.14);
+      box-shadow: var(--shadow);
+    }
+
+    .preview-image-wrap {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background:
+        linear-gradient(135deg, rgba(69, 182, 255, 0.14), rgba(0, 0, 0, 0)),
+        #09111d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .preview-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .preview-placeholder {
+      color: #9cb5ce;
+      font-size: 0.96rem;
+      padding: 18px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .preview-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      backdrop-filter: blur(8px);
+      z-index: 2;
+    }
+
+    .badge-blog {
+      background: rgba(88, 225, 255, 0.16);
+      color: #d7f7ff;
+      border: 1px solid rgba(88, 225, 255, 0.24);
+    }
+
+    .badge-linkedin {
+      background: rgba(76, 144, 255, 0.2);
+      color: #d9ebff;
+      border: 1px solid rgba(76, 144, 255, 0.28);
+    }
+
+    .preview-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .preview-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .preview-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .preview-title {
+      margin: 0;
+      font-size: 1.24rem;
+      line-height: 1.28;
+      letter-spacing: -0.3px;
+    }
+
+    .preview-excerpt {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 0.98rem;
+    }
+
+    .preview-material {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .preview-material strong {
+      color: #dff4ff;
+    }
+
+    .preview-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .json-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .json-box-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .json-box-head strong {
+      font-size: 0.98rem;
+    }
+
+    .json-box-head span {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .json-output {
+      margin: 0;
+      padding: 16px;
+      color: #d9f3ff;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 380px;
+      overflow: auto;
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+      margin-top: 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1120px) {
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-shell {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .nav {
+        padding: 14px 0;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .type-switch {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-box h1 {
+        line-height: 1.02;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>HausKI Blog Admin</h1>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="brand-logo" src="bilder/New_Home_Assistant_logo.svg.png" alt="HausKI Logo" />
+        <div class="brand-text">
+          <strong>HausKI</strong>
+          <span>Blog & Content Admin</span>
+        </div>
+      </a>
 
-    <form id="post-form">
-      <label for="title">Titel</label>
-      <input id="title" type="text" required>
+      <nav class="nav-links">
+        <a href="index.html">Start</a>
+        <a href="blog.html">Blog</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="admin.html" class="active">Admin</a>
+      </nav>
+    </div>
+  </header>
 
-      <label for="excerpt">Auszug</label>
-      <textarea id="excerpt"></textarea>
+  <main class="page">
+    <div class="container">
+      <section class="hero-box">
+        <div class="eyebrow">HausKI Content Center</div>
+        <h1>Neue Beiträge sauber erstellen</h1>
+        <p>
+          Hier legst du neue HausKI-Beiträge an. Die Maske ist bewusst aufgeteilt in Grunddaten,
+          Inhalt und Medien. Rechts siehst du sofort eine Live-Vorschau, wie der Beitrag später
+          als Karte im Blog wirkt. Im nächsten Schritt hängen wir das direkt an Supabase.
+        </p>
+      </section>
 
-      <label for="content">Inhalt</label>
-      <textarea id="content"></textarea>
+      <section class="admin-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Beitrag anlegen</h2>
+              <p>Blogartikel und LinkedIn-Updates in einer gemeinsamen Struktur.</p>
+            </div>
+          </div>
 
-      <label for="post_type">Post Typ</label>
-      <select id="post_type">
-        <option value="linkedin">LinkedIn</option>
-        <option value="blog" selected>Blog</option>
-      </select>
+          <div class="panel-body">
+            <form id="postForm">
+              <div class="section">
+                <h3 class="section-title">1. Beitragstyp</h3>
 
-      <label for="linkedin_url">LinkedIn URL</label>
-      <input id="linkedin_url" type="url">
+                <div class="type-switch">
+                  <label class="type-option">
+                    <input type="radio" name="type" value="blog" checked />
+                    <span class="type-card">
+                      <strong>Blogartikel</strong>
+                      <span>Für ausführlichere Inhalte, echte Praxisberichte, Learnings und Dokumentation.</span>
+                    </span>
+                  </label>
 
-      <label for="cover_image">Cover Bild</label>
-      <input id="cover_image" type="file" accept="image/*">
-      <div class="hint">Bild auswählen, Vorschau kontrollieren, dann speichern.</div>
+                  <label class="type-option">
+                    <input type="radio" name="type" value="linkedin" />
+                    <span class="type-card">
+                      <strong>LinkedIn Update</strong>
+                      <span>Für kurze Projektupdates, Gedanken, Screenshots, Fortschritte und Impulse.</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
 
-      <div class="image-preview-wrap">
-        <img id="image_preview" class="image-preview" alt="Bildvorschau">
-      </div>
+              <div class="section">
+                <h3 class="section-title">2. Grunddaten</h3>
 
-      <label for="published_at">Veröffentlicht am</label>
-      <input id="published_at" type="date">
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="title">Titel</label>
+                    <input id="title" name="title" type="text" placeholder="z. B. HausKI HUD: Live-Energie auf einen Blick" required />
+                  </div>
 
-      <label for="visible">Sichtbar</label>
-      <select id="visible">
-        <option value="true">Ja</option>
-        <option value="false">Nein</option>
-      </select>
+                  <div class="field">
+                    <label for="slug">ID / Slug</label>
+                    <input id="slug" name="slug" type="text" placeholder="wird automatisch erzeugt" />
+                    <small>Kann leer bleiben. Wird automatisch aus dem Titel erzeugt.</small>
+                  </div>
 
-      <button type="submit">Beitrag speichern</button>
+                  <div class="field">
+                    <label for="category">Kategorie</label>
+                    <input id="category" name="category" type="text" placeholder="z. B. Dashboard, Heizung, HausKI" />
+                  </div>
 
-      <div id="message"></div>
-    </form>
-  </div>
+                  <div class="field">
+                    <label for="date">Veröffentlichungsdatum</label>
+                    <input id="date" name="date" type="date" required />
+                  </div>
+                </div>
+              </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+              <div class="section">
+                <h3 class="section-title">3. Inhalt</h3>
+
+                <div class="field-grid single">
+                  <div class="field">
+                    <label for="excerpt">Auszug</label>
+                    <textarea id="excerpt" name="excerpt" placeholder="Kurzer Teasertext für die Kartenansicht im Blog." required></textarea>
+                  </div>
+
+                  <div class="field">
+                    <label for="content">Volltext / Inhalt</label>
+                    <textarea id="content" name="content" placeholder="Hier kommt der eigentliche Beitrag hinein. Aktuell noch als einfacher Text. Später können wir daraus HTML oder Rich-Text machen." required></textarea>
+                  </div>
+
+                  <div class="field">
+                    <label for="material">Verwendetes Material / Geräte</label>
+                    <input id="material" name="material" type="text" placeholder="z. B. Home Assistant, Shelly Plug, Solax, Templates" />
+                  </div>
+
+                  <div class="field hidden" id="linkedinField">
+                    <label for="linkedin_url">LinkedIn URL</label>
+                    <input id="linkedin_url" name="linkedin_url" type="url" placeholder="https://www.linkedin.com/..." />
+                    <small>Nur relevant, wenn der Beitragstyp LinkedIn ist.</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <h3 class="section-title">4. Medien & Sichtbarkeit</h3>
+
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="image">Bildpfad oder Bild-URL</label>
+                    <input id="image" name="image" type="text" placeholder="z. B. bilder/blog/hud-energie.jpg" />
+                    <small>Für jetzt am einfachsten als Bildpfad eintragen.</small>
+                  </div>
+
+                  <div class="field">
+                    <label for="source">Quelle</label>
+                    <select id="source" name="source">
+                      <option value="manual">HausKI Blog</option>
+                      <option value="linkedin">LinkedIn</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field-grid" style="margin-top:16px;">
+                  <div class="field">
+                    <div class="toggle-row">
+                      <div class="copy">
+                        <strong>Sichtbar</strong>
+                        <span>Unsichtbare Beiträge bleiben intern und erscheinen nicht im Blog.</span>
+                      </div>
+
+                      <label class="switch">
+                        <input id="published" name="published" type="checkbox" checked />
+                        <span class="slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary">Beitrag vorbereiten</button>
+                  <button type="button" class="btn btn-secondary" id="resetBtn">Formular leeren</button>
+                  <button type="button" class="btn btn-secondary" id="copyJsonBtn">JSON kopieren</button>
+                </div>
+
+                <div id="statusBox" class="status-box"></div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="preview-shell">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Live-Vorschau</h2>
+                <p>So wirkt der Beitrag später als Karte im Blog.</p>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <article class="preview-card">
+                <div class="preview-image-wrap">
+                  <div id="previewBadge" class="preview-badge badge-blog">Blog</div>
+                  <img id="previewImage" alt="Beitragsbild Vorschau" />
+                  <div id="previewPlaceholder" class="preview-placeholder">
+                    Noch kein Bild gesetzt.<br />
+                    Trage links einen Bildpfad oder eine Bild-URL ein.
+                  </div>
+                </div>
+
+                <div class="preview-content">
+                  <div class="preview-meta">
+                    <span class="preview-pill" id="previewDate">Datum</span>
+                    <span class="preview-pill" id="previewCategory">Kategorie</span>
+                  </div>
+
+                  <h3 class="preview-title" id="previewTitle">Dein Beitragstitel erscheint hier</h3>
+                  <p class="preview-excerpt" id="previewExcerpt">
+                    Hier siehst du den Auszug des Beitrags. So bekommst du sofort ein Gefühl,
+                    ob der Text gut für die Kartenansicht funktioniert.
+                  </p>
+
+                  <div class="preview-material" id="previewMaterial">
+                    <strong>Verwendetes Material:</strong><br />
+                    Noch nichts eingetragen.
+                  </div>
+
+                  <div class="preview-footer">
+                    <span id="previewSource">HausKI Blog</span>
+                    <span id="previewVisibility">Sichtbar</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="json-box">
+            <div class="json-box-head">
+              <div>
+                <strong>Generierter Datensatz</strong>
+                <span>Diese Struktur passt zu deinem Blog-System.</span>
+              </div>
+            </div>
+            <pre class="json-output" id="jsonOutput">{}</pre>
+          </div>
+
+          <p class="helper">
+            Im nächsten Schritt können wir den Speichern-Button direkt mit Supabase verbinden,
+            damit neue Beiträge wirklich in der Datenbank landen statt nur vorbereitet zu werden.
+          </p>
+        </div>
+      </section>
+    </div>
+  </main>
 
   <script>
-    const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
-    const STORAGE_BUCKET = "blog-images";
+    const form = document.getElementById("postForm");
+    const statusBox = document.getElementById("statusBox");
 
-    const adminSupabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+    const titleInput = document.getElementById("title");
+    const slugInput = document.getElementById("slug");
+    const categoryInput = document.getElementById("category");
+    const dateInput = document.getElementById("date");
+    const excerptInput = document.getElementById("excerpt");
+    const contentInput = document.getElementById("content");
+    const materialInput = document.getElementById("material");
+    const linkedinUrlInput = document.getElementById("linkedin_url");
+    const imageInput = document.getElementById("image");
+    const sourceInput = document.getElementById("source");
+    const publishedInput = document.getElementById("published");
+    const linkedinField = document.getElementById("linkedinField");
+    const resetBtn = document.getElementById("resetBtn");
+    const copyJsonBtn = document.getElementById("copyJsonBtn");
 
-    const form = document.getElementById("post-form");
-    const message = document.getElementById("message");
-    const coverImageInput = document.getElementById("cover_image");
-    const imagePreview = document.getElementById("image_preview");
+    const previewBadge = document.getElementById("previewBadge");
+    const previewImage = document.getElementById("previewImage");
+    const previewPlaceholder = document.getElementById("previewPlaceholder");
+    const previewDate = document.getElementById("previewDate");
+    const previewCategory = document.getElementById("previewCategory");
+    const previewTitle = document.getElementById("previewTitle");
+    const previewExcerpt = document.getElementById("previewExcerpt");
+    const previewMaterial = document.getElementById("previewMaterial");
+    const previewSource = document.getElementById("previewSource");
+    const previewVisibility = document.getElementById("previewVisibility");
+    const jsonOutput = document.getElementById("jsonOutput");
 
-    coverImageInput.addEventListener("change", () => {
-      const file = coverImageInput.files[0];
+    const typeInputs = document.querySelectorAll('input[name="type"]');
 
-      if (!file) {
-        imagePreview.style.display = "none";
-        imagePreview.src = "";
+    function setTodayIfEmpty() {
+      if (!dateInput.value) {
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, "0");
+        const d = String(today.getDate()).padStart(2, "0");
+        dateInput.value = `${y}-${m}-${d}`;
+      }
+    }
+
+    function slugify(text) {
+      return text
+        .toString()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function textToSimpleHtml(text) {
+      const safe = escapeHtml(text.trim());
+      if (!safe) return "";
+      return safe
+        .split(/\n{2,}/)
+        .map(paragraph => `<p>${paragraph.replace(/\n/g, "<br>")}</p>`)
+        .join("");
+    }
+
+    function getSelectedType() {
+      return document.querySelector('input[name="type"]:checked')?.value || "blog";
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "Datum";
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString("de-AT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    }
+
+    function buildRecord() {
+      const type = getSelectedType();
+      const title = titleInput.value.trim();
+      const manualSlug = slugInput.value.trim();
+      const id = manualSlug || slugify(title) || "neuer-beitrag";
+      const source = sourceInput.value || (type === "linkedin" ? "linkedin" : "manual");
+
+      return {
+        id,
+        title,
+        excerpt: excerptInput.value.trim(),
+        content: textToSimpleHtml(contentInput.value),
+        image: imageInput.value.trim(),
+        date: dateInput.value,
+        type,
+        category: categoryInput.value.trim(),
+        material: materialInput.value.trim(),
+        source,
+        linkedin_url: linkedinUrlInput.value.trim() || null,
+        published: publishedInput.checked
+      };
+    }
+
+    function updateTypeState() {
+      const type = getSelectedType();
+      linkedinField.classList.toggle("hidden", type !== "linkedin");
+
+      if (type === "linkedin") {
+        sourceInput.value = "linkedin";
+      } else if (sourceInput.value === "linkedin") {
+        sourceInput.value = "manual";
+      }
+
+      previewBadge.textContent = type === "linkedin" ? "LinkedIn" : "Blog";
+      previewBadge.className = `preview-badge ${type === "linkedin" ? "badge-linkedin" : "badge-blog"}`;
+      updatePreview();
+    }
+
+    function updatePreviewImage() {
+      const value = imageInput.value.trim();
+
+      if (!value) {
+        previewImage.style.display = "none";
+        previewImage.removeAttribute("src");
+        previewPlaceholder.style.display = "block";
         return;
       }
 
-      const localUrl = URL.createObjectURL(file);
-      imagePreview.src = localUrl;
-      imagePreview.style.display = "block";
-    });
+      previewImage.src = value;
+      previewImage.style.display = "block";
+      previewPlaceholder.style.display = "none";
 
-    async function uploadCoverImage(file) {
-      if (!file) return "";
+      previewImage.onerror = () => {
+        previewImage.style.display = "none";
+        previewPlaceholder.style.display = "block";
+        previewPlaceholder.innerHTML = "Bild konnte nicht geladen werden.<br>Bitte Pfad oder URL prüfen.";
+      };
 
-      const fileExt = file.name.split(".").pop();
-      const safeName = file.name
-        .replace(/\.[^/.]+$/, "")
-        .replace(/[^a-zA-Z0-9-_]/g, "-")
-        .toLowerCase();
-
-      const fileName = `${Date.now()}-${safeName}.${fileExt}`;
-      const filePath = `covers/${fileName}`;
-
-      const { error: uploadError } = await adminSupabase.storage
-        .from(STORAGE_BUCKET)
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = adminSupabase.storage
-        .from(STORAGE_BUCKET)
-        .getPublicUrl(filePath);
-
-      return data.publicUrl;
+      previewImage.onload = () => {
+        previewImage.style.display = "block";
+        previewPlaceholder.style.display = "none";
+      };
     }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      message.innerHTML = "";
+    function updatePreview() {
+      const record = buildRecord();
 
-      const submitButton = form.querySelector("button[type='submit']");
-      submitButton.disabled = true;
-      submitButton.textContent = "Speichert...";
+      previewTitle.textContent = record.title || "Dein Beitragstitel erscheint hier";
+      previewExcerpt.textContent =
+        record.excerpt ||
+        "Hier siehst du den Auszug des Beitrags. So bekommst du sofort ein Gefühl, ob der Text gut für die Kartenansicht funktioniert.";
+      previewDate.textContent = formatDate(record.date);
+      previewCategory.textContent = record.category || "Allgemein";
+      previewMaterial.innerHTML = `<strong>Verwendetes Material:</strong><br>${record.material || "Noch nichts eingetragen."}`;
+      previewSource.textContent = record.source === "linkedin" ? "Quelle: LinkedIn" : "HausKI Blog";
+      previewVisibility.textContent = record.published ? "Sichtbar" : "Nicht sichtbar";
 
+      jsonOutput.textContent = JSON.stringify(record, null, 2);
+
+      updatePreviewImage();
+    }
+
+    function clearStatus() {
+      statusBox.className = "status-box";
+      statusBox.textContent = "";
+    }
+
+    function showStatus(message, type = "success") {
+      statusBox.className = `status-box ${type}`;
+      statusBox.textContent = message;
+    }
+
+    titleInput.addEventListener("input", () => {
+      if (!slugInput.dataset.userEdited) {
+        slugInput.value = slugify(titleInput.value);
+      }
+      updatePreview();
+    });
+
+    slugInput.addEventListener("input", () => {
+      slugInput.dataset.userEdited = slugInput.value.trim() ? "true" : "";
+      updatePreview();
+    });
+
+    [
+      categoryInput,
+      dateInput,
+      excerptInput,
+      contentInput,
+      materialInput,
+      linkedinUrlInput,
+      imageInput,
+      sourceInput,
+      publishedInput
+    ].forEach(field => {
+      field.addEventListener("input", updatePreview);
+      field.addEventListener("change", updatePreview);
+    });
+
+    typeInputs.forEach(input => {
+      input.addEventListener("change", updateTypeState);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      form.reset();
+      slugInput.dataset.userEdited = "";
+      clearStatus();
+      setTodayIfEmpty();
+      updateTypeState();
+      updatePreview();
+    });
+
+    copyJsonBtn.addEventListener("click", async () => {
       try {
-        const publishedDate = document.getElementById("published_at").value;
-        const selectedFile = coverImageInput.files[0];
-
-        let coverImageUrl = "";
-        if (selectedFile) {
-          coverImageUrl = await uploadCoverImage(selectedFile);
-        }
-
-        const post = {
-          title: document.getElementById("title").value.trim(),
-          excerpt: document.getElementById("excerpt").value.trim(),
-          content: document.getElementById("content").value.trim(),
-          post_type: document.getElementById("post_type").value,
-          linkedin_url: document.getElementById("linkedin_url").value.trim(),
-          cover_image: coverImageUrl,
-          published_at: publishedDate ? `${publishedDate}T12:00:00` : null,
-          visible: document.getElementById("visible").value === "true"
-        };
-
-        const { error } = await adminSupabase
-          .from("posts")
-          .insert([post]);
-
-        if (error) {
-          throw error;
-        }
-
-        message.innerHTML = "<div class='success'>Beitrag erfolgreich gespeichert.</div>";
-        form.reset();
-        imagePreview.src = "";
-        imagePreview.style.display = "none";
+        await navigator.clipboard.writeText(jsonOutput.textContent);
+        showStatus("JSON wurde in die Zwischenablage kopiert.");
       } catch (error) {
-        console.error("Fehler beim Speichern:", error);
-        message.innerHTML = "<div class='error'>Fehler beim Speichern des Beitrags oder beim Bild-Upload.</div>";
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Beitrag speichern";
+        showStatus("Kopieren hat nicht funktioniert. Bitte JSON manuell markieren und kopieren.", "error");
       }
     });
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      clearStatus();
+
+      const record = buildRecord();
+
+      if (!record.title || !record.excerpt || !record.content || !record.date) {
+        showStatus("Bitte Titel, Auszug, Inhalt und Veröffentlichungsdatum ausfüllen.", "error");
+        return;
+      }
+
+      if (record.type === "linkedin" && record.source !== "linkedin") {
+        record.source = "linkedin";
+        sourceInput.value = "linkedin";
+      }
+
+      jsonOutput.textContent = JSON.stringify(record, null, 2);
+      showStatus("Beitrag wurde vorbereitet. Als nächstes hängen wir diesen Button direkt an Supabase.");
+    });
+
+    setTodayIfEmpty();
+    updateTypeState();
+    updatePreview();
   </script>
 </body>
 </html>
