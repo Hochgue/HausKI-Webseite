@@ -24,7 +24,6 @@
       --blue-soft: rgba(69, 182, 255, 0.14);
       --cyan: #78ecff;
       --success: #6ee7b7;
-      --warn: #ffd166;
       --danger: #ff7b7b;
       --radius-xl: 24px;
       --radius-lg: 18px;
@@ -196,7 +195,7 @@
 
     .admin-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+      grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
       gap: 24px;
       align-items: start;
     }
@@ -728,11 +727,10 @@
     <div class="container">
       <section class="hero-box">
         <div class="eyebrow">HausKI Content Center</div>
-        <h1>Neue Beiträge sauber erstellen</h1>
+        <h1>Neue Beiträge direkt veröffentlichen</h1>
         <p>
-          Hier legst du neue HausKI-Beiträge an. Die Maske ist bewusst aufgeteilt in Grunddaten,
-          Inhalt und Medien. Rechts siehst du sofort eine Live-Vorschau, wie der Beitrag später
-          als Karte im Blog wirkt. Im nächsten Schritt hängen wir das direkt an Supabase.
+          Hier legst du neue HausKI-Beiträge an und speicherst sie direkt in Supabase.
+          Rechts siehst du live, wie die Karte später im Blog wirkt.
         </p>
       </section>
 
@@ -740,7 +738,7 @@
         <div class="panel">
           <div class="panel-head">
             <div>
-              <h2>Beitrag anlegen</h2>
+              <h2>Beitrag erstellen</h2>
               <p>Blogartikel und LinkedIn-Updates in einer gemeinsamen Struktur.</p>
             </div>
           </div>
@@ -755,7 +753,7 @@
                     <input type="radio" name="type" value="blog" checked />
                     <span class="type-card">
                       <strong>Blogartikel</strong>
-                      <span>Für ausführlichere Inhalte, echte Praxisberichte, Learnings und Dokumentation.</span>
+                      <span>Für ausführliche Inhalte, Praxisberichte, Learnings und Dokumentation.</span>
                     </span>
                   </label>
 
@@ -763,7 +761,7 @@
                     <input type="radio" name="type" value="linkedin" />
                     <span class="type-card">
                       <strong>LinkedIn Update</strong>
-                      <span>Für kurze Projektupdates, Gedanken, Screenshots, Fortschritte und Impulse.</span>
+                      <span>Für kurze Projektupdates, Gedanken, Fortschritte und Impulse.</span>
                     </span>
                   </label>
                 </div>
@@ -775,23 +773,23 @@
                 <div class="field-grid">
                   <div class="field">
                     <label for="title">Titel</label>
-                    <input id="title" name="title" type="text" placeholder="z. B. HausKI HUD: Live-Energie auf einen Blick" required />
+                    <input id="title" type="text" placeholder="z. B. HausKI HUD: Live-Energie auf einen Blick" required />
                   </div>
 
                   <div class="field">
                     <label for="slug">ID / Slug</label>
-                    <input id="slug" name="slug" type="text" placeholder="wird automatisch erzeugt" />
+                    <input id="slug" type="text" placeholder="wird automatisch erzeugt" />
                     <small>Kann leer bleiben. Wird automatisch aus dem Titel erzeugt.</small>
                   </div>
 
                   <div class="field">
                     <label for="category">Kategorie</label>
-                    <input id="category" name="category" type="text" placeholder="z. B. Dashboard, Heizung, HausKI" />
+                    <input id="category" type="text" placeholder="z. B. Dashboard, Heizung, HausKI" />
                   </div>
 
                   <div class="field">
                     <label for="date">Veröffentlichungsdatum</label>
-                    <input id="date" name="date" type="date" required />
+                    <input id="date" type="date" required />
                   </div>
                 </div>
               </div>
@@ -802,22 +800,22 @@
                 <div class="field-grid single">
                   <div class="field">
                     <label for="excerpt">Auszug</label>
-                    <textarea id="excerpt" name="excerpt" placeholder="Kurzer Teasertext für die Kartenansicht im Blog." required></textarea>
+                    <textarea id="excerpt" placeholder="Kurzer Teasertext für die Kartenansicht im Blog." required></textarea>
                   </div>
 
                   <div class="field">
                     <label for="content">Volltext / Inhalt</label>
-                    <textarea id="content" name="content" placeholder="Hier kommt der eigentliche Beitrag hinein. Aktuell noch als einfacher Text. Später können wir daraus HTML oder Rich-Text machen." required></textarea>
+                    <textarea id="content" placeholder="Hier kommt der eigentliche Beitrag hinein." required></textarea>
                   </div>
 
                   <div class="field">
                     <label for="material">Verwendetes Material / Geräte</label>
-                    <input id="material" name="material" type="text" placeholder="z. B. Home Assistant, Shelly Plug, Solax, Templates" />
+                    <input id="material" type="text" placeholder="z. B. Home Assistant, Shelly Plug, Solax, Templates" />
                   </div>
 
                   <div class="field hidden" id="linkedinField">
                     <label for="linkedin_url">LinkedIn URL</label>
-                    <input id="linkedin_url" name="linkedin_url" type="url" placeholder="https://www.linkedin.com/..." />
+                    <input id="linkedin_url" type="url" placeholder="https://www.linkedin.com/..." />
                     <small>Nur relevant, wenn der Beitragstyp LinkedIn ist.</small>
                   </div>
                 </div>
@@ -829,13 +827,13 @@
                 <div class="field-grid">
                   <div class="field">
                     <label for="image">Bildpfad oder Bild-URL</label>
-                    <input id="image" name="image" type="text" placeholder="z. B. bilder/blog/hud-energie.jpg" />
-                    <small>Für jetzt am einfachsten als Bildpfad eintragen.</small>
+                    <input id="image" type="text" placeholder="z. B. bilder/blog/hud-energie.jpg" />
+                    <small>Für jetzt am einfachsten als Bildpfad oder URL eintragen.</small>
                   </div>
 
                   <div class="field">
                     <label for="source">Quelle</label>
-                    <select id="source" name="source">
+                    <select id="source">
                       <option value="manual">HausKI Blog</option>
                       <option value="linkedin">LinkedIn</option>
                     </select>
@@ -847,11 +845,11 @@
                     <div class="toggle-row">
                       <div class="copy">
                         <strong>Sichtbar</strong>
-                        <span>Unsichtbare Beiträge bleiben intern und erscheinen nicht im Blog.</span>
+                        <span>Unsichtbare Beiträge erscheinen nicht im Blog.</span>
                       </div>
 
                       <label class="switch">
-                        <input id="published" name="published" type="checkbox" checked />
+                        <input id="published" type="checkbox" checked />
                         <span class="slider"></span>
                       </label>
                     </div>
@@ -859,7 +857,7 @@
                 </div>
 
                 <div class="actions">
-                  <button type="submit" class="btn btn-primary">Beitrag vorbereiten</button>
+                  <button type="submit" class="btn btn-primary" id="saveBtn">Beitrag speichern</button>
                   <button type="button" class="btn btn-secondary" id="resetBtn">Formular leeren</button>
                   <button type="button" class="btn btn-secondary" id="copyJsonBtn">JSON kopieren</button>
                 </div>
@@ -920,24 +918,28 @@
             <div class="json-box-head">
               <div>
                 <strong>Generierter Datensatz</strong>
-                <span>Diese Struktur passt zu deinem Blog-System.</span>
+                <span>Diese Struktur wird in Supabase gespeichert.</span>
               </div>
             </div>
             <pre class="json-output" id="jsonOutput">{}</pre>
           </div>
 
           <p class="helper">
-            Im nächsten Schritt können wir den Speichern-Button direkt mit Supabase verbinden,
-            damit neue Beiträge wirklich in der Datenbank landen statt nur vorbereitet zu werden.
+            Nach dem Speichern sollte der Beitrag direkt in deiner Tabelle <strong>posts</strong>
+            landen und anschließend im Blog erscheinen.
           </p>
         </div>
       </section>
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+
   <script>
     const form = document.getElementById("postForm");
     const statusBox = document.getElementById("statusBox");
+    const saveBtn = document.getElementById("saveBtn");
 
     const titleInput = document.getElementById("title");
     const slugInput = document.getElementById("slug");
@@ -1026,7 +1028,7 @@
       const type = getSelectedType();
       const title = titleInput.value.trim();
       const manualSlug = slugInput.value.trim();
-      const id = manualSlug || slugify(title) || "neuer-beitrag";
+      const id = manualSlug || slugify(title) || `post-${Date.now()}`;
       const source = sourceInput.value || (type === "linkedin" ? "linkedin" : "manual");
 
       return {
@@ -1040,7 +1042,7 @@
         category: categoryInput.value.trim(),
         material: materialInput.value.trim(),
         source,
-        linkedin_url: linkedinUrlInput.value.trim() || null,
+        linkedin_url: type === "linkedin" ? (linkedinUrlInput.value.trim() || null) : null,
         published: publishedInput.checked
       };
     }
@@ -1067,6 +1069,7 @@
         previewImage.style.display = "none";
         previewImage.removeAttribute("src");
         previewPlaceholder.style.display = "block";
+        previewPlaceholder.innerHTML = "Noch kein Bild gesetzt.<br>Trage links einen Bildpfad oder eine Bild-URL ein.";
         return;
       }
 
@@ -1100,7 +1103,6 @@
       previewVisibility.textContent = record.published ? "Sichtbar" : "Nicht sichtbar";
 
       jsonOutput.textContent = JSON.stringify(record, null, 2);
-
       updatePreviewImage();
     }
 
@@ -1163,7 +1165,7 @@
       }
     });
 
-    form.addEventListener("submit", event => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       clearStatus();
 
@@ -1174,13 +1176,31 @@
         return;
       }
 
-      if (record.type === "linkedin" && record.source !== "linkedin") {
-        record.source = "linkedin";
-        sourceInput.value = "linkedin";
-      }
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Speichert ...";
 
-      jsonOutput.textContent = JSON.stringify(record, null, 2);
-      showStatus("Beitrag wurde vorbereitet. Als nächstes hängen wir diesen Button direkt an Supabase.");
+      try {
+        const { error } = await window.supabaseClient
+          .from("posts")
+          .insert([record]);
+
+        if (error) {
+          throw error;
+        }
+
+        showStatus("✅ Beitrag wurde erfolgreich in Supabase gespeichert.");
+        form.reset();
+        slugInput.dataset.userEdited = "";
+        setTodayIfEmpty();
+        updateTypeState();
+        updatePreview();
+      } catch (error) {
+        console.error(error);
+        showStatus(`Fehler beim Speichern: ${error.message}`, "error");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Beitrag speichern";
+      }
     });
 
     setTodayIfEmpty();
