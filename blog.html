@@ -1085,7 +1085,6 @@
       const { data, error } = await supabaseClient
         .from(TABLE_COMMENTS)
         .select('*')
-        .eq('approved', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
