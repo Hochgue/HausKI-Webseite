@@ -1176,7 +1176,7 @@
             <h2 class="detail-title">${escapeHtml(post.title || 'Ohne Titel')}</h2>
             <div class="detail-actions">
               <button id="modalLikeButton" class="like-button" type="button" ${hasLiked ? 'disabled' : ''}>
-                ${hasLiked ? 'Bereits geliked ❤' : 'Beitrag liken ❤'}
+                ${hasLiked ? 'Bereits geliked 👍' : 'Beitrag liken 👍'}
               </button>
               ${linkedInUrl ? `<a class="button-outline" href="${escapeHtml(linkedInUrl)}" target="_blank" rel="noopener noreferrer">Auf LinkedIn ansehen</a>` : ''}
             </div>
@@ -1262,7 +1262,7 @@
 
         const countEl = document.getElementById('modalLikeCount');
         if (countEl) countEl.textContent = String(state.likesByPost[postId]);
-        if (likeButton) likeButton.textContent = 'Bereits geliked ❤';
+        if (likeButton) likeButton.textContent = 'Bereits geliked 👍';
 
         updateStats();
         renderPosts();
