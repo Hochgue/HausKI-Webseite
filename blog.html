@@ -3,15 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HausKI Blog</title>
-  <meta name="description" content="HausKI Blog – Einblicke in Smart Home, Energie, Automationen und echte Umsetzungen.">
-  <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png">
+  <title>HausKI Blog – Beiträge, Einblicke und Projektalltag</title>
+  <meta name="description" content="Der HausKI Blog zeigt Einblicke, Umbauten, Tests, Erfahrungen und Learnings rund um Smart Home, Energie, Sicherheit und Systemlogik.">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-06MC8PY5BN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-06MC8PY5BN');
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    *{
-      box-sizing:border-box;
-    }
+    *{ box-sizing:border-box; }
 
     :root{
       --bg:#040911;
@@ -23,12 +30,15 @@
       --muted:#9db2c9;
       --accent:#21c8ff;
       --accent2:#6af0c7;
+      --danger:#ff6b81;
+      --warning:#ffd76a;
       --shadow:0 20px 60px rgba(0,0,0,0.35);
+      --radius-xl:22px;
+      --radius-lg:18px;
+      --radius-md:14px;
     }
 
-    html{
-      scroll-behavior:smooth;
-    }
+    html{ scroll-behavior:smooth; }
 
     body{
       margin:0;
@@ -53,6 +63,8 @@
       z-index:0;
     }
 
+    a{ color:inherit; }
+
     .nav{
       position:sticky;
       top:0;
@@ -74,7 +86,6 @@
       font-weight:bold;
       color:var(--accent);
       letter-spacing:0.5px;
-      text-decoration:none;
     }
 
     .nav-links{
@@ -106,21 +117,29 @@
     .panel{
       background:var(--card);
       border:1px solid var(--line);
-      border-radius:22px;
+      border-radius:var(--radius-xl);
       box-shadow:var(--shadow);
     }
 
     .hero{
-      padding:48px 0 22px;
+      padding:72px 0 24px;
     }
 
-    .hero-box{
-      padding:34px;
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.2fr 0.8fr;
+      gap:26px;
+      align-items:stretch;
+    }
+
+    .hero-main,
+    .hero-side{
+      padding:28px;
       position:relative;
       overflow:hidden;
     }
 
-    .hero-box::after{
+    .hero-main::after{
       content:"";
       position:absolute;
       right:-120px;
@@ -132,9 +151,11 @@
       pointer-events:none;
     }
 
-    .eyebrow{
+    .eyebrow,
+    .section-badge,
+    .mini-badge{
       display:inline-block;
-      padding:10px 14px;
+      padding:9px 14px;
       border-radius:999px;
       background:rgba(33,200,255,0.08);
       border:1px solid rgba(33,200,255,0.18);
@@ -142,291 +163,339 @@
       font-size:12px;
       letter-spacing:1px;
       text-transform:uppercase;
-      margin-bottom:18px;
     }
 
-    h1{
+    .hero-main h1{
       font-size:clamp(34px,5vw,52px);
       line-height:1.03;
-      margin:0 0 18px;
+      margin:18px 0 16px;
       letter-spacing:-1.8px;
-      max-width:11ch;
+      max-width:12ch;
     }
 
-    .hero-text{
+    .hero-text,
+    .section-head p,
+    .side-copy,
+    .card p,
+    .detail-content,
+    .comment-body,
+    .empty-text,
+    .small-note{
       color:var(--muted);
-      font-size:18px;
       line-height:1.75;
-      max-width:64ch;
-      margin:0;
     }
 
-    .toolbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:16px;
-      flex-wrap:wrap;
-      margin:0 0 24px;
-    }
-
-    .filters{
+    .hero-actions,
+    .meta-row,
+    .stats-row,
+    .filter-row,
+    .card-actions,
+    .detail-actions,
+    .comment-form-actions,
+    .footer-line{
       display:flex;
       gap:12px;
       flex-wrap:wrap;
+      align-items:center;
     }
 
-    .filter-btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
+    .hero-actions{ margin-top:26px; }
+
+    .button,
+    .button-outline,
+    .ghost-button,
+    .tag,
+    .chip,
+    .like-button,
+    .icon-button{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:42px;
+      min-height:44px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:700;
+      transition:0.2s ease;
+      cursor:pointer;
+      border:none;
+      font-size:14px;
+    }
+
+    .button{
+      padding:0 18px;
+      background:linear-gradient(135deg,var(--accent),#1da1ff);
+      color:#04111b;
+      box-shadow:0 10px 30px rgba(33,200,255,0.28);
+    }
+
+    .button-outline,
+    .ghost-button,
+    .icon-button,
+    .like-button{
       padding:0 16px;
-      border-radius:12px;
-      color:var(--text);
       background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.10);
-      transition:.2s;
-      font-size:14px;
-      font-weight:600;
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--text);
     }
 
-    .filter-btn:hover{
+    .button:hover,
+    .button-outline:hover,
+    .ghost-button:hover,
+    .icon-button:hover,
+    .like-button:hover,
+    .card:hover{
       transform:translateY(-2px);
-      border-color:var(--accent);
-      color:var(--accent);
     }
 
-    .filter-btn.active{
-      border-color:var(--accent);
-      color:var(--accent);
-      background:rgba(33,200,255,0.08);
+    .button:disabled,
+    .button-outline:disabled,
+    .ghost-button:disabled,
+    .icon-button:disabled,
+    .like-button:disabled{
+      opacity:0.55;
+      cursor:not-allowed;
+      transform:none;
     }
 
-    .toolbar-right{
-      display:flex;
-      align-items:center;
+    .stats-stack{
+      display:grid;
       gap:14px;
-      flex-wrap:wrap;
     }
 
-    .count{
-      color:var(--text);
-      font-size:14px;
-      font-weight:600;
-      white-space:nowrap;
-    }
-
-    .search-input{
-      min-height:42px;
-      width:min(320px, 80vw);
-      padding:0 14px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.10);
+    .stat-card{
+      padding:18px;
+      border-radius:18px;
       background:rgba(255,255,255,0.03);
-      color:var(--text);
-      outline:none;
-      font-size:14px;
+      border:1px solid rgba(255,255,255,0.08);
     }
 
-    .search-input::placeholder{
+    .stat-label{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:1px;
       color:var(--muted);
     }
 
-    .search-input:focus{
-      border-color:var(--accent);
+    .stat-value{
+      display:block;
+      margin-top:8px;
+      font-size:28px;
+      color:var(--accent);
+      font-weight:700;
+    }
+
+    .section{
+      padding:18px 0 0;
+      margin-bottom:42px;
+    }
+
+    .section-head{
+      margin-bottom:22px;
+    }
+
+    .section-head h2{
+      margin:14px 0 0;
+      font-size:clamp(28px,4vw,40px);
+      letter-spacing:-1px;
+    }
+
+    .controls{
+      padding:22px;
+      display:grid;
+      gap:16px;
+    }
+
+    .filter-row{
+      justify-content:space-between;
+    }
+
+    .filter-group{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      flex:1;
+    }
+
+    .field,
+    .select,
+    .textarea{
+      width:100%;
+      background:rgba(255,255,255,0.03);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:14px;
+      min-height:48px;
+      padding:0 14px;
+      font:inherit;
+      outline:none;
+      transition:0.2s ease;
+    }
+
+    .textarea{
+      min-height:120px;
+      padding:14px;
+      resize:vertical;
+    }
+
+    .field:focus,
+    .select:focus,
+    .textarea:focus{
+      border-color:rgba(33,200,255,0.45);
+      box-shadow:0 0 0 4px rgba(33,200,255,0.08);
+    }
+
+    .search-wrap{
+      flex:1.4;
+      min-width:240px;
+    }
+
+    .select-wrap{
+      min-width:190px;
+      flex:0.8;
     }
 
     .posts-grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns:repeat(3, 1fr);
       gap:18px;
     }
 
-    .post-card{
-      display:flex;
-      flex-direction:column;
+    .card{
+      padding:0;
+      overflow:hidden;
       border-radius:20px;
       background:var(--card);
       border:1px solid var(--line);
       box-shadow:0 12px 35px rgba(0,0,0,0.22);
       transition:all .25s ease;
-      overflow:hidden;
+      display:flex;
+      flex-direction:column;
       min-height:100%;
     }
 
-    .post-card:hover{
-      transform:translateY(-6px);
-      box-shadow:0 15px 40px rgba(0,0,0,0.5);
-    }
-
-    .post-image-wrap{
-      position:relative;
+    .card-image-wrap{
       aspect-ratio:16 / 9;
       background:
-        linear-gradient(135deg, rgba(33,200,255,0.10), rgba(0,0,0,0)),
+        linear-gradient(135deg, rgba(69,182,255,0.14), rgba(0,0,0,0)),
         #09111d;
-      display:flex;
-      align-items:center;
-      justify-content:center;
       overflow:hidden;
+      border-bottom:1px solid rgba(255,255,255,0.06);
     }
 
-    .post-cover{
+    .card-image{
       width:100%;
       height:100%;
       object-fit:cover;
       display:block;
     }
 
-    .post-cover-placeholder{
+    .card-image.placeholder{
+      display:grid;
+      place-items:center;
       color:var(--muted);
-      text-align:center;
-      padding:18px;
-      font-size:1rem;
-    }
-
-    .post-type{
-      position:absolute;
-      left:14px;
-      top:14px;
-      display:inline-flex;
-      align-items:center;
-      min-height:34px;
-      padding:0 12px;
-      border-radius:999px;
-      background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.18);
-      color:var(--accent);
-      font-size:12px;
-      font-weight:700;
+      font-size:15px;
       letter-spacing:0.04em;
-      text-transform:uppercase;
     }
 
-    .post-body{
-      display:flex;
-      flex-direction:column;
-      flex:1;
+    .card-body{
       padding:22px;
+      display:grid;
+      gap:14px;
+      flex:1;
     }
 
-    .post-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-bottom:14px;
-    }
-
-    .post-meta span{
-      display:inline-flex;
-      align-items:center;
-      min-height:32px;
-      padding:0 11px;
-      border-radius:999px;
-      background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.18);
-      color:#dff7ff;
+    .meta-row{
+      justify-content:space-between;
       font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:0.06em;
     }
 
-    .post-title{
-      margin:0 0 12px;
-      font-size:22px;
-      line-height:1.28;
-      color:#fff;
+    .card h3,
+    .detail-title{
+      margin:0;
+      line-height:1.25;
+      letter-spacing:-0.02em;
     }
 
-    .post-excerpt{
-      margin:0 0 20px;
+    .card h3{
+      font-size:24px;
+    }
+
+    .excerpt{
+      margin:0;
       color:var(--muted);
       line-height:1.75;
-      flex:1;
+      display:-webkit-box;
+      -webkit-line-clamp:4;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
     }
 
-    .material-box{
-      margin-top:auto;
-      margin-bottom:18px;
-      padding:16px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,0.08);
-      background:rgba(255,255,255,0.03);
-    }
-
-    .material-box strong{
-      display:block;
-      margin-bottom:8px;
-      color:var(--text);
-      font-size:14px;
-    }
-
-    .material-box span{
-      color:var(--muted);
-      line-height:1.7;
-      font-size:14px;
-    }
-
-    .post-footer{
+    .tags{
       display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
+      gap:8px;
       flex-wrap:wrap;
     }
 
-    .post-link{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:42px;
-      padding:0 16px;
-      border-radius:12px;
-      text-decoration:none;
-      color:var(--text);
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.10);
-      transition:.2s;
-      font-size:14px;
+    .tag,
+    .chip{
+      min-height:32px;
+      padding:0 12px;
+      border-radius:999px;
       font-weight:600;
-    }
-
-    .post-link:hover{
-      transform:translateY(-2px);
-      border-color:var(--accent);
-      color:var(--accent);
-    }
-
-    .post-source{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
       color:var(--muted);
-      font-size:14px;
-      white-space:nowrap;
+      font-size:12px;
     }
 
-    .status-box,
-    .empty-state{
-      padding:24px;
-      border-radius:20px;
-      background:var(--card);
-      border:1px solid var(--line);
-      box-shadow:0 12px 35px rgba(0,0,0,0.22);
+    .card-actions{
+      justify-content:space-between;
+      margin-top:auto;
+    }
+
+    .metric-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .empty-state,
+    .loading-state{
+      padding:34px;
       text-align:center;
     }
 
-    .status-box h2,
-    .empty-state h2{
-      margin-top:0;
-      color:#fff;
+    .loading-spinner{
+      width:42px;
+      height:42px;
+      margin:0 auto 14px;
+      border-radius:50%;
+      border:3px solid rgba(255,255,255,0.08);
+      border-top-color:var(--accent);
+      animation:spin 1s linear infinite;
     }
 
-    .status-box p,
-    .empty-state p{
-      color:var(--muted);
-      line-height:1.7;
-      margin:0;
+    @keyframes spin{
+      to{ transform:rotate(360deg); }
     }
+
+    .message-bar{
+      display:none;
+      padding:14px 16px;
+      border-radius:14px;
+      margin-bottom:16px;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .message-bar.show{ display:block; }
+    .message-bar.error{ background:rgba(255,107,129,0.08); color:#ffd2da; border-color:rgba(255,107,129,0.2); }
+    .message-bar.success{ background:rgba(106,240,199,0.08); color:#d7fff3; border-color:rgba(106,240,199,0.16); }
 
     .footer{
       padding:24px 0 60px;
@@ -437,15 +506,204 @@
     .footer-line{
       border-top:1px solid rgba(255,255,255,0.08);
       padding-top:22px;
+      justify-content:space-between;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(2,7,14,0.78);
+      backdrop-filter:blur(10px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      z-index:300;
+    }
+
+    .modal.open{ display:flex; }
+
+    .modal-card{
+      width:min(980px, 100%);
+      max-height:calc(100vh - 44px);
+      overflow:auto;
+      background:linear-gradient(180deg, rgba(12,22,37,0.98), rgba(7,15,28,0.98));
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:0 20px 80px rgba(0,0,0,0.48);
+      position:relative;
+    }
+
+    .modal-close{
+      position:sticky;
+      top:18px;
+      margin-left:auto;
+      margin-right:18px;
+      z-index:2;
+      display:flex;
+      justify-content:flex-end;
+      pointer-events:none;
+    }
+
+    .modal-close .icon-button{
+      pointer-events:auto;
+      width:44px;
+      min-width:44px;
+      padding:0;
+      border-radius:12px;
+    }
+
+    .detail-cover{
+      width:100%;
+      aspect-ratio:16 / 7;
+      object-fit:cover;
+      display:block;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      background:
+        linear-gradient(135deg, rgba(69,182,255,0.14), rgba(0,0,0,0)),
+        #09111d;
+    }
+
+    .detail-layout{
+      padding:0 28px 28px;
+      display:grid;
+      gap:26px;
+    }
+
+    .detail-head{
+      display:grid;
+      gap:16px;
+    }
+
+    .detail-title{
+      font-size:clamp(28px, 4vw, 42px);
+    }
+
+    .detail-meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .detail-content{
+      white-space:pre-wrap;
+      font-size:16px;
+    }
+
+    .detail-content h1,
+    .detail-content h2,
+    .detail-content h3{
+      color:var(--text);
+      line-height:1.25;
+      margin:1.2em 0 0.5em;
+    }
+
+    .detail-content p{
+      margin:0 0 1em;
+    }
+
+    .detail-content ul,
+    .detail-content ol{
+      margin:0 0 1em 1.4em;
+      color:var(--muted);
+    }
+
+    .detail-content strong{ color:var(--text); }
+    .detail-content em{ color:#d7ebff; }
+    .detail-content code{
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:8px;
+      padding:2px 6px;
+      color:#dff4ff;
+    }
+
+    .detail-grid{
+      display:grid;
+      grid-template-columns:1.4fr 0.8fr;
+      gap:24px;
+      align-items:start;
+    }
+
+    .side-panel{
+      padding:18px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.03);
+      display:grid;
+      gap:16px;
+    }
+
+    .side-panel h3,
+    .comments-title{
+      margin:0;
+      font-size:20px;
+    }
+
+    .comment-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .comment-card{
+      padding:14px 16px;
+      border-radius:16px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06);
+    }
+
+    .comment-head{
       display:flex;
       justify-content:space-between;
-      gap:20px;
-      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:8px;
+    }
+
+    .comment-author{
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .comment-date{
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .comment-form{
+      display:grid;
+      gap:12px;
+    }
+
+    .comment-form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .detail-divider{
+      height:1px;
+      background:rgba(255,255,255,0.08);
+      margin:6px 0;
     }
 
     @media (max-width:1100px){
-      .posts-grid{
-        grid-template-columns:repeat(2,1fr);
+      .posts-grid{ grid-template-columns:repeat(2,1fr); }
+      .detail-grid{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width:980px){
+      .hero-grid{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width:720px){
+      .posts-grid,
+      .comment-form-grid{
+        grid-template-columns:1fr;
       }
     }
 
@@ -457,37 +715,45 @@
         gap:12px;
       }
 
-      .hero-box,
-      .post-body,
-      .status-box,
-      .empty-state{
+      .hero-main,
+      .hero-side,
+      .controls,
+      .card-body,
+      .detail-layout,
+      .side-panel{
         padding:20px;
       }
 
-      .toolbar{
-        align-items:flex-start;
-      }
-
-      .toolbar-right{
-        width:100%;
+      .hero-actions,
+      .filter-row,
+      .card-actions,
+      .detail-actions,
+      .footer-line{
         flex-direction:column;
         align-items:stretch;
       }
 
-      .search-input{
+      .button,
+      .button-outline,
+      .ghost-button,
+      .like-button,
+      .icon-button{
         width:100%;
       }
 
-      .posts-grid{
-        grid-template-columns:1fr;
+      .modal{
+        padding:10px;
+      }
+
+      .modal-card{
+        max-height:calc(100vh - 20px);
       }
     }
   </style>
 </head>
 <body>
-
   <nav class="nav">
-    <a class="nav-logo" href="index.html">HausKI</a>
+    <div class="nav-logo">HausKI</div>
     <div class="nav-links">
       <a href="index.html">Start</a>
       <a href="architektur.html">Architektur</a>
@@ -499,249 +765,580 @@
   </nav>
 
   <header class="hero">
-    <div class="container">
-      <div class="panel hero-box">
-        <div class="eyebrow">Blog · LinkedIn · Projekteinblicke</div>
-        <h1>HausKI Blog</h1>
+    <div class="container hero-grid">
+      <section class="panel hero-main">
+        <span class="eyebrow">HausKI Blog</span>
+        <h1>Erfahrungen, Umbauten und echte Learnings.</h1>
         <p class="hero-text">
-          Hier dokumentiere ich echte Umsetzungen, technische Entscheidungen, Learnings,
-          Tests und auch Dinge, die nicht sofort perfekt funktioniert haben. Genau das gehört für mich zu HausKI dazu.
+          Im Blog dokumentiere ich Umbauten, Integrationen, Fehler, Erkenntnisse und Entwicklungen rund um HausKI.
+          Nicht nur was funktioniert, sondern auch was sich in der Praxis bewährt – oder eben nicht.
         </p>
-      </div>
+        <div class="hero-actions">
+          <a class="button" href="#beitraege">Zu den Beiträgen</a>
+          <a class="button-outline" href="https://www.linkedin.com/in/g%C3%BCnther-hochreiter-66b6a8184/" target="_blank" rel="noopener noreferrer">LinkedIn ansehen</a>
+        </div>
+      </section>
+
+      <aside class="panel hero-side">
+        <span class="mini-badge">Live aus Supabase</span>
+        <div class="stats-stack">
+          <div class="stat-card">
+            <div class="stat-label">Veröffentlichte Beiträge</div>
+            <strong class="stat-value" id="statPosts">0</strong>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Kommentare</div>
+            <strong class="stat-value" id="statComments">0</strong>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Likes gesamt</div>
+            <strong class="stat-value" id="statLikes">0</strong>
+          </div>
+        </div>
+        <p class="side-copy">
+          Die Beiträge werden direkt aus deiner Supabase-Tabelle geladen. Kommentare und Likes laufen über eigene Tabellen und bleiben damit sauber getrennt.
+        </p>
+      </aside>
     </div>
   </header>
 
   <main class="container">
-
-    <div class="toolbar">
-      <div class="filters">
-        <button class="filter-btn active" data-filter="all">Alle</button>
-        <button class="filter-btn" data-filter="linkedin">LinkedIn</button>
-        <button class="filter-btn" data-filter="blog">Blog</button>
+    <section class="section" id="beitraege">
+      <div class="section-head">
+        <span class="section-badge">Blogübersicht</span>
+        <h2>HausKI im echten Projektalltag</h2>
+        <p>
+          Von Smart-Lock-Integration über Heizungsanalyse bis zu Visualisierung und Systemlogik: Hier findest du Beiträge,
+          Bilder, Einblicke und praktische Erfahrungen aus dem laufenden Aufbau von HausKI.
+        </p>
       </div>
 
-      <div class="toolbar-right">
-        <div class="count" id="postCount">0 Beiträge</div>
-        <input id="searchInput" class="search-input" type="text" placeholder="Beiträge durchsuchen ...">
+      <div id="messageBar" class="message-bar"></div>
+
+      <div class="panel controls">
+        <div class="filter-row">
+          <div class="filter-group" style="width:100%;">
+            <div class="search-wrap">
+              <input id="searchInput" class="field" type="search" placeholder="Beiträge durchsuchen ...">
+            </div>
+            <div class="select-wrap">
+              <select id="categoryFilter" class="select">
+                <option value="">Alle Kategorien</option>
+              </select>
+            </div>
+            <div class="select-wrap">
+              <select id="sourceFilter" class="select">
+                <option value="">Alle Quellen</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div id="statusBox" class="status-box">
-      <h2>Beiträge werden geladen ...</h2>
-      <p>Bitte kurz warten.</p>
-    </div>
+    <section class="section" style="padding-top:0;">
+      <div id="loadingState" class="panel loading-state">
+        <div class="loading-spinner"></div>
+        <div class="empty-text">Beiträge werden geladen ...</div>
+      </div>
 
-    <div id="postsGrid" class="posts-grid" hidden></div>
+      <div id="postsGrid" class="posts-grid" hidden></div>
 
-    <div id="emptyState" class="empty-state" hidden>
-      <h2>Keine Beiträge gefunden</h2>
-      <p>Für den aktuellen Filter oder Suchbegriff gibt es noch keine Einträge.</p>
-    </div>
-
+      <div id="emptyState" class="panel empty-state" hidden>
+        <h3 style="margin-top:0;">Noch keine passenden Beiträge gefunden.</h3>
+        <p class="empty-text">
+          Prüfe Filter und Suchbegriff oder veröffentliche den ersten Beitrag über deine Admin-Seite.
+        </p>
+      </div>
+    </section>
   </main>
 
   <footer class="footer container">
     <div class="footer-line">
       <div>© 2026 HausKI • Günther Hochreiter</div>
-      <div>Smart Home • Energie • Systemlogik</div>
+      <div>Smart Home • Energie • Sicherheit • Systemlogik</div>
     </div>
   </footer>
 
+  <div id="postModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-close">
+        <button id="closeModalButton" class="icon-button" type="button" aria-label="Schließen">✕</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
   <script>
-    const SUPABASE_URL = "https://wuizcshgkdolnkngoutj.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    /*
+      HIER DEINE DATEN EINTRAGEN
+      -------------------------------------------------
+      const SUPABASE_URL = 'https://deinprojekt.supabase.co';
+      const SUPABASE_ANON_KEY = 'dein_publishable_key';
+    */
+    const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
 
-    const postsGrid = document.getElementById("postsGrid");
-    const postCount = document.getElementById("postCount");
-    const searchInput = document.getElementById("searchInput");
-    const filterButtons = document.querySelectorAll(".filter-btn");
-    const statusBox = document.getElementById("statusBox");
-    const emptyState = document.getElementById("emptyState");
+    const TABLE_POSTS = 'posts';
+    const TABLE_COMMENTS = 'post_comments';
+    const TABLE_LIKES = 'post_likes';
 
-    let allPosts = [];
-    let activeFilter = "all";
-    let searchTerm = "";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function formatDate(dateString) {
-      if (!dateString) return "";
-      const date = new Date(dateString);
-      if (Number.isNaN(date.getTime())) return dateString;
-      return date.toLocaleDateString("de-DE");
+    const state = {
+      posts: [],
+      commentsByPost: {},
+      likesByPost: {},
+      filters: {
+        search: '',
+        category: '',
+        source: ''
+      },
+      activePostId: null,
+      likedPosts: JSON.parse(localStorage.getItem('hauski_liked_posts') || '[]')
+    };
+
+    const els = {
+      statPosts: document.getElementById('statPosts'),
+      statComments: document.getElementById('statComments'),
+      statLikes: document.getElementById('statLikes'),
+      searchInput: document.getElementById('searchInput'),
+      categoryFilter: document.getElementById('categoryFilter'),
+      sourceFilter: document.getElementById('sourceFilter'),
+      loadingState: document.getElementById('loadingState'),
+      postsGrid: document.getElementById('postsGrid'),
+      emptyState: document.getElementById('emptyState'),
+      messageBar: document.getElementById('messageBar'),
+      postModal: document.getElementById('postModal'),
+      closeModalButton: document.getElementById('closeModalButton'),
+      modalBody: document.getElementById('modalBody')
+    };
+
+    function showMessage(text, type = 'error') {
+      els.messageBar.textContent = text;
+      els.messageBar.className = `message-bar show ${type}`;
     }
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    function clearMessage() {
+      els.messageBar.className = 'message-bar';
+      els.messageBar.textContent = '';
     }
 
-    function normalize(value) {
-      return String(value || "").toLowerCase().trim();
+    function escapeHtml(value = '') {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
-    function sortPosts(posts) {
-      return [...posts].sort((a, b) => {
-        const dateA = new Date(a.date || 0).getTime();
-        const dateB = new Date(b.date || 0).getTime();
-        return dateB - dateA;
+    function formatDate(value) {
+      if (!value) return 'ohne Datum';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat('de-AT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(date);
+    }
+
+    function normalizeList(value) {
+      if (!value) return [];
+      return String(value)
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+
+    function markdownToHtml(markdown = '') {
+      let html = escapeHtml(markdown);
+
+      html = html.replace(/^###\s+(.*)$/gm, '<h3>$1</h3>');
+      html = html.replace(/^##\s+(.*)$/gm, '<h2>$1</h2>');
+      html = html.replace(/^#\s+(.*)$/gm, '<h1>$1</h1>');
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+      html = html.replace(/(?:^|\n)-\s+(.*?)(?=\n(?!-\s)|$)/gs, block => {
+        const items = block.trim().split('\n').map(line => line.replace(/^-\s+/, '').trim()).filter(Boolean);
+        if (!items.length) return block;
+        return `<ul>${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
       });
+
+      html = html
+        .split(/\n{2,}/)
+        .map(block => {
+          const trimmed = block.trim();
+          if (!trimmed) return '';
+          if (/^<(h1|h2|h3|ul|ol)/.test(trimmed)) return trimmed;
+          return `<p>${trimmed.replace(/\n/g, '<br>')}</p>`;
+        })
+        .join('');
+
+      return html;
     }
 
-    function renderPostCard(post) {
-      const imageHtml = post.image && post.image.trim() !== ""
-        ? `<img class="post-cover" src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" onerror="this.parentElement.innerHTML='<div class=&quot;post-cover-placeholder&quot;>Bild konnte nicht geladen werden.</div>';">`
-        : `<div class="post-cover-placeholder">Noch kein Bild hinterlegt.</div>`;
+    function updateStats() {
+      const postCount = state.posts.length;
+      const commentCount = Object.values(state.commentsByPost).reduce((sum, items) => sum + items.length, 0);
+      const likeCount = Object.values(state.likesByPost).reduce((sum, value) => sum + value, 0);
 
-      const tags = Array.isArray(post.tags) ? post.tags : [];
-      const sourceLabel = post.source === "linkedin" ? "LinkedIn" : "Blog";
-      const footerSource = post.source === "linkedin" ? "LinkedIn" : "HausKI Blog";
-      const material = post.material && String(post.material).trim() !== "" ? post.material : "-";
-
-      return `
-        <article class="post-card">
-          <div class="post-image-wrap">
-            ${imageHtml}
-            <span class="post-type">${escapeHtml(sourceLabel)}</span>
-          </div>
-
-          <div class="post-body">
-            <div class="post-meta">
-              ${post.date ? `<span>${escapeHtml(formatDate(post.date))}</span>` : ""}
-              ${post.category ? `<span>${escapeHtml(post.category)}</span>` : ""}
-              ${tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
-            </div>
-
-            <h2 class="post-title">${escapeHtml(post.title || "Ohne Titel")}</h2>
-            <p class="post-excerpt">${escapeHtml(post.excerpt || "")}</p>
-
-            <div class="material-box">
-              <strong>Verwendetes Material:</strong>
-              <span>${escapeHtml(material)}</span>
-            </div>
-
-            <div class="post-footer">
-              <a class="post-link" href="post.html?id=${encodeURIComponent(post.id)}">Mehr lesen</a>
-              <span class="post-source">${escapeHtml(footerSource)}</span>
-            </div>
-          </div>
-        </article>
-      `;
+      els.statPosts.textContent = String(postCount);
+      els.statComments.textContent = String(commentCount);
+      els.statLikes.textContent = String(likeCount);
     }
 
-    function filterPosts() {
-      let filtered = [...allPosts];
+    function populateFilters() {
+      const categories = [...new Set(state.posts.map(post => post.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'de'));
+      const sources = [...new Set(state.posts.map(post => post.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'de'));
 
-      if (activeFilter !== "all") {
-        filtered = filtered.filter(post => normalize(post.source) === activeFilter);
-      }
-
-      if (searchTerm) {
-        filtered = filtered.filter(post => {
-          const tags = Array.isArray(post.tags) ? post.tags.join(" ") : "";
-          const haystack = [
-            post.title,
-            post.excerpt,
-            post.category,
-            post.material,
-            post.content,
-            tags
-          ].join(" ").toLowerCase();
-
-          return haystack.includes(searchTerm);
-        });
-      }
-
-      return sortPosts(filtered);
+      els.categoryFilter.innerHTML = '<option value="">Alle Kategorien</option>' + categories.map(item => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join('');
+      els.sourceFilter.innerHTML = '<option value="">Alle Quellen</option>' + sources.map(item => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join('');
     }
 
-    function updateCount(count) {
-      postCount.textContent = `${count} ${count === 1 ? "Beitrag" : "Beiträge"}`;
+    function getFilteredPosts() {
+      const search = state.filters.search.toLowerCase();
+      return state.posts.filter(post => {
+        const matchesSearch = !search || [post.title, post.excerpt, post.content, post.category, post.material, post.source, post.type]
+          .filter(Boolean)
+          .some(value => String(value).toLowerCase().includes(search));
+
+        const matchesCategory = !state.filters.category || post.category === state.filters.category;
+        const matchesSource = !state.filters.source || post.source === state.filters.source;
+
+        return matchesSearch && matchesCategory && matchesSource;
+      });
     }
 
     function renderPosts() {
-      const filtered = filterPosts();
-      updateCount(filtered.length);
+      const posts = getFilteredPosts();
 
-      if (!allPosts.length) {
-        statusBox.hidden = false;
-        statusBox.innerHTML = `
-          <h2>Noch keine Beiträge vorhanden</h2>
-          <p>Stelle sicher, dass deine posts.json im Hauptverzeichnis liegt und Einträge enthält.</p>
+      els.loadingState.hidden = true;
+      els.postsGrid.hidden = posts.length === 0;
+      els.emptyState.hidden = posts.length !== 0;
+
+      if (!posts.length) {
+        els.postsGrid.innerHTML = '';
+        return;
+      }
+
+      els.postsGrid.innerHTML = posts.map(post => {
+        const tags = normalizeList(post.type);
+        const commentsCount = (state.commentsByPost[post.id] || []).length;
+        const likesCount = state.likesByPost[post.id] || 0;
+        const image = post.image && String(post.image).trim();
+
+        return `
+          <article class="card">
+            <div class="card-image-wrap">
+              ${image
+                ? `<img class="card-image" src="${escapeHtml(image)}" alt="${escapeHtml(post.title)}" loading="lazy">`
+                : `<div class="card-image placeholder">HausKI Blog</div>`}
+            </div>
+            <div class="card-body">
+              <div class="meta-row">
+                <span>${escapeHtml(post.category || 'Allgemein')}</span>
+                <span>${escapeHtml(formatDate(post.date))}</span>
+              </div>
+
+              <h3>${escapeHtml(post.title || 'Ohne Titel')}</h3>
+              <p class="excerpt">${escapeHtml(post.excerpt || 'Kein Kurztext vorhanden.')}</p>
+
+              <div class="tags">
+                ${tags.slice(0, 4).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+                ${post.source ? `<span class="tag">${escapeHtml(post.source)}</span>` : ''}
+              </div>
+
+              <div class="card-actions">
+                <button class="button-outline" type="button" onclick="openPost('${escapeHtml(post.id)}')">Beitrag lesen</button>
+                <div class="metric-row">
+                  <span>❤ ${likesCount}</span>
+                  <span>💬 ${commentsCount}</span>
+                </div>
+              </div>
+            </div>
+          </article>
         `;
-        postsGrid.hidden = true;
-        emptyState.hidden = true;
-        return;
-      }
-
-      statusBox.hidden = true;
-
-      if (!filtered.length) {
-        postsGrid.hidden = true;
-        emptyState.hidden = false;
-        return;
-      }
-
-      emptyState.hidden = true;
-      postsGrid.hidden = false;
-      postsGrid.innerHTML = filtered.map(renderPostCard).join("");
+      }).join('');
     }
 
     async function loadPosts() {
+      const { data, error } = await supabaseClient
+        .from(TABLE_POSTS)
+        .select('*')
+        .eq('published', true)
+        .order('date', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      state.posts = data || [];
+    }
+
+    async function loadComments() {
+      const { data, error } = await supabaseClient
+        .from(TABLE_COMMENTS)
+        .select('*')
+        .eq('approved', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      state.commentsByPost = (data || []).reduce((acc, row) => {
+        if (!acc[row.post_id]) acc[row.post_id] = [];
+        acc[row.post_id].push(row);
+        return acc;
+      }, {});
+    }
+
+    async function loadLikes() {
+      const { data, error } = await supabaseClient
+        .from(TABLE_LIKES)
+        .select('post_id');
+
+      if (error) throw error;
+
+      state.likesByPost = (data || []).reduce((acc, row) => {
+        acc[row.post_id] = (acc[row.post_id] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    async function loadAll() {
+      clearMessage();
+      els.loadingState.hidden = false;
+      els.postsGrid.hidden = true;
+      els.emptyState.hidden = true;
+
       try {
-        const { data, error } = await supabaseClient
-          .from("posts")
-          .select("*")
-          .eq("published", true)
-          .order("date", { ascending: false });
-
-        if (error) {
-          throw error;
-        }
-
-        if (!Array.isArray(data)) {
-          throw new Error("Keine gültigen Beitragsdaten aus Supabase erhalten.");
-        }
-
-        allPosts = sortPosts(
-          data.map(post => ({
-            ...post,
-            tags: []
-          }))
-        );
-
+        await Promise.all([loadPosts(), loadComments(), loadLikes()]);
+        populateFilters();
+        updateStats();
         renderPosts();
       } catch (error) {
         console.error(error);
-        statusBox.hidden = false;
-        statusBox.innerHTML = `
-          <h2>Beiträge konnten nicht geladen werden</h2>
-          <p>Prüfe bitte Supabase URL, Publishable Key und ob in der Tabelle <strong>posts</strong> Einträge mit <strong>published = true</strong> vorhanden sind.</p>
-        `;
-        postsGrid.hidden = true;
-        emptyState.hidden = true;
-        updateCount(0);
+        els.loadingState.hidden = true;
+        showMessage('Die Blogdaten konnten nicht geladen werden. Prüfe bitte Supabase-URL, Key und Tabellenstruktur.');
       }
     }
 
-    filterButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        filterButtons.forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-        activeFilter = button.dataset.filter;
+    function getPostById(postId) {
+      return state.posts.find(post => post.id === postId) || null;
+    }
+
+    function buildCommentMarkup(comments) {
+      if (!comments.length) {
+        return `
+          <div class="comment-card">
+            <div class="comment-body">Noch keine freigegebenen Kommentare vorhanden.</div>
+          </div>
+        `;
+      }
+
+      return comments.map(comment => `
+        <article class="comment-card">
+          <div class="comment-head">
+            <div class="comment-author">${escapeHtml(comment.author_name || 'Gast')}</div>
+            <div class="comment-date">${escapeHtml(formatDate(comment.created_at))}</div>
+          </div>
+          <div class="comment-body">${escapeHtml(comment.comment || '')}</div>
+        </article>
+      `).join('');
+    }
+
+    window.openPost = function(postId) {
+      const post = getPostById(postId);
+      if (!post) return;
+
+      state.activePostId = postId;
+      const comments = state.commentsByPost[postId] || [];
+      const likeCount = state.likesByPost[postId] || 0;
+      const tags = normalizeList(post.type);
+      const image = post.image && String(post.image).trim();
+      const material = post.material && String(post.material).trim();
+      const linkedInUrl = post.linkedin_url && String(post.linkedin_url).trim();
+      const hasLiked = state.likedPosts.includes(postId);
+
+      els.modalBody.innerHTML = `
+        ${image ? `<img class="detail-cover" src="${escapeHtml(image)}" alt="${escapeHtml(post.title)}">` : '<div class="detail-cover"></div>'}
+        <div class="detail-layout">
+          <div class="detail-head">
+            <div class="detail-meta">
+              <span class="chip">${escapeHtml(post.category || 'Allgemein')}</span>
+              <span>${escapeHtml(formatDate(post.date))}</span>
+              ${post.source ? `<span>${escapeHtml(post.source)}</span>` : ''}
+            </div>
+            <h2 class="detail-title">${escapeHtml(post.title || 'Ohne Titel')}</h2>
+            <div class="detail-actions">
+              <button id="modalLikeButton" class="like-button" type="button" ${hasLiked ? 'disabled' : ''}>
+                ${hasLiked ? 'Bereits geliked ❤' : 'Beitrag liken ❤'}
+              </button>
+              ${linkedInUrl ? `<a class="button-outline" href="${escapeHtml(linkedInUrl)}" target="_blank" rel="noopener noreferrer">Auf LinkedIn ansehen</a>` : ''}
+            </div>
+            <div class="metric-row">
+              <span><strong id="modalLikeCount">${likeCount}</strong> Likes</span>
+              <span><strong>${comments.length}</strong> Kommentare</span>
+              ${material ? `<span>Material: ${escapeHtml(material)}</span>` : ''}
+            </div>
+            <div class="tags">
+              ${tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+            </div>
+          </div>
+
+          <div class="detail-grid">
+            <div>
+              <div class="detail-content">${markdownToHtml(post.content || post.excerpt || '')}</div>
+            </div>
+
+            <aside class="side-panel">
+              <h3 class="comments-title">Kommentare</h3>
+              <div id="commentList" class="comment-list">${buildCommentMarkup(comments)}</div>
+              <div class="detail-divider"></div>
+              <div>
+                <p class="small-note" style="margin-top:0;">
+                  Kommentare werden zur Moderation gespeichert und erst nach Freigabe sichtbar.
+                </p>
+                <form id="commentForm" class="comment-form">
+                  <div class="comment-form-grid">
+                    <input class="field" type="text" name="author_name" placeholder="Dein Name" required>
+                    <input class="field" type="email" name="author_email" placeholder="Deine E-Mail (nicht öffentlich)">
+                  </div>
+                  <textarea class="textarea" name="comment" placeholder="Dein Kommentar ..." required></textarea>
+                  <div class="comment-form-actions">
+                    <button id="commentSubmitButton" class="button" type="submit">Kommentar senden</button>
+                  </div>
+                </form>
+              </div>
+            </aside>
+          </div>
+        </div>
+      `;
+
+      const modalLikeButton = document.getElementById('modalLikeButton');
+      if (modalLikeButton) {
+        modalLikeButton.addEventListener('click', () => likePost(postId));
+      }
+
+      const commentForm = document.getElementById('commentForm');
+      if (commentForm) {
+        commentForm.addEventListener('submit', handleCommentSubmit);
+      }
+
+      els.postModal.classList.add('open');
+      els.postModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    function closeModal() {
+      els.postModal.classList.remove('open');
+      els.postModal.setAttribute('aria-hidden', 'true');
+      els.modalBody.innerHTML = '';
+      state.activePostId = null;
+      document.body.style.overflow = '';
+    }
+
+    async function likePost(postId) {
+      if (!postId) return;
+      if (state.likedPosts.includes(postId)) return;
+
+      const likeButton = document.getElementById('modalLikeButton');
+      if (likeButton) likeButton.disabled = true;
+
+      try {
+        const { error } = await supabaseClient
+          .from(TABLE_LIKES)
+          .insert([{ post_id: postId }]);
+
+        if (error) throw error;
+
+        state.likesByPost[postId] = (state.likesByPost[postId] || 0) + 1;
+        state.likedPosts.push(postId);
+        localStorage.setItem('hauski_liked_posts', JSON.stringify(state.likedPosts));
+
+        const countEl = document.getElementById('modalLikeCount');
+        if (countEl) countEl.textContent = String(state.likesByPost[postId]);
+        if (likeButton) likeButton.textContent = 'Bereits geliked ❤';
+
+        updateStats();
+        renderPosts();
+      } catch (error) {
+        console.error(error);
+        showMessage('Der Like konnte nicht gespeichert werden. Prüfe bitte die Tabelle post_likes und die Insert-Policy.');
+        if (likeButton) likeButton.disabled = false;
+      }
+    }
+
+    async function handleCommentSubmit(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const submitButton = document.getElementById('commentSubmitButton');
+      const formData = new FormData(form);
+
+      const payload = {
+        post_id: state.activePostId,
+        author_name: String(formData.get('author_name') || '').trim(),
+        author_email: String(formData.get('author_email') || '').trim() || null,
+        comment: String(formData.get('comment') || '').trim(),
+        approved: false
+      };
+
+      if (!payload.post_id || !payload.author_name || !payload.comment) {
+        showMessage('Bitte Name und Kommentar vollständig ausfüllen.');
+        return;
+      }
+
+      submitButton.disabled = true;
+
+      try {
+        const { error } = await supabaseClient
+          .from(TABLE_COMMENTS)
+          .insert([payload]);
+
+        if (error) throw error;
+
+        form.reset();
+        showMessage('Danke. Dein Kommentar wurde gespeichert und wartet auf Freigabe.', 'success');
+      } catch (error) {
+        console.error(error);
+        showMessage('Der Kommentar konnte nicht gespeichert werden. Prüfe bitte die Tabelle post_comments und die Insert-Policy.');
+      } finally {
+        submitButton.disabled = false;
+      }
+    }
+
+    function bindEvents() {
+      els.searchInput.addEventListener('input', event => {
+        state.filters.search = event.target.value.trim();
         renderPosts();
       });
-    });
 
-    searchInput.addEventListener("input", (event) => {
-      searchTerm = event.target.value.trim().toLowerCase();
-      renderPosts();
-    });
+      els.categoryFilter.addEventListener('change', event => {
+        state.filters.category = event.target.value;
+        renderPosts();
+      });
 
-    loadPosts();
+      els.sourceFilter.addEventListener('change', event => {
+        state.filters.source = event.target.value;
+        renderPosts();
+      });
+
+      els.closeModalButton.addEventListener('click', closeModal);
+
+      els.postModal.addEventListener('click', event => {
+        if (event.target === els.postModal) closeModal();
+      });
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && els.postModal.classList.contains('open')) {
+          closeModal();
+        }
+      });
+    }
+
+    bindEvents();
+    loadAll();
   </script>
 </body>
 </html>
