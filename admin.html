@@ -6,6 +6,7 @@
   <title>HausKI Admin</title>
   <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     *{
@@ -596,6 +597,10 @@
   </main>
 
   <script>
+    const SUPABASE_URL = "https://wuizcshgkdolnkngoutj.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     const STORAGE_KEY = "hauski_posts";
 
     const postForm = document.getElementById("postForm");
@@ -659,16 +664,24 @@
       return date.toLocaleDateString("de-DE");
     }
 
-    function getPosts() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (error) {
+    async function getPosts() {
+      const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .order("date", { ascending: false });
+
+      if (error) {
         console.error(error);
+        setStatus("Beiträge konnten nicht aus Supabase geladen werden.", "error");
         return [];
       }
+
+      return Array.isArray(data)
+        ? data.map(post => ({
+            ...post,
+            tags: []
+          }))
+        : [];
     }
 
     function savePosts() {
@@ -711,21 +724,31 @@
       setStatus(`Beitrag "${post.title}" zum Bearbeiten geladen.`, "warn");
     }
 
-    function removePost(id) {
+    async function removePost(id) {
       const post = posts.find(item => item.id === id);
       if (!post) return;
 
       if (!confirm(`Beitrag "${post.title}" wirklich löschen?`)) return;
 
-      posts = posts.filter(item => item.id !== id);
-      savePosts();
+      const { error } = await supabaseClient
+        .from("posts")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error(error);
+        setStatus(`Beitrag "${post.title}" konnte nicht gelöscht werden.`, "error");
+        return;
+      }
+
+      posts = await getPosts();
       renderList();
 
       if (editingId.value === id) {
         resetForm();
       }
 
-      setStatus(`Beitrag "${post.title}" wurde gelöscht.`, "error");
+      setStatus(`Beitrag "${post.title}" wurde gelöscht.`, "success");
     }
 
     function renderList() {
@@ -774,18 +797,7 @@
     }
 
     function exportPostsJson() {
-      const sorted = sortPosts(posts);
-      const blob = new Blob([JSON.stringify(sorted, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "posts.json";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-
-      setStatus("posts.json wurde exportiert. Lege die Datei ins Hauptverzeichnis deiner Website.", "success");
+      setStatus("Nicht mehr nötig: Beiträge werden jetzt direkt in Supabase gespeichert.", "success");
     }
 
     function loadDemoData() {
@@ -825,19 +837,29 @@
       setStatus("Beispieldaten wurden geladen.", "success");
     }
 
-    function clearAllPosts() {
+    async function clearAllPosts() {
       if (!posts.length) {
-        setStatus("Es sind keine lokalen Beiträge vorhanden.", "warn");
+        setStatus("Es sind keine Beiträge vorhanden.", "warn");
         return;
       }
 
-      if (!confirm("Wirklich alle lokal gespeicherten Beiträge löschen?")) return;
+      if (!confirm("Wirklich alle Beiträge in Supabase löschen?")) return;
+
+      const { error } = await supabaseClient
+        .from("posts")
+        .delete()
+        .neq("id", "__niemals_vorhanden__");
+
+      if (error) {
+        console.error(error);
+        setStatus("Alle Beiträge konnten nicht gelöscht werden.", "error");
+        return;
+      }
 
       posts = [];
-      savePosts();
       renderList();
       resetForm();
-      setStatus("Alle lokalen Beiträge wurden gelöscht.", "error");
+      setStatus("Alle Beiträge wurden in Supabase gelöscht.", "success");
     }
 
     function createPostObject() {
@@ -853,65 +875,56 @@
         throw new Error("Es konnte keine gültige ID erzeugt werden.");
       }
 
-      const rawTags = tagsInput.value
-        .split(",")
-        .map(item => item.trim())
-        .filter(Boolean);
-
       return {
         id,
         title,
-        date: dateInput.value || "",
-        category: categoryInput.value.trim(),
-        tags: rawTags,
-        source: sourceInput.value,
-        image: imageInput.value.trim(),
         excerpt: excerptInput.value.trim(),
+        content: contentInput.value.trim(),
+        image: imageInput.value.trim(),
+        date: dateInput.value || null,
+        type: sourceInput.value,
+        category: categoryInput.value.trim(),
         material: materialInput.value.trim(),
-        content: contentInput.value.trim()
+        source: sourceInput.value,
+        linkedin_url: "",
+        published: true
       };
     }
 
-    postForm.addEventListener("submit", (event) => {
+    postForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       try {
         const newPost = createPostObject();
         const oldId = editingId.value.trim();
 
-        if (oldId) {
-          const index = posts.findIndex(item => item.id === oldId);
-          if (index === -1) {
-            throw new Error("Der zu bearbeitende Beitrag wurde nicht gefunden.");
-          }
+        if (oldId && oldId !== newPost.id) {
+          const { error: deleteError } = await supabaseClient
+            .from("posts")
+            .delete()
+            .eq("id", oldId);
 
-          const duplicate = posts.find(item => item.id === newPost.id && item.id !== oldId);
-          if (duplicate) {
-            throw new Error(`Die ID "${newPost.id}" existiert bereits.`);
+          if (deleteError) {
+            throw deleteError;
           }
-
-          posts[index] = newPost;
-          savePosts();
-          renderList();
-          editingId.value = newPost.id;
-          slugInput.value = newPost.id;
-          setStatus(`Beitrag "${newPost.title}" wurde aktualisiert.`, "success");
-        } else {
-          const exists = posts.find(item => item.id === newPost.id);
-          if (exists) {
-            throw new Error(`Die ID "${newPost.id}" existiert bereits. Bitte Slug ändern.`);
-          }
-
-          posts.push(newPost);
-          savePosts();
-          renderList();
-          editingId.value = newPost.id;
-          slugInput.value = newPost.id;
-          setStatus(`Beitrag "${newPost.title}" wurde gespeichert.`, "success");
         }
+
+        const { error } = await supabaseClient
+          .from("posts")
+          .upsert([newPost], { onConflict: "id" });
+
+        if (error) {
+          throw error;
+        }
+
+        posts = await getPosts();
+        renderList();
+        editingId.value = newPost.id;
+        slugInput.value = newPost.id;
+        setStatus(`Beitrag "${newPost.title}" wurde direkt in Supabase gespeichert.`, "success");
       } catch (error) {
         console.error(error);
-        setStatus(error.message || "Beitrag konnte nicht gespeichert werden.", "error");
+        setStatus(error.message || "Beitrag konnte nicht in Supabase gespeichert werden.", "error");
       }
     });
 
@@ -965,8 +978,8 @@
       window.open(`post.html?id=${encodeURIComponent(decodedId)}`, "_blank");
     };
 
-    function init() {
-      posts = getPosts();
+    async function init() {
+      posts = await getPosts();
       renderList();
       resetForm();
     }

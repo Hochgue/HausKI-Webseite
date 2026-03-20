@@ -6,6 +6,7 @@
   <title>HausKI Blog</title>
   <meta name="description" content="HausKI Blog – Einblicke in Smart Home, Energie, Automationen und echte Umsetzungen.">
   <link rel="icon" type="image/png" href="bilder/New_Home_Assistant_logo.svg.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     *{
@@ -547,6 +548,10 @@
   </footer>
 
   <script>
+    const SUPABASE_URL = "https://wuizcshgkdolnkngoutj.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     const postsGrid = document.getElementById("postsGrid");
     const postCount = document.getElementById("postCount");
     const searchInput = document.getElementById("searchInput");
@@ -687,26 +692,34 @@
 
     async function loadPosts() {
       try {
-        const response = await fetch("posts.json?v=" + Date.now());
+        const { data, error } = await supabaseClient
+          .from("posts")
+          .select("*")
+          .eq("published", true)
+          .order("date", { ascending: false });
 
-        if (!response.ok) {
-          throw new Error("posts.json konnte nicht geladen werden.");
+        if (error) {
+          throw error;
         }
-
-        const data = await response.json();
 
         if (!Array.isArray(data)) {
-          throw new Error("posts.json muss ein Array enthalten.");
+          throw new Error("Keine gültigen Beitragsdaten aus Supabase erhalten.");
         }
 
-        allPosts = sortPosts(data);
+        allPosts = sortPosts(
+          data.map(post => ({
+            ...post,
+            tags: []
+          }))
+        );
+
         renderPosts();
       } catch (error) {
         console.error(error);
         statusBox.hidden = false;
         statusBox.innerHTML = `
           <h2>Beiträge konnten nicht geladen werden</h2>
-          <p>Prüfe bitte, ob die Datei <strong>posts.json</strong> im Hauptverzeichnis liegt und gültiges JSON enthält.</p>
+          <p>Prüfe bitte Supabase URL, Publishable Key und ob in der Tabelle <strong>posts</strong> Einträge mit <strong>published = true</strong> vorhanden sind.</p>
         `;
         postsGrid.hidden = true;
         emptyState.hidden = true;
