@@ -1066,15 +1066,19 @@
     }
 
     async function loadPosts() {
-      const { data, error } = await supabaseClient
-        .from(TABLE_POSTS)
-        .select('*')
-        .eq('published', true)
-        .order('date', { ascending: false, nullsFirst: false })
-        .order('created_at', { ascending: false });
+  const { data, error } = await supabaseClient
+    .from(TABLE_POSTS)
+    .select('*')
+    .eq('published', true)
+    .order('date', { ascending: false });
 
-      if (error) throw error;
-      state.posts = data || [];
+  if (error) {
+    console.error('SUPABASE ERROR loadPosts:', error);
+    alert(error.message);
+    return;
+  }
+
+  state.posts = data || [];
     }
 
     async function loadComments() {
