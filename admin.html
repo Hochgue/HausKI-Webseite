@@ -241,6 +241,7 @@
             <input id="type" class="input" type="text" placeholder="Tags, mit Beistrich getrennt">
             <input id="excerpt" class="input full" type="text" placeholder="Kurztext / Teaser">
             <input id="material" class="input full" type="text" placeholder="Verwendetes Material">
+            <input id="automationIdField" class="input full" type="text" placeholder="Automation-ID, z. B. rasenmaeher-automation">
             <input id="linkedinUrl" class="input full" type="url" placeholder="LinkedIn URL (optional)">
             <input id="image" class="input full" type="text" placeholder="Bildpfad oder URL">
             <div class="full toolbar">
@@ -369,6 +370,10 @@
               <strong>5. Tabelle für Automationen.</strong><br>
               Zusätzliche Tabelle: <span class="mono">automationen (id, title, yaml_code, created_at)</span>.
             </div>
+            <div class="note-item small">
+              <strong>6. Blog-zu-Automation Link.</strong><br>
+              Für direkte Buttons im Blog braucht die Tabelle <span class="mono">posts</span> die Spalte <span class="mono">automation_id</span>.
+            </div>
           </div>
         </div>
       </div>
@@ -416,6 +421,7 @@
         type: document.getElementById('type'),
         excerpt: document.getElementById('excerpt'),
         material: document.getElementById('material'),
+        automationId: document.getElementById('automationIdField'),
         linkedinUrl: document.getElementById('linkedinUrl'),
         image: document.getElementById('image'),
         content: document.getElementById('content'),
@@ -454,6 +460,7 @@
       ui.fields.type,
       ui.fields.excerpt,
       ui.fields.material,
+      ui.fields.automationId,
       ui.fields.image,
       ui.fields.content,
       ui.fields.published
@@ -524,6 +531,7 @@
       if(ui.fields.date.value) meta.push(formatDate(ui.fields.date.value));
       if(ui.fields.source.value) meta.push(ui.fields.source.value);
       if(ui.fields.type.value.trim()) meta.push(ui.fields.type.value.trim());
+      if(ui.fields.automationId.value.trim()) meta.push(`Automation: ${ui.fields.automationId.value.trim()}`);
       ui.preview.meta.innerHTML = meta.map(item => `<span>${escapeHtml(item)}</span>`).join('');
 
       ui.preview.excerpt.textContent = ui.fields.excerpt.value.trim() || 'Hier erscheint dein Kurztext oder Teaser.';
@@ -552,6 +560,11 @@
       yaml = yaml.replace(/(bearer\s+)[a-z0-9\-_.=]+/gim, '$1***');
       yaml = yaml.replace(/(authorization\s*:\s*)(.+)/gim, '$1***');
 
+      yaml = yaml.replace(/^(\s*alias\s*:\s*)(.+)$/gim, '$1deine_automation');
+      yaml = yaml.replace(/^(\s*id\s*:\s*)(.+)$/gim, '$1deine_id');
+      yaml = yaml.replace(/^(\s*unique_id\s*:\s*)(.+)$/gim, '$1deine_unique_id');
+      yaml = yaml.replace(/^(\s*name\s*:\s*)(.+)$/gim, '$1dein_name');
+
       yaml = yaml.replace(/^(\s*entity_id\s*:\s*)(.+)$/gim, '$1deine_entitaet');
       yaml = yaml.replace(/^(\s*device_id\s*:\s*)(.+)$/gim, '$1dein_device');
       yaml = yaml.replace(/^(\s*area_id\s*:\s*)(.+)$/gim, '$1dein_bereich');
@@ -560,8 +573,13 @@
       yaml = yaml.replace(/^(\s*service_template\s*:\s*)(.+)$/gim, '$1dein_service');
 
       yaml = yaml.replace(
-        /(\b(sensor|binary_sensor|switch|light|cover|climate|fan|input_boolean|input_number|input_select|person|device_tracker|media_player|camera|lock|script|automation|scene|sun|weather|number|select|button|alarm_control_panel|lawn_mower|timer)\.)[a-z0-9_]+/gim,
+        /(\b(sensor|binary_sensor|switch|light|cover|climate|fan|input_boolean|input_number|input_select|person|device_tracker|media_player|camera|lock|script|automation|scene|sun|weather|number|select|button|alarm_control_panel|lawn_mower|timer|notify)\.)[a-z0-9_]+/gim,
         'deine_entitaet'
+      );
+
+      yaml = yaml.replace(
+        /(\b(notify|script|automation)\.)[a-z0-9_]+/gim,
+        'dein_service'
       );
 
       yaml = yaml.replace(/[ \t]+$/gm, '');
@@ -598,7 +616,7 @@
       const term = ui.postSearch.value.trim().toLowerCase();
       const filtered = posts.filter(post => {
         if(!term) return true;
-        const hay = [post.title, post.excerpt, post.category, post.source, post.type].join(' ').toLowerCase();
+        const hay = [post.title, post.excerpt, post.category, post.source, post.type, post.automation_id].join(' ').toLowerCase();
         return hay.includes(term);
       });
 
@@ -619,6 +637,7 @@
                   <span>${escapeHtml(post.date || '')}</span>
                   ${post.category ? `<span>${escapeHtml(post.category)}</span>` : ''}
                   ${post.source ? `<span>${escapeHtml(post.source)}</span>` : ''}
+                  ${post.automation_id ? `<span>Automation: ${escapeHtml(post.automation_id)}</span>` : ''}
                   <span>${post.published ? 'Veröffentlicht' : 'Entwurf'}</span>
                   <span>${likeCount} Likes</span>
                   <span>${commentCount} Kommentare</span>
@@ -647,6 +666,7 @@
       ui.fields.type.value = post.type || '';
       ui.fields.excerpt.value = post.excerpt || '';
       ui.fields.material.value = post.material || '';
+      ui.fields.automationId.value = post.automation_id || '';
       ui.fields.linkedinUrl.value = post.linkedin_url || '';
       ui.fields.image.value = post.image || '';
       ui.fields.content.value = post.content || '';
@@ -683,6 +703,7 @@
         type: ui.fields.type.value.trim() || null,
         excerpt: ui.fields.excerpt.value.trim() || null,
         material: ui.fields.material.value.trim() || null,
+        automation_id: ui.fields.automationId.value.trim() || null,
         linkedin_url: ui.fields.linkedinUrl.value.trim() || null,
         image: ui.fields.image.value.trim() || null,
         content: ui.fields.content.value.trim(),

@@ -20,6 +20,10 @@
       --shadow:0 20px 60px rgba(0,0,0,0.35);
     }
 
+    html{
+      scroll-behavior:smooth;
+    }
+
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
@@ -114,6 +118,19 @@
       background:var(--card);
       border:1px solid var(--line);
       box-shadow:var(--shadow);
+      scroll-margin-top:24px;
+      transition:border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    }
+
+    .item:target{
+      border-color:rgba(33,200,255,0.65);
+      box-shadow:0 0 0 3px rgba(33,200,255,0.12), var(--shadow);
+      transform:translateY(-2px);
+    }
+
+    .item.highlight{
+      border-color:rgba(33,200,255,0.65);
+      box-shadow:0 0 0 3px rgba(33,200,255,0.12), var(--shadow);
     }
 
     .item-head{
@@ -240,6 +257,10 @@
 
       ui.status.textContent = `${automations.length} Automation(en) geladen.`;
       renderAutomations();
+
+      requestAnimationFrame(() => {
+        highlightHashTarget();
+      });
     }
 
     function renderAutomations(){
@@ -256,7 +277,7 @@
       }
 
       ui.list.innerHTML = filtered.map(item => `
-        <article class="item">
+        <article class="item" id="${escapeHtml(item.id || '')}">
           <div class="item-head">
             <div>
               <h2>${escapeHtml(item.title || 'Ohne Titel')}</h2>
@@ -272,6 +293,22 @@
         </article>
       `).join('');
     }
+
+    function highlightHashTarget(){
+      const hash = decodeURIComponent(window.location.hash || '').replace('#', '').trim();
+      if(!hash) return;
+
+      const target = document.getElementById(hash);
+      if(!target) return;
+
+      target.classList.add('highlight');
+
+      setTimeout(() => {
+        target.classList.remove('highlight');
+      }, 2500);
+    }
+
+    window.addEventListener('hashchange', highlightHashTarget);
 
     function escapeHtml(value){
       return String(value ?? '')

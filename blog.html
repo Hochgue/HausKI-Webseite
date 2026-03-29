@@ -945,6 +945,12 @@
         .filter(Boolean);
     }
 
+    function getAutomationUrl(post) {
+      const automationId = String(post.automation_id || '').trim();
+      if (!automationId) return '';
+      return `/automationen.html#${encodeURIComponent(automationId)}`;
+    }
+
     function markdownToHtml(markdown = '') {
       let html = escapeHtml(markdown);
 
@@ -1023,6 +1029,7 @@
         const commentsCount = (state.commentsByPost[post.id] || []).length;
         const likesCount = state.likesByPost[post.id] || 0;
         const image = post.image && String(post.image).trim();
+        const automationUrl = getAutomationUrl(post);
 
         return `
           <article class="card">
@@ -1046,7 +1053,10 @@
               </div>
 
               <div class="card-actions">
-                <button class="button-outline" type="button" onclick="openPost('${escapeHtml(post.id)}')">Beitrag lesen</button>
+                <div class="hero-actions" style="margin-top:0;">
+                  <button class="button-outline" type="button" onclick="openPost('${escapeHtml(post.id)}')">Beitrag lesen</button>
+                  ${automationUrl ? `<a class="button-outline" href="${escapeHtml(automationUrl)}">Zur Automation</a>` : ''}
+                </div>
                 <div class="metric-row">
                   <span>👍 ${likesCount}</span>
                   <span>💬 ${commentsCount}</span>
@@ -1059,19 +1069,19 @@
     }
 
     async function loadPosts() {
-  const { data, error } = await supabaseClient
-    .from(TABLE_POSTS)
-    .select('*')
-    .eq('published', true)
-    .order('date', { ascending: false });
+      const { data, error } = await supabaseClient
+        .from(TABLE_POSTS)
+        .select('*')
+        .eq('published', true)
+        .order('date', { ascending: false });
 
-  if (error) {
-    console.error('SUPABASE ERROR loadPosts:', error);
-    alert(error.message);
-    return;
-  }
+      if (error) {
+        console.error('SUPABASE ERROR loadPosts:', error);
+        alert(error.message);
+        return;
+      }
 
-  state.posts = data || [];
+      state.posts = data || [];
     }
 
     async function loadComments() {
@@ -1156,6 +1166,7 @@
       const material = post.material && String(post.material).trim();
       const linkedInUrl = post.linkedin_url && String(post.linkedin_url).trim();
       const hasLiked = state.likedPosts.includes(postId);
+      const automationUrl = getAutomationUrl(post);
 
       els.modalBody.innerHTML = `
         ${image ? `<img class="detail-cover" src="${escapeHtml(image)}" alt="${escapeHtml(post.title)}">` : '<div class="detail-cover"></div>'}
@@ -1171,6 +1182,9 @@
               <button id="modalLikeButton" class="like-button" type="button" ${hasLiked ? 'disabled' : ''}>
                 ${hasLiked ? 'Bereits geliked 👍' : 'Beitrag liken 👍'}
               </button>
+
+              ${automationUrl ? `<a class="button" href="${escapeHtml(automationUrl)}">Zur Automation</a>` : ''}
+
               ${linkedInUrl ? `<a class="button-outline" href="${escapeHtml(linkedInUrl)}" target="_blank" rel="noopener noreferrer">Auf LinkedIn ansehen</a>` : ''}
             </div>
             <div class="metric-row">
