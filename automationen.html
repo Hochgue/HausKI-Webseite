@@ -42,37 +42,25 @@
 
     .hero{
       margin-bottom:24px;
-      padding:26px;
-      border-radius:22px;
+      padding:22px;
+      border-radius:18px;
       background:var(--card);
       border:1px solid var(--line);
       box-shadow:var(--shadow);
     }
 
-    .eyebrow{
-      display:inline-block;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.18);
-      color:var(--accent);
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:1px;
-      margin-bottom:14px;
-    }
-
     h1{
       margin:0 0 10px;
-      font-size:clamp(28px,4vw,42px);
-      line-height:1.08;
+      font-size:clamp(24px,3vw,34px);
+      line-height:1.1;
     }
 
     .lead{
       margin:0;
       color:var(--muted);
-      line-height:1.7;
-      max-width:70ch;
+      line-height:1.65;
+      max-width:75ch;
+      font-size:15px;
     }
 
     .status{
@@ -166,6 +154,38 @@
       white-space:nowrap;
     }
 
+    .placeholder-hints{
+      margin:0 0 14px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.08);
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .placeholder-hints strong{
+      color:var(--text);
+    }
+
+    .placeholder-hints ul{
+      margin:8px 0 0;
+      padding-left:18px;
+    }
+
+    .placeholder-hints li{
+      margin:4px 0;
+    }
+
+    .placeholder{
+      color:#21c8ff;
+      font-weight:700;
+      background:rgba(33,200,255,0.08);
+      padding:2px 6px;
+      border-radius:6px;
+    }
+
     pre{
       margin:0;
       padding:16px;
@@ -199,11 +219,10 @@
 <body>
   <main class="container">
     <section class="hero">
-      <span class="eyebrow">HausKI · Technische Seite</span>
-      <h1>Automationen</h1>
+      <h1>HausKI Automationen</h1>
       <p class="lead">
-        Auf dieser Seite werden bearbeitete YAML-Automationen aus Supabase geladen.
-        Ohne Bilder, ohne Zusatztext, nur die technische Version.
+        Auf dieser Seite werden meine YAML-Automationen geladen.<br>
+        Die Entitäten sind bewusst anonymisiert und müssen an die eigene Umgebung angepasst werden.
       </p>
     </section>
 
@@ -289,9 +308,92 @@
             <span class="chip">YAML</span>
           </div>
 
-          <pre>${escapeHtml(item.yaml_code || '')}</pre>
+          ${renderPlaceholderHints(item.yaml_code || '')}
+          <pre>${formatYaml(item.yaml_code || '')}</pre>
         </article>
       `).join('');
+    }
+
+    function getPlaceholdersFromYaml(yaml){
+      const known = [
+        'Dein Regensensor',
+        'Dein Mäher',
+        'Deine PV-Leistung',
+        'Dein Temperatursensor',
+        'Dein Licht',
+        'Dein Timer',
+        'Deine Heizung',
+        'Dein Fensterkontakt',
+        'Dein Türkontakt',
+        'Dein Bewegungssensor',
+        'Dein Rauchmelder',
+        'Dein Wassersensor',
+        'Deine Kamera',
+        'Dein Schloss',
+        'Deine Person',
+        'Dein Lautsprecher',
+        'Dein Schalter',
+        'Dein Rollladen',
+        'Dein Lüfter',
+        'Dein Benachrichtigungsdienst',
+        'Dein Script',
+        'Deine Szene',
+        'Deine Automation',
+        'Dein Dienst 1',
+        'Dein Dienst 2',
+        'Dein Dienst 3',
+        'Dein Gerät',
+        'Dein Bereich'
+      ];
+
+      const found = new Set();
+
+      known.forEach(item => {
+        if (String(yaml || '').includes(item)) {
+          found.add(item);
+        }
+      });
+
+      const genericEntityMatches = String(yaml || '').match(/Deine Entität \d+/g) || [];
+      genericEntityMatches.forEach(item => found.add(item));
+
+      const genericServiceMatches = String(yaml || '').match(/Dein Dienst \d+/g) || [];
+      genericServiceMatches.forEach(item => found.add(item));
+
+      return Array.from(found);
+    }
+
+    function renderPlaceholderHints(yaml){
+      const placeholders = getPlaceholdersFromYaml(yaml);
+
+      if (!placeholders.length) return '';
+
+      return `
+        <div class="placeholder-hints">
+          <strong>Das musst du anpassen:</strong>
+          <ul>
+            ${placeholders.map(item => `<li><span class="placeholder">${escapeHtml(item)}</span></li>`).join('')}
+          </ul>
+        </div>
+      `;
+    }
+
+    function formatYaml(value){
+      let text = escapeHtml(value || '');
+
+      const placeholders = getPlaceholdersFromYaml(value || '');
+
+      placeholders
+        .sort((a, b) => b.length - a.length)
+        .forEach(p => {
+          const escaped = escapeHtml(p);
+          text = text.replaceAll(
+            escaped,
+            `<span class="placeholder">${escaped}</span>`
+          );
+        });
+
+      return text;
     }
 
     function highlightHashTarget(){
