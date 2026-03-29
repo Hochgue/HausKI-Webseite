@@ -542,11 +542,29 @@
     function sanitizeYaml(input){
       let yaml = String(input || '');
 
-      yaml = yaml.replace(/^(\s*)(password|passwd|token|api_key|apikey|secret|client_secret|authorization|bearer)\s*:\s*.*$/gim, '$1$2: ***');
-      yaml = yaml.replace(/(bearer\s+)[a-z0-9\-_\.=]+/gim, '$1***');
+      yaml = yaml.replace(/\r\n/g, '\n');
+
+      yaml = yaml.replace(
+        /^(\s*)(password|passwd|token|api_key|apikey|secret|client_secret|authorization|bearer|access_token|refresh_token)\s*:\s*.*$/gim,
+        '$1$2: ***'
+      );
+
+      yaml = yaml.replace(/(bearer\s+)[a-z0-9\-_.=]+/gim, '$1***');
       yaml = yaml.replace(/(authorization\s*:\s*)(.+)/gim, '$1***');
-      yaml = yaml.replace(/(access_token\s*:\s*)(.+)/gim, '$1***');
-      yaml = yaml.replace(/(refresh_token\s*:\s*)(.+)/gim, '$1***');
+
+      yaml = yaml.replace(/^(\s*entity_id\s*:\s*)(.+)$/gim, '$1deine_entitaet');
+      yaml = yaml.replace(/^(\s*device_id\s*:\s*)(.+)$/gim, '$1dein_device');
+      yaml = yaml.replace(/^(\s*area_id\s*:\s*)(.+)$/gim, '$1dein_bereich');
+
+      yaml = yaml.replace(/^(\s*service\s*:\s*)(.+)$/gim, '$1dein_service');
+      yaml = yaml.replace(/^(\s*service_template\s*:\s*)(.+)$/gim, '$1dein_service');
+
+      yaml = yaml.replace(
+        /(\b(sensor|binary_sensor|switch|light|cover|climate|fan|input_boolean|input_number|input_select|person|device_tracker|media_player|camera|lock|script|automation|scene|sun|weather|number|select|button|alarm_control_panel|lawn_mower|timer)\.)[a-z0-9_]+/gim,
+        'deine_entitaet'
+      );
+
+      yaml = yaml.replace(/[ \t]+$/gm, '');
 
       return yaml.trim();
     }
