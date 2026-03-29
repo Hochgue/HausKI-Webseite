@@ -95,6 +95,26 @@
       box-shadow:0 0 0 3px rgba(33,200,255,0.08);
     }
 
+    .button-outline{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:46px;
+      padding:0 16px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:700;
+      transition:.2s;
+      cursor:pointer;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--text);
+    }
+
+    .button-outline:hover{
+      transform:translateY(-2px);
+    }
+
     .list{
       display:grid;
       gap:16px;
@@ -232,6 +252,12 @@
       <input id="search" class="input" type="search" placeholder="Automationen filtern …">
     </div>
 
+    <div id="viewControls" class="toolbar" style="display:none;">
+      <button id="showAllBtn" class="button-outline" type="button">
+        Alle Automationen anzeigen
+      </button>
+    </div>
+
     <section id="automationList" class="list"></section>
   </main>
 
@@ -243,12 +269,21 @@
     const ui = {
       status: document.getElementById('status'),
       search: document.getElementById('search'),
-      list: document.getElementById('automationList')
+      list: document.getElementById('automationList'),
+      viewControls: document.getElementById('viewControls'),
+      showAllBtn: document.getElementById('showAllBtn')
     };
 
     let automations = [];
 
     ui.search.addEventListener('input', renderAutomations);
+
+    ui.showAllBtn.addEventListener('click', () => {
+      history.replaceState(null, '', '/automationen.html');
+      ui.search.value = '';
+      renderAutomations();
+      ui.status.textContent = `${automations.length} Automation(en) geladen.`;
+    });
 
     loadAutomations();
 
@@ -274,7 +309,6 @@
         return;
       }
 
-      ui.status.textContent = `${automations.length} Automation(en) geladen.`;
       renderAutomations();
 
       requestAnimationFrame(() => {
@@ -284,11 +318,27 @@
 
     function renderAutomations(){
       const term = ui.search.value.trim().toLowerCase();
+      const hash = decodeURIComponent(window.location.hash || '').replace('#', '').trim();
 
-      const filtered = automations.filter(item => {
+      let filtered = automations.filter(item => {
         if(!term) return true;
         return [item.title, item.id, item.yaml_code].join(' ').toLowerCase().includes(term);
       });
+
+      if(hash){
+        filtered = filtered.filter(item => item.id === hash);
+        ui.viewControls.style.display = 'flex';
+      } else {
+        ui.viewControls.style.display = 'none';
+      }
+
+      if(hash && filtered.length === 1){
+        ui.status.textContent = `Direktansicht: ${filtered[0].title || filtered[0].id}`;
+      } else if(hash && !filtered.length){
+        ui.status.textContent = 'Die verlinkte Automation wurde nicht gefunden.';
+      } else {
+        ui.status.textContent = `${filtered.length} Automation(en) geladen.`;
+      }
 
       if(!filtered.length){
         ui.list.innerHTML = '<div class="empty">Keine passenden Automationen gefunden.</div>';
@@ -410,7 +460,10 @@
       }, 2500);
     }
 
-    window.addEventListener('hashchange', highlightHashTarget);
+    window.addEventListener('hashchange', () => {
+      renderAutomations();
+      highlightHashTarget();
+    });
 
     function escapeHtml(value){
       return String(value ?? '')
