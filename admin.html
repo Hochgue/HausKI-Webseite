@@ -77,6 +77,7 @@
     .section-head h2{margin:0; font-size:28px; letter-spacing:-.8px}
     .section-head p{margin:8px 0 0; color:var(--muted); line-height:1.7}
     .grid-2{display:grid; grid-template-columns:1.2fr .95fr; gap:18px}
+    .stack{display:grid; gap:18px}
     .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:18px}
     .stat{padding:16px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03)}
     .stat-label{font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--muted)}
@@ -94,6 +95,12 @@
       border:1px solid rgba(255,255,255,0.10); color:var(--text); padding:0 14px; outline:none;
     }
     .textarea{min-height:180px; resize:vertical; padding:14px; line-height:1.6}
+    .textarea.code{
+      min-height:260px;
+      font-family:Consolas, monospace;
+      font-size:13px;
+      background:rgba(4,11,20,0.92);
+    }
     .input:focus,.select:focus,.textarea:focus{border-color:rgba(33,200,255,0.45); box-shadow:0 0 0 3px rgba(33,200,255,0.08)}
     .button,.button-outline,.button-danger,.button-warning{
       display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0 16px;
@@ -107,7 +114,7 @@
     .toolbar,.action-row{display:flex; gap:10px; flex-wrap:wrap}
     .toolbar{margin-bottom:14px}
     .list{display:grid; gap:12px}
-    .post-item,.comment-item,.note-item{padding:16px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08)}
+    .post-item,.comment-item,.note-item,.automation-item{padding:16px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08)}
     .item-head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:10px}
     .item-head h3{margin:0; font-size:18px}
     .meta{color:var(--muted); font-size:13px; display:flex; flex-wrap:wrap; gap:8px}
@@ -116,6 +123,66 @@
     .chip.danger{color:#ffdada; border-color:rgba(255,125,125,0.30); background:rgba(255,125,125,0.10)}
     .small{color:var(--muted); font-size:13px; line-height:1.7}
     .preview-image{width:100%; aspect-ratio:16/9; object-fit:cover; display:block; margin-top:12px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:#09111d}
+    .preview-wrap{
+      overflow:hidden;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:linear-gradient(180deg, rgba(10,19,32,.96), rgba(6,11,19,.98));
+    }
+    .preview-hero{
+      padding:22px 22px 0;
+    }
+    .preview-badge{
+      display:inline-flex;
+      min-height:28px;
+      align-items:center;
+      padding:0 10px;
+      border-radius:999px;
+      background:rgba(33,200,255,0.08);
+      border:1px solid rgba(33,200,255,0.18);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:14px;
+    }
+    .preview-title{
+      margin:0 0 10px;
+      font-size:30px;
+      line-height:1.1;
+      letter-spacing:-1px;
+    }
+    .preview-meta{
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .preview-excerpt{
+      color:#dbeaff;
+      font-size:16px;
+      line-height:1.75;
+      margin:0 0 16px;
+    }
+    .preview-content{
+      padding:22px;
+      color:#eaf4ff;
+      line-height:1.8;
+      white-space:pre-wrap;
+    }
+    .code-preview{
+      margin-top:12px;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(4,11,20,0.92);
+      border:1px solid rgba(255,255,255,0.08);
+      color:#d7f0ff;
+      overflow:auto;
+      font-family:Consolas, monospace;
+      font-size:13px;
+      white-space:pre-wrap;
+    }
     .mono{font-family:Consolas, monospace; font-size:12px; word-break:break-all}
     @media (max-width:1100px){.grid-2,.stats{grid-template-columns:1fr}}
     @media (max-width:760px){
@@ -140,8 +207,8 @@
   <header class="hero container">
     <div class="panel hero-box">
       <span class="eyebrow">Intern • Admin</span>
-      <h1>Beiträge pflegen, Bilder hochladen und Kommentare moderieren.</h1>
-      <p class="lead">Diese Admin-Seite arbeitet direkt mit deinen Supabase-Tabellen <strong>posts</strong>, <strong>post_comments</strong> und <strong>post_likes</strong>. Ohne Login funktioniert das nur, wenn deine RLS-Policies anonyme Schreibzugriffe für diese Seite erlauben.</p>
+      <h1>Beiträge pflegen, Bilder hochladen, Vorschau prüfen und Automationen verwalten.</h1>
+      <p class="lead">Diese Admin-Seite arbeitet direkt mit deinen Supabase-Tabellen <strong>posts</strong>, <strong>post_comments</strong>, <strong>post_likes</strong> und <strong>automationen</strong>. Ohne Login funktioniert das nur, wenn deine RLS-Policies anonyme Schreibzugriffe für diese Seite erlauben.</p>
       <div class="stats">
         <div class="stat"><div class="stat-label">Beiträge</div><strong id="statPosts">0</strong></div>
         <div class="stat"><div class="stat-label">Veröffentlicht</div><strong id="statPublished">0</strong></div>
@@ -191,16 +258,77 @@
           </form>
         </div>
 
+        <div class="stack">
+          <div class="panel section-box">
+            <div class="section-head">
+              <h2>Vorschau</h2>
+              <p>So sieht dein Blogartikel vor dem Veröffentlichen ungefähr aus.</p>
+            </div>
+
+            <div class="preview-wrap">
+              <div class="preview-hero">
+                <span id="previewCategory" class="preview-badge">Kategorie</span>
+                <h3 id="previewTitle" class="preview-title">Titelvorschau</h3>
+                <div id="previewMeta" class="preview-meta"></div>
+                <p id="previewExcerpt" class="preview-excerpt">Hier erscheint dein Kurztext oder Teaser.</p>
+              </div>
+              <img id="previewImage" class="preview-image" alt="Vorschaubild" style="display:none;">
+              <div id="previewContent" class="preview-content">Hier erscheint der eigentliche Inhalt des Blogartikels.</div>
+            </div>
+          </div>
+
+          <div class="panel section-box">
+            <div class="section-head">
+              <h2>Beiträge</h2>
+              <p>Vorhandene Einträge laden, suchen, bearbeiten, veröffentlichen oder löschen.</p>
+            </div>
+            <div class="toolbar">
+              <input id="postSearch" class="input" type="search" placeholder="Beiträge filtern …">
+              <button id="reloadPostsBtn" class="button-outline" type="button">Neu laden</button>
+            </div>
+            <div id="postList" class="list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="grid-2">
         <div class="panel section-box">
           <div class="section-head">
-            <h2>Beiträge</h2>
-            <p>Vorhandene Einträge laden, suchen, bearbeiten, veröffentlichen oder löschen.</p>
+            <h2>Automationen</h2>
+            <p>Nur bearbeiteter YAML-Code. Ohne Bilder, ohne Erklärungen, ohne Tokens oder Passwörter.</p>
+          </div>
+
+          <div id="automationStatus" class="status">Hier legst du die YAML-Versionen für die versteckte technische Seite an.</div>
+
+          <form id="automationForm" class="form-grid">
+            <input id="automationId" type="hidden">
+            <input id="automationTitle" class="input full" type="text" placeholder="Titel der Automation, z. B. Rasenmäher Start" required>
+            <textarea id="automationYaml" class="textarea code full" placeholder="YAML-Code hier einfügen" required></textarea>
+            <div class="action-row full">
+              <button class="button" type="submit">Automation speichern</button>
+              <button id="resetAutomationBtn" class="button-outline" type="button">Formular leeren</button>
+            </div>
+          </form>
+
+          <div class="section-head" style="margin-top:22px;">
+            <h2 style="font-size:22px;">Bereinigte Vorschau</h2>
+            <p>So wird der Code nach dem Entfernen sensibler Inhalte gespeichert.</p>
+          </div>
+          <pre id="automationPreview" class="code-preview">Hier erscheint die bereinigte YAML-Vorschau.</pre>
+        </div>
+
+        <div class="panel section-box">
+          <div class="section-head">
+            <h2>Gespeicherte Automationen</h2>
+            <p>Einträge laden, bearbeiten oder löschen.</p>
           </div>
           <div class="toolbar">
-            <input id="postSearch" class="input" type="search" placeholder="Beiträge filtern …">
-            <button id="reloadPostsBtn" class="button-outline" type="button">Neu laden</button>
+            <input id="automationSearch" class="input" type="search" placeholder="Automationen filtern …">
+            <button id="reloadAutomationsBtn" class="button-outline" type="button">Neu laden</button>
           </div>
-          <div id="postList" class="list"></div>
+          <div id="automationList" class="list"></div>
         </div>
       </div>
     </section>
@@ -237,6 +365,10 @@
               <strong>4. Upload-Bucket.</strong><br>
               Bild-Upload erwartet den Bucket <strong>blog-images</strong>.
             </div>
+            <div class="note-item small">
+              <strong>5. Tabelle für Automationen.</strong><br>
+              Zusätzliche Tabelle: <span class="mono">automationen (id, title, yaml_code, created_at)</span>.
+            </div>
           </div>
         </div>
       </div>
@@ -250,10 +382,15 @@
 
     const ui = {
       formStatus: document.getElementById('formStatus'),
+      automationStatus: document.getElementById('automationStatus'),
       postForm: document.getElementById('postForm'),
+      automationForm: document.getElementById('automationForm'),
       postSearch: document.getElementById('postSearch'),
+      automationSearch: document.getElementById('automationSearch'),
       reloadPostsBtn: document.getElementById('reloadPostsBtn'),
+      reloadAutomationsBtn: document.getElementById('reloadAutomationsBtn'),
       postList: document.getElementById('postList'),
+      automationList: document.getElementById('automationList'),
       commentList: document.getElementById('commentList'),
       statPosts: document.getElementById('statPosts'),
       statPublished: document.getElementById('statPublished'),
@@ -261,6 +398,15 @@
       statPendingComments: document.getElementById('statPendingComments'),
       uploadImageBtn: document.getElementById('uploadImageBtn'),
       imageFile: document.getElementById('imageFile'),
+      preview: {
+        category: document.getElementById('previewCategory'),
+        title: document.getElementById('previewTitle'),
+        meta: document.getElementById('previewMeta'),
+        excerpt: document.getElementById('previewExcerpt'),
+        image: document.getElementById('previewImage'),
+        content: document.getElementById('previewContent')
+      },
+      automationPreview: document.getElementById('automationPreview'),
       fields: {
         postId: document.getElementById('postId'),
         title: document.getElementById('title'),
@@ -274,27 +420,72 @@
         image: document.getElementById('image'),
         content: document.getElementById('content'),
         published: document.getElementById('published')
+      },
+      automationFields: {
+        id: document.getElementById('automationId'),
+        title: document.getElementById('automationTitle'),
+        yaml: document.getElementById('automationYaml')
       }
     };
 
     let posts = [];
     let comments = [];
+    let automations = [];
 
     document.getElementById('resetFormBtn').addEventListener('click', resetForm);
+    document.getElementById('resetAutomationBtn').addEventListener('click', resetAutomationForm);
+
     ui.postForm.addEventListener('submit', savePost);
+    ui.automationForm.addEventListener('submit', saveAutomation);
+
     ui.reloadPostsBtn.addEventListener('click', bootstrap);
+    ui.reloadAutomationsBtn.addEventListener('click', loadAutomations);
+
     ui.postSearch.addEventListener('input', renderPosts);
+    ui.automationSearch.addEventListener('input', renderAutomations);
+
     ui.uploadImageBtn.addEventListener('click', uploadImage);
+
+    [
+      ui.fields.title,
+      ui.fields.date,
+      ui.fields.category,
+      ui.fields.source,
+      ui.fields.type,
+      ui.fields.excerpt,
+      ui.fields.material,
+      ui.fields.image,
+      ui.fields.content,
+      ui.fields.published
+    ].forEach(el => {
+      el.addEventListener('input', renderPreview);
+      el.addEventListener('change', renderPreview);
+    });
+
+    [
+      ui.automationFields.title,
+      ui.automationFields.yaml
+    ].forEach(el => {
+      el.addEventListener('input', renderAutomationPreview);
+      el.addEventListener('change', renderAutomationPreview);
+    });
 
     bootstrap();
 
     async function bootstrap(){
-      await Promise.all([loadPosts(), loadComments()]);
+      await Promise.all([loadPosts(), loadComments(), loadAutomations()]);
+      renderPreview();
+      renderAutomationPreview();
     }
 
     function setStatus(message, type='default'){
       ui.formStatus.className = `status${type === 'default' ? '' : ' ' + type}`;
       ui.formStatus.innerHTML = message;
+    }
+
+    function setAutomationStatus(message, type='default'){
+      ui.automationStatus.className = `status${type === 'default' ? '' : ' ' + type}`;
+      ui.automationStatus.innerHTML = message;
     }
 
     function slugify(input){
@@ -308,6 +499,61 @@
 
     function today(){
       return new Date().toISOString().slice(0,10);
+    }
+
+    function formatDate(value){
+      if(!value) return '';
+      try{
+        return new Date(value).toLocaleDateString('de-AT');
+      }catch{
+        return value;
+      }
+    }
+
+    function formatPreviewContent(value){
+      const cleaned = String(value || '').trim();
+      if(!cleaned) return 'Hier erscheint der eigentliche Inhalt des Blogartikels.';
+      return cleaned;
+    }
+
+    function renderPreview(){
+      ui.preview.category.textContent = ui.fields.category.value.trim() || 'Kategorie';
+      ui.preview.title.textContent = ui.fields.title.value.trim() || 'Titelvorschau';
+
+      const meta = [];
+      if(ui.fields.date.value) meta.push(formatDate(ui.fields.date.value));
+      if(ui.fields.source.value) meta.push(ui.fields.source.value);
+      if(ui.fields.type.value.trim()) meta.push(ui.fields.type.value.trim());
+      ui.preview.meta.innerHTML = meta.map(item => `<span>${escapeHtml(item)}</span>`).join('');
+
+      ui.preview.excerpt.textContent = ui.fields.excerpt.value.trim() || 'Hier erscheint dein Kurztext oder Teaser.';
+      ui.preview.content.textContent = formatPreviewContent(ui.fields.content.value);
+
+      const imageUrl = ui.fields.image.value.trim();
+      if(imageUrl){
+        ui.preview.image.src = imageUrl;
+        ui.preview.image.style.display = 'block';
+      } else {
+        ui.preview.image.removeAttribute('src');
+        ui.preview.image.style.display = 'none';
+      }
+    }
+
+    function sanitizeYaml(input){
+      let yaml = String(input || '');
+
+      yaml = yaml.replace(/^(\s*)(password|passwd|token|api_key|apikey|secret|client_secret|authorization|bearer)\s*:\s*.*$/gim, '$1$2: ***');
+      yaml = yaml.replace(/(bearer\s+)[a-z0-9\-_\.=]+/gim, '$1***');
+      yaml = yaml.replace(/(authorization\s*:\s*)(.+)/gim, '$1***');
+      yaml = yaml.replace(/(access_token\s*:\s*)(.+)/gim, '$1***');
+      yaml = yaml.replace(/(refresh_token\s*:\s*)(.+)/gim, '$1***');
+
+      return yaml.trim();
+    }
+
+    function renderAutomationPreview(){
+      const sanitized = sanitizeYaml(ui.automationFields.yaml.value);
+      ui.automationPreview.textContent = sanitized || 'Hier erscheint die bereinigte YAML-Vorschau.';
     }
 
     async function loadPosts(){
@@ -387,6 +633,7 @@
       ui.fields.image.value = post.image || '';
       ui.fields.content.value = post.content || '';
       ui.fields.published.checked = !!post.published;
+      renderPreview();
       setStatus(`Beitrag <strong>${escapeHtml(post.title || post.id)}</strong> geladen.`, 'ok');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -401,6 +648,7 @@
       ui.fields.postId.value = '';
       ui.fields.date.value = today();
       ui.fields.source.value = 'Blog';
+      renderPreview();
       setStatus('Bereit. Du kannst einen neuen Beitrag anlegen.', 'default');
     }
 
@@ -473,6 +721,135 @@
       await loadPosts();
       await loadComments();
       setStatus('Beitrag wurde gelöscht.', 'ok');
+    };
+
+    async function loadAutomations(){
+      const { data, error } = await supabaseClient
+        .from('automationen')
+        .select('*')
+        .order('created_at', { ascending:false });
+
+      if(error){
+        ui.automationList.innerHTML = `<div class="automation-item small">Automationen konnten nicht geladen werden.<br>${escapeHtml(error.message)}</div>`;
+        setAutomationStatus(`Fehler beim Laden der Automationen: ${escapeHtml(error.message)}`, 'warn');
+        return;
+      }
+
+      automations = data || [];
+      renderAutomations();
+    }
+
+    function renderAutomations(){
+      const term = ui.automationSearch.value.trim().toLowerCase();
+      const filtered = automations.filter(item => {
+        if(!term) return true;
+        return [item.title, item.id, item.yaml_code].join(' ').toLowerCase().includes(term);
+      });
+
+      if(!filtered.length){
+        ui.automationList.innerHTML = '<div class="automation-item small">Keine passenden Automationen gefunden.</div>';
+        return;
+      }
+
+      ui.automationList.innerHTML = filtered.map(item => `
+        <article class="automation-item">
+          <div class="item-head">
+            <div>
+              <h3>${escapeHtml(item.title || 'Ohne Titel')}</h3>
+              <div class="meta">
+                <span>ID: ${escapeHtml(item.id || '')}</span>
+                ${item.created_at ? `<span>${new Date(item.created_at).toLocaleString('de-AT')}</span>` : ''}
+              </div>
+            </div>
+            <span class="chip">YAML</span>
+          </div>
+          <pre class="code-preview">${escapeHtml(item.yaml_code || '')}</pre>
+          <div class="toolbar" style="margin-top:12px;">
+            <button class="button-outline" type="button" onclick="editAutomation('${escapeJs(item.id)}')">Bearbeiten</button>
+            <button class="button-danger" type="button" onclick="deleteAutomation('${escapeJs(item.id)}')">Löschen</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function fillAutomationForm(item){
+      ui.automationFields.id.value = item.id || '';
+      ui.automationFields.title.value = item.title || '';
+      ui.automationFields.yaml.value = item.yaml_code || '';
+      renderAutomationPreview();
+      setAutomationStatus(`Automation <strong>${escapeHtml(item.title || item.id)}</strong> geladen.`, 'ok');
+      window.scrollTo({ top: document.body.scrollHeight * 0.35, behavior: 'smooth' });
+    }
+
+    window.editAutomation = function(id){
+      const item = automations.find(entry => entry.id === id);
+      if(item) fillAutomationForm(item);
+    };
+
+    function resetAutomationForm(){
+      ui.automationForm.reset();
+      ui.automationFields.id.value = '';
+      renderAutomationPreview();
+      setAutomationStatus('Bereit. Du kannst eine neue Automation anlegen.', 'default');
+    }
+
+    async function saveAutomation(event){
+      event.preventDefault();
+
+      const title = ui.automationFields.title.value.trim();
+      const manualId = ui.automationFields.id.value.trim();
+      const sanitizedYaml = sanitizeYaml(ui.automationFields.yaml.value);
+
+      if(!title){
+        setAutomationStatus('Bitte einen Titel eingeben.', 'warn');
+        return;
+      }
+
+      if(!sanitizedYaml){
+        setAutomationStatus('Bitte YAML-Code eingeben.', 'warn');
+        return;
+      }
+
+      const payload = {
+        id: manualId || slugify(title),
+        title,
+        yaml_code: sanitizedYaml
+      };
+
+      setAutomationStatus('Automation wird gespeichert …', 'default');
+
+      const isEdit = !!manualId;
+      let response;
+      if(isEdit){
+        response = await supabaseClient.from('automationen').update(payload).eq('id', manualId).select().single();
+      } else {
+        response = await supabaseClient.from('automationen').insert(payload).select().single();
+      }
+
+      if(response.error){
+        setAutomationStatus(`Speichern fehlgeschlagen: ${escapeHtml(response.error.message)}`, 'warn');
+        return;
+      }
+
+      setAutomationStatus(`Automation <strong>${escapeHtml(payload.title)}</strong> wurde gespeichert.`, 'ok');
+      resetAutomationForm();
+      await loadAutomations();
+    }
+
+    window.deleteAutomation = async function(id){
+      const item = automations.find(entry => entry.id === id);
+      if(!item) return;
+      const confirmed = confirm(`Automation "${item.title}" wirklich löschen?`);
+      if(!confirmed) return;
+
+      const { error } = await supabaseClient.from('automationen').delete().eq('id', id);
+      if(error){
+        setAutomationStatus(`Löschen fehlgeschlagen: ${escapeHtml(error.message)}`, 'warn');
+        return;
+      }
+
+      await loadAutomations();
+      setAutomationStatus('Automation wurde gelöscht.', 'ok');
     };
 
     async function loadComments(){
@@ -559,6 +936,7 @@
       }
       const { data } = supabaseClient.storage.from('blog-images').getPublicUrl(path);
       ui.fields.image.value = data.publicUrl;
+      renderPreview();
       setStatus('Bild erfolgreich hochgeladen und Feld befüllt.', 'ok');
     }
 
@@ -576,6 +954,7 @@
     }
 
     resetForm();
+    resetAutomationForm();
   </script>
 </body>
 </html>
