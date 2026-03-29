@@ -548,38 +548,116 @@
     }
 
     function sanitizeYaml(input){
-      let yaml = String(input || '');
-
-      yaml = yaml.replace(/\r\n/g, '\n');
+      let yaml = String(input || '').replace(/\r\n/g, '\n');
 
       yaml = yaml.replace(
         /^(\s*)(password|passwd|token|api_key|apikey|secret|client_secret|authorization|bearer|access_token|refresh_token)\s*:\s*.*$/gim,
         '$1$2: ***'
       );
-
       yaml = yaml.replace(/(bearer\s+)[a-z0-9\-_.=]+/gim, '$1***');
       yaml = yaml.replace(/(authorization\s*:\s*)(.+)/gim, '$1***');
 
-      yaml = yaml.replace(/^(\s*alias\s*:\s*)(.+)$/gim, '$1deine_automation');
-      yaml = yaml.replace(/^(\s*id\s*:\s*)(.+)$/gim, '$1deine_id');
+      const entityMap = new Map();
+      const serviceMap = new Map();
+      let genericEntityCounter = 1;
+      let genericServiceCounter = 1;
+
+      function labelForEntity(entity){
+        const e = String(entity || '').toLowerCase().trim();
+        if (!e.includes('.')) return null;
+
+        if (/(regen|rain|niederschlag)/.test(e)) return 'Dein Regensensor';
+        if (/(maeher|mäher|mower|automower|lawn)/.test(e)) return 'Dein Mäher';
+        if (/(pv|solar|einspeis|grid_export)/.test(e)) return 'Deine PV-Leistung';
+        if (/(temp|temperature|temperatur)/.test(e)) return 'Dein Temperatursensor';
+        if (/(licht|light|lampe|beleuchtung)/.test(e)) return 'Dein Licht';
+        if (/(timer)/.test(e)) return 'Dein Timer';
+        if (/(heizung|climate|heiz|thermostat)/.test(e)) return 'Deine Heizung';
+        if (/(fenster|window)/.test(e)) return 'Dein Fensterkontakt';
+        if (/(tuere|tuer|door)/.test(e)) return 'Dein Türkontakt';
+        if (/(bewegung|motion|presence|praesenz)/.test(e)) return 'Dein Bewegungssensor';
+        if (/(rauch|smoke)/.test(e)) return 'Dein Rauchmelder';
+        if (/(wasser|water|leak)/.test(e)) return 'Dein Wassersensor';
+        if (/(kamera|camera)/.test(e)) return 'Deine Kamera';
+        if (/(lock|schloss)/.test(e)) return 'Dein Schloss';
+        if (/(person|device_tracker)/.test(e)) return 'Deine Person';
+        if (/(media_player|echo|alexa|speaker|lautsprecher)/.test(e)) return 'Dein Lautsprecher';
+        if (/(switch|schalter|relay)/.test(e)) return 'Dein Schalter';
+        if (/(cover|rollladen|jalousie)/.test(e)) return 'Dein Rollladen';
+        if (/(fan|luefter|lüfter)/.test(e)) return 'Dein Lüfter';
+
+        return `Deine Entität ${genericEntityCounter++}`;
+      }
+
+      function labelForService(service){
+        const s = String(service || '').toLowerCase().trim();
+        if (!s.includes('.')) return null;
+
+        if (s.startsWith('notify.')) return 'Dein Benachrichtigungsdienst';
+        if (s.startsWith('script.')) return 'Dein Script';
+        if (s.startsWith('scene.')) return 'Deine Szene';
+        if (s.startsWith('automation.')) return 'Deine Automation';
+        if (s.startsWith('timer.')) return 'Dein Timer';
+        if (s.startsWith('light.')) return 'Dein Licht';
+        if (s.startsWith('switch.')) return 'Dein Schalter';
+
+        return `Dein Dienst ${genericServiceCounter++}`;
+      }
+
+      function getEntityLabel(entity){
+        const key = String(entity || '').trim();
+        if (!key) return 'Deine Entität';
+        if (!entityMap.has(key)) {
+          entityMap.set(key, labelForEntity(key));
+        }
+        return entityMap.get(key);
+      }
+
+      function getServiceLabel(service){
+        const key = String(service || '').trim();
+        if (!key) return 'Dein Dienst';
+        if (!serviceMap.has(key)) {
+          serviceMap.set(key, labelForService(key));
+        }
+        return serviceMap.get(key);
+      }
+
+      yaml = yaml.replace(/^(\s*entity_id\s*:\s*)([^\n]+)$/gim, (_, prefix, entity) => {
+        return prefix + getEntityLabel(entity.trim());
+      });
+
+      yaml = yaml.replace(/^(\s*device_id\s*:\s*)([^\n]+)$/gim, '$1Dein Gerät');
+      yaml = yaml.replace(/^(\s*area_id\s*:\s*)([^\n]+)$/gim, '$1Dein Bereich');
+
+      yaml = yaml.replace(/^(\s*service\s*:\s*)([^\n]+)$/gim, (_, prefix, service) => {
+        return prefix + getServiceLabel(service.trim());
+      });
+
+      yaml = yaml.replace(/^(\s*service_template\s*:\s*)([^\n]+)$/gim, '$1Dein Dienst');
+
+      yaml = yaml.replace(/^(\s*alias\s*:\s*)(.+)$/gim, '$1Deine Automation');
+      yaml = yaml.replace(/^(\s*id\s*:\s*)(.+)$/gim, '$1deine_automation_id');
       yaml = yaml.replace(/^(\s*unique_id\s*:\s*)(.+)$/gim, '$1deine_unique_id');
       yaml = yaml.replace(/^(\s*name\s*:\s*)(.+)$/gim, '$1dein_name');
 
-      yaml = yaml.replace(/^(\s*entity_id\s*:\s*)(.+)$/gim, '$1deine_entitaet');
-      yaml = yaml.replace(/^(\s*device_id\s*:\s*)(.+)$/gim, '$1dein_device');
-      yaml = yaml.replace(/^(\s*area_id\s*:\s*)(.+)$/gim, '$1dein_bereich');
-
-      yaml = yaml.replace(/^(\s*service\s*:\s*)(.+)$/gim, '$1dein_service');
-      yaml = yaml.replace(/^(\s*service_template\s*:\s*)(.+)$/gim, '$1dein_service');
-
       yaml = yaml.replace(
-        /(\b(sensor|binary_sensor|switch|light|cover|climate|fan|input_boolean|input_number|input_select|person|device_tracker|media_player|camera|lock|script|automation|scene|sun|weather|number|select|button|alarm_control_panel|lawn_mower|timer|notify)\.)[a-z0-9_]+/gim,
-        'deine_entitaet'
+        /^(\s*-\s*)((?:input_boolean|input_number|input_select|sensor|binary_sensor|switch|light|cover|climate|fan|media_player|camera|lock|person|device_tracker|script|scene|automation|timer|lawn_mower)\.[a-z0-9_]+)\s*$/gim,
+        (_, prefix, entity) => prefix + getEntityLabel(entity.trim())
       );
 
       yaml = yaml.replace(
-        /(\b(notify|script|automation)\.)[a-z0-9_]+/gim,
-        'dein_service'
+        /'((?:input_boolean|input_number|input_select|sensor|binary_sensor|switch|light|cover|climate|fan|media_player|camera|lock|person|device_tracker|script|scene|automation|timer|lawn_mower)\.[a-z0-9_]+)'/gim,
+        (_, entity) => `'${getEntityLabel(entity.trim())}'`
+      );
+
+      yaml = yaml.replace(
+        /\b((?:input_boolean|input_number|input_select|sensor|binary_sensor|switch|light|cover|climate|fan|media_player|camera|lock|person|device_tracker|script|scene|automation|timer|lawn_mower)\.[a-z0-9_]+)\b/gim,
+        (match) => getEntityLabel(match.trim())
+      );
+
+      yaml = yaml.replace(
+        /\b((?:notify|script|scene|automation|timer|light|switch)\.[a-z0-9_]+)\b/gim,
+        (match) => getServiceLabel(match.trim())
       );
 
       yaml = yaml.replace(/[ \t]+$/gm, '');
