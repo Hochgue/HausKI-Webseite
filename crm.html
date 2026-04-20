@@ -3,8 +3,9 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini CRM Vertrieb – Supabase Test</title>
+<title>Mini CRM Vertrieb – Supabase Clean v27</title>
 <style>
   :root{
     --bg:#eef2f6; --panel:#ffffff; --line:#d8e0e8; --text:#1f2937; --muted:#6b7280;
@@ -1042,18 +1043,23 @@ function removeNoteEntry(index){
 }
 
 
-function saveCurrentContact(){
+async function saveCurrentContact(){
   const c = getSelected();
   if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
   try{
     syncFormToSelected();
+    const current = getSelected();
+    setSaveState("Speichere in Supabase ...");
+    await saveOneContactToSupabase(current);
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
     fillForm();
     renderList();
-    persistData(false);
-    alert("Kontakt aktualisiert.");
+    setSaveState("In Supabase gespeichert");
+    alert("Kontakt in Supabase gespeichert.");
   }catch(e){
     console.error("saveCurrentContact failed", e);
-    alert("Speichern des Kontakts fehlgeschlagen. Bitte erneut versuchen.");
+    setSaveState("Supabase-Speichern fehlgeschlagen", true);
+    alert("Speichern in Supabase fehlgeschlagen.");
   }
 }
 
@@ -1081,27 +1087,34 @@ function duplicateContact(){
   copy.firma = (copy.firma || "") + " Kopie";
   contacts.unshift(copy); selectedId = copy.id; fillForm(); renderList(); scheduleAutosave();
 }
-function saveData(){
+async function saveData(){
   try{
     syncFormToSelected();
-    persistData(false);
-    alert("Daten gespeichert.");
+    setSaveState("Speichere alle Kontakte in Supabase ...");
+    for (const contact of [...contacts]){
+      await saveOneContactToSupabase(contact);
+    }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Alle Kontakte in Supabase gespeichert");
+    alert("Alle Kontakte in Supabase gespeichert.");
   }catch(e){
     console.error("saveData failed", e);
-    alert("Speichern fehlgeschlagen.");
+    setSaveState("Supabase-Speichern fehlgeschlagen", true);
+    alert("Speichern in Supabase fehlgeschlagen.");
   }
 }
 
-function loadData(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(!saved){ alert("Keine gespeicherten Daten gefunden."); return; }
+async function loadData(){
   try{
-    const parsed = JSON.parse(saved);
-    const incoming = Array.isArray(parsed) ? parsed : (parsed.contacts || []);
-    contacts = sanitizeContacts(incoming);
-    selectedId = contacts.length ? contacts[0].id : null;
-    fillForm(); renderList(); alert("Anrufliste geladen.");
-  }catch(e){ alert("Gespeicherte Daten konnten nicht geladen werden."); }
+    await loadAllFromSupabase();
+    alert("Daten aus Supabase geladen.");
+  }catch(e){
+    console.error("loadData failed", e);
+    setSaveState("Supabase-Laden fehlgeschlagen", true);
+    alert("Laden aus Supabase fehlgeschlagen.");
+  }
 }
 
 function exportCSV(){
@@ -1469,6 +1482,7 @@ function generateDailyReport(){
     <html lang="de">
     <head>
       <meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
       <title>Tagesbericht Vertrieb ${today}</title>
       <style>
         body{font-family:Arial,Helvetica,sans-serif;margin:28px;color:#111827}
@@ -1656,12 +1670,10 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 function isUuid(value){
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
 }
-
 function normalizeDate(value){
   const v = String(value || "").trim();
   return v === "" ? null : v;
 }
-
 function baseCompanyPayload(contact){
   return {
     firma: contact.firma || "",
@@ -1681,10 +1693,9 @@ function baseCompanyPayload(contact){
     updated_at: new Date().toISOString()
   };
 }
-
 function mapDbToContact(firma, ansprechpartnerRows, historieRows){
   const rows = (ansprechpartnerRows || []).filter(r => r.firma_id === firma.id);
-  const historie = (historieRows || []).filter(r => r.firma_id === firma.id);
+  const historie = (historieRows || []).filter(r => r.firma_id === firma.id).sort((a,b) => String(a.datum||"").localeCompare(String(b.datum||"")));
   const haupt = rows.find(r => r.hauptkontakt) || rows[0] || {};
   const weitere = rows.filter(r => !r.hauptkontakt).map(r => ({
     vorname: r.vorname || "",
@@ -1695,7 +1706,6 @@ function mapDbToContact(firma, ansprechpartnerRows, historieRows){
     position: r.rolle || "",
     notiz: ""
   }));
-
   return sanitizeContacts([{
     id: firma.id,
     firma: firma.firma || "",
@@ -1731,19 +1741,16 @@ function mapDbToContact(firma, ansprechpartnerRows, historieRows){
     archived: false
   }])[0];
 }
-
 async function loadAllFromSupabase(){
   setSaveState("Lade aus Supabase ...");
   const [{ data: firmen, error: firmenError }, { data: ansprechpartner, error: ansprechpartnerError }, { data: historie, error: historieError }] = await Promise.all([
     supabaseClient.from("crm_firmen").select("*").order("firma", { ascending: true }),
     supabaseClient.from("crm_ansprechpartner").select("*").order("created_at", { ascending: true }),
-    supabaseClient.from("crm_historie").select("*").order("datum", { ascending: true }),
+    supabaseClient.from("crm_historie").select("*").order("datum", { ascending: true })
   ]);
-
   if (firmenError) throw firmenError;
   if (ansprechpartnerError) throw ansprechpartnerError;
   if (historieError) throw historieError;
-
   contacts = (firmen || []).map(f => mapDbToContact(f, ansprechpartner || [], historie || []));
   selectedId = contacts.length ? contacts[0].id : null;
   fillForm();
@@ -1751,29 +1758,15 @@ async function loadAllFromSupabase(){
   showDueTodayBanner();
   setSaveState("Aus Supabase geladen");
 }
-
 async function saveOneContactToSupabase(contact){
   let firmaId = isUuid(contact.id) ? contact.id : null;
   const payload = baseCompanyPayload(contact);
-
-  let savedFirma;
   if (firmaId){
-    const { data, error } = await supabaseClient
-      .from("crm_firmen")
-      .update(payload)
-      .eq("id", firmaId)
-      .select()
-      .single();
+    const { error } = await supabaseClient.from("crm_firmen").update(payload).eq("id", firmaId);
     if (error) throw error;
-    savedFirma = data;
   } else {
-    const { data, error } = await supabaseClient
-      .from("crm_firmen")
-      .insert(payload)
-      .select()
-      .single();
+    const { data, error } = await supabaseClient.from("crm_firmen").insert(payload).select().single();
     if (error) throw error;
-    savedFirma = data;
     firmaId = data.id;
   }
 
@@ -1832,110 +1825,8 @@ async function saveOneContactToSupabase(contact){
 
   contacts = contacts.map(x => x.id === contact.id ? { ...x, id: firmaId } : x);
   if (selectedId === contact.id) selectedId = firmaId;
-  return firmaId;
 }
-
-async function saveCurrentContact(){
-  const c = getSelected();
-  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
-  try{
-    syncFormToSelected();
-    const current = getSelected();
-    setSaveState("Speichere in Supabase ...");
-    await saveOneContactToSupabase(current);
-    fillForm();
-    renderList();
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    setSaveState("In Supabase gespeichert");
-    alert("Kontakt in Supabase gespeichert.");
-  }catch(e){
-    console.error("saveCurrentContact failed", e);
-    setSaveState("Supabase-Speichern fehlgeschlagen", true);
-    alert("Speichern in Supabase fehlgeschlagen.");
-  }
-}
-
-async function saveData(){
-  try{
-    syncFormToSelected();
-    setSaveState("Speichere alle Kontakte in Supabase ...");
-    for (const contact of [...contacts]){
-      await saveOneContactToSupabase(contact);
-    }
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    fillForm();
-    renderList();
-    setSaveState("Alle Kontakte in Supabase gespeichert");
-    alert("Alle Kontakte in Supabase gespeichert.");
-  }catch(e){
-    console.error("saveData failed", e);
-    setSaveState("Supabase-Speichern fehlgeschlagen", true);
-    alert("Speichern in Supabase fehlgeschlagen.");
-  }
-}
-
-async function loadData(){
-  try{
-    await loadAllFromSupabase();
-    alert("Daten aus Supabase geladen.");
-  }catch(e){
-    console.error("loadData failed", e);
-    setSaveState("Supabase-Laden fehlgeschlagen", true);
-    alert("Laden aus Supabase fehlgeschlagen.");
-  }
-}
-
-async function deleteSingle(id){
-  const item = contacts.find(c => c.id === id);
-  if(!item) return;
-  createDeletionBackup("einzeln", [id]);
-  if(!confirm(`Kontakt "${item.firma || [item.vorname, item.nachname].filter(Boolean).join(" ") || id}" wirklich löschen?`)) return;
-  try{
-    if (isUuid(id)){
-      const { error } = await supabaseClient.from("crm_firmen").delete().eq("id", id);
-      if (error) throw error;
-    }
-    contacts = contacts.filter(c => c.id !== id);
-    selectedIds.delete(id);
-    if(selectedId === id){ selectedId = contacts.length ? contacts[0].id : null; }
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    fillForm();
-    renderList();
-    setSaveState("Kontakt gelöscht");
-  }catch(e){
-    console.error("deleteSingle failed", e);
-    alert("Löschen in Supabase fehlgeschlagen.");
-  }
-}
-
-async function deleteSelected(){
-  const ids = Array.from(selectedIds);
-  if(!ids.length){ alert("Bitte zuerst Kontakte markieren."); return; }
-  createDeletionBackup("auswahl", ids);
-  if(!confirm(ids.length + " markierte Kontakte wirklich löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
-  try{
-    const uuidIds = ids.filter(isUuid);
-    if (uuidIds.length){
-      const { error } = await supabaseClient.from("crm_firmen").delete().in("id", uuidIds);
-      if (error) throw error;
-    }
-    contacts = contacts.filter(c => !selectedIds.has(c.id));
-    if(selectedId !== null && !contacts.find(c => c.id === selectedId)){
-      selectedId = contacts.length ? contacts[0].id : null;
-    }
-    selectedIds.clear();
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    fillForm();
-    renderList();
-    setSaveState("Ausgewählte Kontakte gelöscht");
-    alert("Ausgewählte Kontakte wurden gelöscht.");
-  }catch(e){
-    console.error("deleteSelected failed", e);
-    alert("Löschen in Supabase fehlgeschlagen.");
-  }
-}
-
-async function clearAllData(){
+clearAllData = async function(){
   if(!contacts.length){ alert("Keine Kontakte vorhanden."); return; }
   createDeletionBackup("alle", contacts.map(c => c.id));
   if(!confirm("ACHTUNG: Wirklich alle Kontakte und Daten löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
@@ -1957,18 +1848,16 @@ async function clearAllData(){
     console.error("clearAllData failed", e);
     alert("Komplettes Löschen in Supabase fehlgeschlagen.");
   }
-}
+};
 
-async function initSupabaseMode(){
+window.addEventListener("load", async () => {
   try{
     await loadAllFromSupabase();
   }catch(e){
     console.error("initSupabaseMode failed", e);
     setSaveState("Supabase noch leer oder nicht erreichbar", true);
   }
-}
-
-initSupabaseMode();
+});
 </script>
 
 </body>
@@ -2068,12 +1957,10 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 function isUuid(value){
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
 }
-
 function normalizeDate(value){
   const v = String(value || "").trim();
   return v === "" ? null : v;
 }
-
 function baseCompanyPayload(contact){
   return {
     firma: contact.firma || "",
@@ -2093,10 +1980,9 @@ function baseCompanyPayload(contact){
     updated_at: new Date().toISOString()
   };
 }
-
 function mapDbToContact(firma, ansprechpartnerRows, historieRows){
   const rows = (ansprechpartnerRows || []).filter(r => r.firma_id === firma.id);
-  const historie = (historieRows || []).filter(r => r.firma_id === firma.id);
+  const historie = (historieRows || []).filter(r => r.firma_id === firma.id).sort((a,b) => String(a.datum||"").localeCompare(String(b.datum||"")));
   const haupt = rows.find(r => r.hauptkontakt) || rows[0] || {};
   const weitere = rows.filter(r => !r.hauptkontakt).map(r => ({
     vorname: r.vorname || "",
@@ -2107,7 +1993,6 @@ function mapDbToContact(firma, ansprechpartnerRows, historieRows){
     position: r.rolle || "",
     notiz: ""
   }));
-
   return sanitizeContacts([{
     id: firma.id,
     firma: firma.firma || "",
@@ -2143,19 +2028,16 @@ function mapDbToContact(firma, ansprechpartnerRows, historieRows){
     archived: false
   }])[0];
 }
-
 async function loadAllFromSupabase(){
   setSaveState("Lade aus Supabase ...");
   const [{ data: firmen, error: firmenError }, { data: ansprechpartner, error: ansprechpartnerError }, { data: historie, error: historieError }] = await Promise.all([
     supabaseClient.from("crm_firmen").select("*").order("firma", { ascending: true }),
     supabaseClient.from("crm_ansprechpartner").select("*").order("created_at", { ascending: true }),
-    supabaseClient.from("crm_historie").select("*").order("datum", { ascending: true }),
+    supabaseClient.from("crm_historie").select("*").order("datum", { ascending: true })
   ]);
-
   if (firmenError) throw firmenError;
   if (ansprechpartnerError) throw ansprechpartnerError;
   if (historieError) throw historieError;
-
   contacts = (firmen || []).map(f => mapDbToContact(f, ansprechpartner || [], historie || []));
   selectedId = contacts.length ? contacts[0].id : null;
   fillForm();
@@ -2163,29 +2045,15 @@ async function loadAllFromSupabase(){
   showDueTodayBanner();
   setSaveState("Aus Supabase geladen");
 }
-
 async function saveOneContactToSupabase(contact){
   let firmaId = isUuid(contact.id) ? contact.id : null;
   const payload = baseCompanyPayload(contact);
-
-  let savedFirma;
   if (firmaId){
-    const { data, error } = await supabaseClient
-      .from("crm_firmen")
-      .update(payload)
-      .eq("id", firmaId)
-      .select()
-      .single();
+    const { error } = await supabaseClient.from("crm_firmen").update(payload).eq("id", firmaId);
     if (error) throw error;
-    savedFirma = data;
   } else {
-    const { data, error } = await supabaseClient
-      .from("crm_firmen")
-      .insert(payload)
-      .select()
-      .single();
+    const { data, error } = await supabaseClient.from("crm_firmen").insert(payload).select().single();
     if (error) throw error;
-    savedFirma = data;
     firmaId = data.id;
   }
 
@@ -2244,110 +2112,8 @@ async function saveOneContactToSupabase(contact){
 
   contacts = contacts.map(x => x.id === contact.id ? { ...x, id: firmaId } : x);
   if (selectedId === contact.id) selectedId = firmaId;
-  return firmaId;
 }
-
-async function saveCurrentContact(){
-  const c = getSelected();
-  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
-  try{
-    syncFormToSelected();
-    const current = getSelected();
-    setSaveState("Speichere in Supabase ...");
-    await saveOneContactToSupabase(current);
-    fillForm();
-    renderList();
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    setSaveState("In Supabase gespeichert");
-    alert("Kontakt in Supabase gespeichert.");
-  }catch(e){
-    console.error("saveCurrentContact failed", e);
-    setSaveState("Supabase-Speichern fehlgeschlagen", true);
-    alert("Speichern in Supabase fehlgeschlagen.");
-  }
-}
-
-async function saveData(){
-  try{
-    syncFormToSelected();
-    setSaveState("Speichere alle Kontakte in Supabase ...");
-    for (const contact of [...contacts]){
-      await saveOneContactToSupabase(contact);
-    }
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    fillForm();
-    renderList();
-    setSaveState("Alle Kontakte in Supabase gespeichert");
-    alert("Alle Kontakte in Supabase gespeichert.");
-  }catch(e){
-    console.error("saveData failed", e);
-    setSaveState("Supabase-Speichern fehlgeschlagen", true);
-    alert("Speichern in Supabase fehlgeschlagen.");
-  }
-}
-
-async function loadData(){
-  try{
-    await loadAllFromSupabase();
-    alert("Daten aus Supabase geladen.");
-  }catch(e){
-    console.error("loadData failed", e);
-    setSaveState("Supabase-Laden fehlgeschlagen", true);
-    alert("Laden aus Supabase fehlgeschlagen.");
-  }
-}
-
-async function deleteSingle(id){
-  const item = contacts.find(c => c.id === id);
-  if(!item) return;
-  createDeletionBackup("einzeln", [id]);
-  if(!confirm(`Kontakt "${item.firma || [item.vorname, item.nachname].filter(Boolean).join(" ") || id}" wirklich löschen?`)) return;
-  try{
-    if (isUuid(id)){
-      const { error } = await supabaseClient.from("crm_firmen").delete().eq("id", id);
-      if (error) throw error;
-    }
-    contacts = contacts.filter(c => c.id !== id);
-    selectedIds.delete(id);
-    if(selectedId === id){ selectedId = contacts.length ? contacts[0].id : null; }
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    fillForm();
-    renderList();
-    setSaveState("Kontakt gelöscht");
-  }catch(e){
-    console.error("deleteSingle failed", e);
-    alert("Löschen in Supabase fehlgeschlagen.");
-  }
-}
-
-async function deleteSelected(){
-  const ids = Array.from(selectedIds);
-  if(!ids.length){ alert("Bitte zuerst Kontakte markieren."); return; }
-  createDeletionBackup("auswahl", ids);
-  if(!confirm(ids.length + " markierte Kontakte wirklich löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
-  try{
-    const uuidIds = ids.filter(isUuid);
-    if (uuidIds.length){
-      const { error } = await supabaseClient.from("crm_firmen").delete().in("id", uuidIds);
-      if (error) throw error;
-    }
-    contacts = contacts.filter(c => !selectedIds.has(c.id));
-    if(selectedId !== null && !contacts.find(c => c.id === selectedId)){
-      selectedId = contacts.length ? contacts[0].id : null;
-    }
-    selectedIds.clear();
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    fillForm();
-    renderList();
-    setSaveState("Ausgewählte Kontakte gelöscht");
-    alert("Ausgewählte Kontakte wurden gelöscht.");
-  }catch(e){
-    console.error("deleteSelected failed", e);
-    alert("Löschen in Supabase fehlgeschlagen.");
-  }
-}
-
-async function clearAllData(){
+clearAllData = async function(){
   if(!contacts.length){ alert("Keine Kontakte vorhanden."); return; }
   createDeletionBackup("alle", contacts.map(c => c.id));
   if(!confirm("ACHTUNG: Wirklich alle Kontakte und Daten löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
@@ -2369,18 +2135,16 @@ async function clearAllData(){
     console.error("clearAllData failed", e);
     alert("Komplettes Löschen in Supabase fehlgeschlagen.");
   }
-}
+};
 
-async function initSupabaseMode(){
+window.addEventListener("load", async () => {
   try{
     await loadAllFromSupabase();
   }catch(e){
     console.error("initSupabaseMode failed", e);
     setSaveState("Supabase noch leer oder nicht erreichbar", true);
   }
-}
-
-initSupabaseMode();
+});
 </script>
 
 </body>
