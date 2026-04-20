@@ -1,190 +1,2386 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex,nofollow">
-<title>HausKI CRM – Supabase clean</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<title>Mini CRM Vertrieb – Supabase Test</title>
 <style>
-body{
-    font-family:Arial,Helvetica,sans-serif;
-    background:#eef2f6;
-    margin:0;
-    padding:20px
-}
-.card{
-    background:white;
-    border:1px solid #d8e0e8;
-    border-radius:8px;
-    padding:16px;
-    max-width:900px
-}
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:12px
-}
-button{
-    padding:10px 14px;
-    border:none;
-    border-radius:4px;
-    background:#5f7897;
-    color:white;
-    font-weight:bold;
-    cursor:pointer
-}
-button:hover{
-    background:#6f87a3
-}
-</style>
+  :root{
+    --bg:#eef2f6; --panel:#ffffff; --line:#d8e0e8; --text:#1f2937; --muted:#6b7280;
+    --blue:#5f7897; --blue2:#6f87a3; --red2:#ef4444; --orange:#fb923c; --yellow:#fde047; --green:#22c55e; --violet:#c4b5fd;
+    --shadow:0 6px 18px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+  .topbar{background:#f7f9fb;border-bottom:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .topbar button,.savebar button,.toolbar button,.attachment-actions button{background:var(--blue);color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;font-weight:700;font-size:13px}
+  .topbar button:hover,.savebar button:hover,.toolbar button:hover,.attachment-actions button:hover{background:var(--blue2)}
+  .savebar button.primary{background:#16a34a}.savebar button.delete{background:#dc2626}
+  .attachment-actions button.delete{background:#dc2626}
+  .page{padding:14px}
+  .header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+  .header h1{margin:0;font-size:28px}
+  .layout{display:grid;grid-template-columns:minmax(720px,1.05fr) minmax(620px,0.95fr);gap:14px;align-items:start}
+  .main-card,.side-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}
+  .section{padding:14px;border-bottom:1px solid #edf1f5}.section:last-child{border-bottom:none}
+  .section-title{font-size:20px;font-weight:700;margin-bottom:12px}
+  .sub-title{font-size:16px;font-weight:700;margin-bottom:10px;color:#374151}
+  .grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px 16px}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:700}
+  input,select,textarea{width:100%;padding:9px 10px;border:1px solid #cfd8e3;border-radius:4px;background:white;color:var(--text);font-size:14px}
+  textarea{min-height:100px;resize:vertical}
+  .badge{display:inline-block;padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#111827}
+  .rot{background:var(--red2)} .orange{background:var(--orange)} .gelb{background:var(--yellow)} .gruen{background:var(--green)} .violett{background:var(--violet)}
+  .toolbar{display:grid;grid-template-columns:1.2fr 0.9fr 0.9fr 1fr auto auto auto;gap:10px;align-items:end;margin-bottom:12px}
+  .contact-list{display:flex;flex-direction:column;gap:10px}
+  .contact-item{border:1px solid var(--line);border-radius:6px;padding:12px;background:#fbfcfd;cursor:pointer}
+  .contact-item:hover{background:#f5f8fb}.contact-item.active{border-color:#9fb2c8;background:#eef4fa}
+  .contact-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:10px;align-items:center}
+  .meta-small{font-size:12px;color:var(--muted);margin-top:3px}
+  .mini-box{background:#f8fafc;border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:10px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{background:#f8fafc;border:1px solid var(--line);border-radius:6px;padding:10px}
+  .stat .label{font-size:12px;color:var(--muted);margin-bottom:4px}.stat .value{font-size:26px;font-weight:700}
+  .savebar{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px}
+  .empty{padding:14px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);background:#fafcff}
+  .toggle-row{display:flex;align-items:center;gap:8px;margin-top:8px}.toggle-row input[type=checkbox]{width:auto}
+  .dropzone{
+    border:2px dashed #a8b6c6;border-radius:8px;padding:16px;background:#f8fbff;text-align:center;
+    color:#455468; transition:.15s ease;
+  }
+  .dropzone.dragover{border-color:#5f7897;background:#edf4fb}
+  .dropzone input[type=file]{display:none}
+  .attachment-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .attachment-item{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd
+  }
+  .attachment-meta{min-width:0}
+  .attachment-name{font-weight:700;word-break:break-all}
+  .attachment-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .attachment-actions{display:flex;gap:8px;flex-wrap:wrap}
 
+  .contact-item-top{display:flex;align-items:flex-start;gap:10px}
+  .contact-select{margin-top:6px}
+  .contact-main{flex:1;min-width:0}
+  .icon-btn{background:#e2e8f0;color:#111827;border:none;border-radius:6px;padding:8px 10px;cursor:pointer;font-weight:700}
+  .icon-btn.danger{background:#fee2e2;color:#991b1b}
+  .icon-btn.archive{background:#ede9fe;color:#5b21b6}
+  .list-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .list-actions .small-note{font-size:12px;color:var(--muted)}
+
+  .subcontact-card{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}
+  .subcontact-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+  .subcontact-card strong{font-size:18px}
+  .subcontact-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+  .stats .stat .label.long{font-size:11px;line-height:1.2}
+
+  .due-banner{
+    display:none;
+    margin:12px 14px 0 14px;
+    padding:12px 14px;
+    background:#fff7ed;
+    border:1px solid #fdba74;
+    border-radius:8px;
+    color:#9a3412;
+    box-shadow:var(--shadow);
+  }
+  .due-banner.show{display:block}
+  .due-banner-title{font-weight:700;margin-bottom:8px}
+  .due-banner-list{margin:0;padding-left:18px}
+  .due-banner-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+
+
+
+  .note-entry{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}
+  .note-entry-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+  .note-entry-date{font-weight:700;color:#374151}
+  .note-entry-meta{font-size:12px;color:var(--muted)}
+  .note-entry-text{white-space:pre-wrap;line-height:1.4}
+  .note-grid{display:grid;grid-template-columns:160px 200px 1fr auto;gap:10px;align-items:end}
+
+  .group-grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px 16px}
+  .group-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 16px}
+  .side-card input,.side-card select,.side-card textarea{font-size:15px}
+  .full-span{grid-column:1 / -1}
+
+  .side-card{
+    max-height:calc(100vh - 28px);
+    overflow:auto;
+  }
+  #noteHistory{
+    max-height:240px;
+    overflow:auto;
+  }
+  #subContactList{
+    max-height:220px;
+    overflow:auto;
+  }
+
+
+
+  @media (max-width: 1200px){.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr 1fr}.contact-row{grid-template-columns:1fr 1fr}.grid-4{grid-template-columns:1fr 1fr}}
+  @media (max-width: 700px){.grid-4,.toolbar,.contact-row,.stats{grid-template-columns:1fr}.header h1{font-size:22px}.attachment-item{flex-direction:column;align-items:flex-start}}
+
+/* --- v21 layout overrides --- */
+.layout{
+  display:grid !important;
+  grid-template-columns:minmax(760px,1.05fr) minmax(680px,0.95fr) !important;
+  gap:14px !important;
+  align-items:start !important;
+}
+.contact-item-top{
+  display:grid !important;
+  grid-template-columns:34px minmax(0,1fr) 92px !important;
+  align-items:center !important;
+  gap:12px !important;
+  width:100% !important;
+}
+.contact-select{
+  margin:0 !important;
+  justify-self:center !important;
+  align-self:center !important;
+}
+.contact-main{
+  min-width:0 !important;
+  width:100% !important;
+}
+.contact-main .contact-row{
+  display:grid !important;
+  grid-template-columns:minmax(260px,2fr) minmax(130px,0.9fr) minmax(130px,0.9fr) minmax(220px,1.2fr) minmax(140px,0.9fr) !important;
+  gap:10px !important;
+  align-items:center !important;
+  width:100% !important;
+}
+.contact-main .contact-row > div{
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+.contact-main .contact-row > div > div,
+.contact-main .contact-row > div .meta-small{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+.contact-actions{
+  display:flex !important;
+  gap:6px !important;
+  justify-self:end !important;
+  justify-content:flex-end !important;
+  align-items:center !important;
+  min-width:92px !important;
+  white-space:nowrap !important;
+}
+.side-card{
+  position:sticky !important;
+  top:14px !important;
+  align-self:start !important;
+  max-height:calc(100vh - 28px) !important;
+  overflow:auto !important;
+}
+.side-card .section{
+  padding:16px !important;
+}
+.side-card .sub-title,
+.side-card .section-title{
+  font-size:18px !important;
+  margin-bottom:12px !important;
+}
+.note-grid{
+  display:grid !important;
+  grid-template-columns:150px 170px 1fr auto !important;
+  gap:10px !important;
+  align-items:end !important;
+}
+.subcontact-grid{
+  display:grid !important;
+  grid-template-columns:1fr 1fr 1fr !important;
+  gap:10px !important;
+}
+.subcontact-card{
+  margin-top:8px !important;
+}
+.subcontact-head{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  margin-bottom:8px !important;
+}
+.stats{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+}
+.stats .stat .label.long{
+  font-size:11px !important;
+  line-height:1.2 !important;
+}
+@media (max-width: 1550px){
+  .layout{grid-template-columns:1fr !important;}
+  .side-card{position:static !important;max-height:none !important;}
+}
+@media (max-width: 900px){
+  .toolbar,.grid-4,.group-grid-4,.group-grid-3,.stats,.subcontact-grid,.note-grid,.contact-main .contact-row{
+    grid-template-columns:1fr !important;
+  }
+  .contact-item-top{
+    grid-template-columns:1fr !important;
+  }
+  .contact-actions{
+    justify-self:start !important;
+  }
+  .contact-select{
+    justify-self:start !important;
+  }
+}
+
+
+/* --- v22 overrides --- */
+.layout{
+  grid-template-columns:minmax(860px,1.15fr) minmax(560px,0.85fr) !important;
+}
+.main-card .section-title{
+  font-size:22px !important;
+}
+
+
+/* --- v23 overrides --- */
+.main-card .section > div[style*="display:flex"][style*="justify-content:space-between"] button{
+  white-space:nowrap;
+}
+
+</style>
 </head>
 <body>
-
-<div class="card">
-
-<h2>HausKI CRM – Testversion Supabase</h2>
-
-<div class="grid">
-
-<div>
-<label>Firma</label>
-<input id="firma">
+<div class="topbar">
+  <button onclick="newContact()">+ Neuer Kontakt</button>
+  <button onclick="document.getElementById('fileInput').click()">CSV Import</button>
+  <button onclick="exportCSV()">CSV Export</button>
+  <button onclick="exportJSONBackup()">JSON Backup</button>
+  <button onclick="document.getElementById('jsonFileInput').click()">JSON Wiederherstellen</button>
+  <button onclick="saveData()">Speichern</button>
+  <button onclick="loadData()">Laden</button>
+  <button onclick="duplicateContact()">Duplizieren</button>
+  <button onclick="generateDailyReport()">Tagesbericht erstellen</button>
+  <span id="saveState" style="margin-left:auto;font-size:12px;color:#475569;font-weight:700;">Bereit</span>
+  <button onclick="clearAllData()" style="background:#dc2626;color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;font-weight:700;font-size:13px">Alle Kontakte löschen</button>
 </div>
 
-<div>
-<label>Ort</label>
-<input id="ort">
+<div id="dueBanner" class="due-banner"></div>
+
+<input type="file" id="fileInput" accept=".csv" style="display:none">
+<input type="file" id="jsonFileInput" accept=".json" style="display:none">
+
+<div class="page">
+  <div class="header">
+    <h1 id="pageTitle">Mini CRM Vertrieb</h1>
+    <div class="badge orange" id="pageStatus">Momentan kein Interesse</div>
+  </div>
+
+  <div class="layout">
+    <div class="main-card">
+      <div class="section">
+        <div class="sub-title">Suche / Übersicht</div>
+        <div class="toolbar">
+          <div><label>Suchen</label><input id="search" placeholder="Firma, Name, Bezirk, Bundesland, Notiz ..." oninput="renderList()"></div>
+          <div><label>Status</label>
+            <select id="statusFilter" onchange="renderList()">
+              <option>Alle</option>
+              <option>Termin vereinbart</option>
+              <option>Unterlagen versendet</option>
+              <option>Telefonat ausgemacht</option>
+              <option>Sonstiges</option>
+              <option>Archiviert</option>
+            </select>
+          </div>
+          <div><label>Kundentyp</label>
+            <select id="kundentypFilter" onchange="renderList()">
+              <option>Alle</option><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option>
+            </select>
+          </div>
+          <div><label>Region</label><input id="regionFilter" placeholder="Ort, Bezirk, Bundesland, PLZ" oninput="renderList()"></div>
+          <button onclick="sortBy('firma')">Nach Firma</button>
+          <button onclick="sortBy('ort')">Nach Ort</button>
+          <button onclick="clearSearch()">Suche leeren</button>
+        </div>
+
+        <div class="toggle-row">
+          <input type="checkbox" id="showRecent" onchange="renderList()" checked>
+          <label for="showRecent" style="margin:0;font-size:13px;">Ohne Suche die letzten 8 Kontakte anzeigen</label>
+        </div>
+
+        <div id="contactList" class="contact-list" style="margin-top:12px;"></div>
+
+        <div class="list-actions">
+          <button onclick="toggleSelectAllVisible()">Sichtbare markieren / abwählen</button>
+          <button onclick="archiveSelected()">Auswahl archivieren</button>
+          <button onclick="deleteSelected()">Auswahl löschen</button>
+          <button onclick="showArchivedOnly()">Nur Archiv anzeigen</button>
+          <button onclick="hideArchivedFilter()">Archivfilter zurücksetzen</button>
+          <span class="small-note" id="selectionInfo">0 markiert</span>
+        </div>
+
+      </div>
+
+      
+<div class="section">
+  <div class="section-title">Stammdaten</div>
+  <div class="group-grid-4">
+    <div class="full-span"><label>Firma</label><input id="firma"></div>
+    <div><label>Straße</label><input id="strasse"></div>
+    <div><label>PLZ</label><input id="plz"></div>
+    <div><label>Ort</label><input id="ort"></div>
+    <div><label>Bezirk</label><input id="bezirk"></div>
+    <div><label>Bundesland</label>
+      <select id="bundesland">
+        <option>Oberösterreich</option>
+        <option>Niederösterreich</option>
+        <option>Wien</option>
+        <option>Salzburg</option>
+        <option>Burgenland</option>
+        <option>Steiermark</option>
+        <option>Kärnten</option>
+      </select>
+    </div>
+    <div><label>Kundentyp</label>
+      <select id="kundentyp">
+        <option>Fachpartner</option>
+        <option>B2B</option>
+        <option>Privat</option>
+        <option>Sonstiges</option>
+      </select>
+    </div>
+    <div><label>Kundenstatus</label>
+      <select id="kundenstatus">
+        <option>Kunde</option>
+        <option>Interessent</option>
+        <option>Sonstiges</option>
+      </select>
+    </div>
+  </div>
 </div>
 
-<div>
-<label>PLZ</label>
-<input id="plz">
+<div class="section">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;"><div class="section-title" style="margin:0;">Ansprechpartner</div><button type="button" onclick="addSubContact()">+ Ansprechpartner</button></div>
+  <div class="group-grid-3">
+    <div><label>Ansprechpartner</label><input id="nachname"></div>
+    <div><label>Vorname</label><input id="vorname"></div>
+    <div><label>Rolle / Position</label><input id="rolle" type="text"></div>
+    <div><label>Telefon</label><input id="telefon"></div>
+    <div><label>Mobil</label><input id="mobil"></div>
+    <div><label>E-Mail</label><input id="email"></div>
+  </div>
 </div>
 
-</div>
+      </div>
 
-<br>
+      <div class="section">
+        <div class="section-title">Vertriebsdetails</div>
+        <div class="grid-4">
+          <div><label>Status</label>
+            <select id="status">
+              <option>Termin vereinbart</option>
+              <option>Unterlagen versendet</option>
+              <option>Telefonat ausgemacht</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+          <div><label>Erstkontakt</label><input id="erstkontakt" type="date"></div>
+          
+          <div>
+            <label>Nächster Kontakt</label>
+            <input id="naechsterkontakt" type="date">
+          </div>
+          <div><label>Art nächster Kontakt</label>
+            <select id="kontaktart">
+              <option>Persönlicher Termin</option>
+              <option>Rückruf</option>
+            </select>
+          </div>
+          
+          <div><label>In weclapp übernommen</label>
+            <select id="weclapp">
+              <option>Nein</option>
+              <option>Ja</option>
+            </select>
+          </div>
+          <div><label>Potenzial</label>
+            <select id="potenzial">
+              <option>klein</option>
+              <option>mittel</option>
+              <option>groß</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <label>Kontakt-Historie / Notizen</label>
+          <div class="note-grid">
+            <div>
+              <label>Datum</label>
+              <input id="noteDate" type="date">
+            </div>
+            <div>
+              <label>Art</label>
+              <select id="noteType">
+                <option>Erstkontakt</option>
+                <option>Telefonat</option>
+                <option>Persönlicher Termin</option>
+                <option>Rückruf</option>
+                <option>Unterlagen</option>
+                <option>Sonstiges</option>
+              </select>
+            </div>
+            <div>
+              <label>Notiz</label>
+              <textarea id="noteText" placeholder="Zum Beispiel: Erstkontakt geführt, Unterlagen gesendet, Kunde besucht ..."></textarea>
+            </div>
+            <div>
+              <button type="button" onclick="addNoteEntry()">Eintrag hinzufügen</button>
+            </div>
+          </div>
+          <div id="noteHistory"></div>
+        </div>
 
-<button onclick="saveContact()">Speichern</button>
-<button onclick="loadContacts()">Laden</button>
+        
+        
 
-<br><br>
+<div style="margin-top:16px">
+          <label>E-Mail / Dateien zum Kunden anhängen</label>
+          <div id="dropzone" class="dropzone">
+            <div><strong>Dateien hier auf den Kunden ziehen</strong></div>
+            <div class="hint">Zum Beispiel Outlook-Mail als .msg, PDF, Angebot, Screenshot oder andere Datei.</div>
+            <div class="hint">Falls Drag-and-Drop nicht geht, unten auf „Dateien auswählen“ klicken.</div>
+            <div style="margin-top:10px">
+              <button type="button" onclick="document.getElementById('attachmentInput').click()">Dateien auswählen</button>
+              <input id="attachmentInput" type="file" multiple onchange="handleAttachmentInput(event)">
+            </div>
+          </div>
+          <div id="attachmentList" class="attachment-list"></div>
+        </div>
 
-<div id="status">Bereit</div>
+        <div class="savebar">
+          <button class="primary" onclick="saveCurrentContact()">Änderungen übernehmen</button>
+          <button onclick="newContact()">Neuer Kontakt</button>
+          <button class="delete" onclick="deleteCurrent()">Kontakt löschen</button>
+        </div>
+        <div class="hint">Hinweis: Outlook-Drag-and-Drop in den Browser funktioniert oft mit gespeicherten Dateien oder .msg-Dateien. Je nach Browser/Outlook-Version kann direktes Ziehen eingeschränkt sein.</div>
+      </div>
+    </div>
 
-<ul id="list"></ul>
+    <div class="side-card">
+      <div class="section">
+        <div class="sub-title">Status</div>
+        <div class="mini-box">
+          <div class="badge orange" id="sideStatus">Momentan kein Interesse</div>
+          <div class="hint" style="margin-top:8px">Kundentyp und Status sind jetzt getrennt. Status: Termin vereinbart, Unterlagen versendet, Telefonat ausgemacht, Sonstiges.</div>
+        </div>
 
+        <div class="sub-title">Kennzahlen</div>
+        <div class="stats">
+          <div class="stat"><div class="label">Gesamt</div><div class="value" id="s_gesamt">0</div></div>
+          <div class="stat"><div class="label long">Heute fällig</div><div class="value" id="s_faellig">0</div></div>
+          <div class="stat"><div class="label long">Sonstiges</div><div class="value" id="s_rot">0</div></div>
+          <div class="stat"><div class="label long">Telefonat ausgemacht</div><div class="value" id="s_orange">0</div></div>
+          <div class="stat"><div class="label long">Unterlagen versendet</div><div class="value" id="s_violett">0</div></div>
+          <div class="stat"><div class="label long">Termin vereinbart</div><div class="value" id="s_gelb">0</div></div>
+          <div class="stat"><div class="label long">B2B</div><div class="value" id="s_gruen">0</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sub-title">Ausgewählter Kontakt</div>
+        <div class="mini-box" id="selectedInfo">Kein Kontakt ausgewählt.</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
+const STORAGE_KEY = "mini_crm_vertrieb_layout_v8";
+const LEGACY_STORAGE_KEYS = ["mini_crm_vertrieb_layout_v7", "mini_crm_vertrieb_layout_v4"];
+const BACKUP_INDEX_KEY = "mini_crm_vertrieb_layout_v8_backup_index";
+const SNAPSHOT_PREFIX = "mini_crm_vertrieb_layout_v8_snapshot_";
+const MAX_SNAPSHOTS = 5;
+let contacts = [];
+let autosaveTimer = null;
 
-const SUPABASE_URL =
-"https://wuizcshgkdolkngqoutj.supabase.co";
-
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
-
-const supabaseClient =
-window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
-
-async function saveContact(){
-
-    const firma =
-    document.getElementById("firma").value;
-
-    const ort =
-    document.getElementById("ort").value;
-
-    const plz =
-    document.getElementById("plz").value;
-
-    document.getElementById("status")
-    .innerText =
-    "Speichern ...";
-
-    const { data, error } =
-    await supabaseClient
-        .from("crm_firmen")
-        .insert([
-            {
-                firma: firma,
-                ort: ort,
-                plz: plz
-            }
-        ]);
-
-    if(error){
-
-        console.log(error);
-
-        document.getElementById("status")
-        .innerText =
-        "Fehler beim Speichern";
-
-        alert("Speichern fehlgeschlagen");
-
-        return;
-
-    }
-
-    document.getElementById("status")
-    .innerText =
-    "Gespeichert";
-
-    alert("Kontakt gespeichert");
-
-    loadContacts();
-
+function buildStoragePayload(includeAttachmentData = true){
+  const sanitizedContacts = (contacts || []).map(c => ({
+    ...c,
+    attachments: Array.isArray(c.attachments) ? c.attachments.map(a => (
+      includeAttachmentData
+        ? a
+        : { name:a.name || "", type:a.type || "", size:a.size || 0, data:"" }
+    )) : []
+  }));
+  return {
+    version: 25,
+    saved_at: new Date().toISOString(),
+    contacts: sanitizedContacts
+  };
 }
 
-async function loadContacts(){
+let saveErrorShown = false;
 
-    const { data, error } =
-    await supabaseClient
-        .from("crm_firmen")
-        .select("*")
-        .order("firma");
+let currentSort = "";
+let selectedId = null;
+let selectedIds = new Set();
 
-    if(error){
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0'); }
+function esc(v){ return String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function parseCsvLine(line){ const result=[]; let cur=""; let inQuotes=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch === '"'){ if(inQuotes && line[i+1] === '"'){ cur+='"'; i++; } else { inQuotes=!inQuotes; } } else if(ch === ';' && !inQuotes){ result.push(cur); cur=""; } else { cur+=ch; } } result.push(cur); return result; }
+function normalizeHeader(h){ return String(h || "").trim().toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss"); }
+function statusBadgeClass(status){
+  if(status === "Termin vereinbart") return "gelb";
+  if(status === "Unterlagen versendet") return "violett";
+  if(status === "Telefonat ausgemacht") return "orange";
+  if(status === "Sonstiges") return "gruen";
+  return "orange";
+}
+function humanSize(bytes){
+  if(!bytes && bytes !== 0) return "";
+  if(bytes < 1024) return bytes + " B";
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + " KB";
+  return (bytes/(1024*1024)).toFixed(1) + " MB";
+}
+function getSelected(){ return contacts.find(c => c.id === selectedId) || null; }
 
-        console.log(error);
+function setSaveState(message, isError = false){
+  const el = document.getElementById("saveState");
+  if(!el) return;
+  el.textContent = message;
+  el.style.color = isError ? "#b91c1c" : "#475569";
+}
 
-        return;
+function sanitizeContacts(list){
+  return (Array.isArray(list) ? list : []).map(c => ({
+    attachments: [],
+    weclapp:"Nein",
+    potenzial:"mittel",
+    archived:false,
+    kontaktart:"Persönlicher Termin",
+    kundenstatus:"Interessent",
+    notes_history: [],
+    weitere_kontakte: [],
+    ...c,
+    attachments: Array.isArray(c.attachments) ? c.attachments : [],
+    notes_history: Array.isArray(c.notes_history) ? c.notes_history : (c.notizen ? [{date: c.erstkontakt || "", type:"Import", text: c.notizen}] : []),
+    weitere_kontakte: Array.isArray(c.weitere_kontakte) ? c.weitere_kontakte : [],
+    archived: !!c.archived
+  }));
+}
 
+
+function syncFormToSelected(){
+  const c = getSelected();
+  if(!c) return;
+
+  const getVal = (id, fallback="") => {
+    const el = document.getElementById(id);
+    return el ? (("value" in el) ? el.value : fallback) : fallback;
+  };
+
+  contacts = contacts.map(x => x.id === selectedId ? {
+    ...x,
+    firma: String(getVal("firma")).trim(),
+    nachname: String(getVal("nachname")).trim(),
+    vorname: String(getVal("vorname")).trim(),
+    kundentyp: getVal("kundentyp"),
+    kundenstatus: getVal("kundenstatus"),
+    bundesland: getVal("bundesland"),
+    bezirk: String(getVal("bezirk")).trim(),
+    telefon: String(getVal("telefon")).trim(),
+    mobil: String(getVal("mobil")).trim(),
+    email: String(getVal("email")).trim(),
+    strasse: String(getVal("strasse")).trim(),
+    plz: String(getVal("plz")).trim(),
+    ort: String(getVal("ort")).trim(),
+    status: getVal("status"),
+    erstkontakt: getVal("erstkontakt"),
+    naechsterkontakt: getVal("naechsterkontakt"),
+    kontaktart: getVal("kontaktart"),
+    weclapp: getVal("weclapp"),
+    potenzial: getVal("potenzial")
+  } : x);
+}
+
+
+function buildBackupPayload(){
+  return {
+    app: "Mini CRM Vertrieb",
+    version: 25,
+    exportedAt: new Date().toISOString(),
+    contactCount: contacts.length,
+    selectedId,
+    contacts
+  };
+}
+
+function writeSnapshot(payload){
+  try{
+    const ts = new Date().toISOString();
+    const key = SNAPSHOT_PREFIX + ts;
+    localStorage.setItem(key, JSON.stringify(payload));
+    const index = JSON.parse(localStorage.getItem(BACKUP_INDEX_KEY) || "[]");
+    index.unshift({ key, ts, count: payload.contactCount || 0 });
+    while(index.length > MAX_SNAPSHOTS){
+      const old = index.pop();
+      try{ localStorage.removeItem(old.key); }catch(e){}
     }
+    localStorage.setItem(BACKUP_INDEX_KEY, JSON.stringify(index));
+  }catch(e){}
+}
 
-    const list =
-    document.getElementById("list");
 
-    list.innerHTML = "";
+function persistData(silent = true){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(true)));
+    setSaveState("Gespeichert");
+    saveErrorShown = false;
+  }catch(e){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false)));
+      setSaveState("Gespeichert ohne Anhänge", true);
+      if(!silent && !saveErrorShown){
+        alert("Browser-Speicher war zu klein. Kontakte wurden gespeichert, Anhänge aber nur ohne Dateiinhalte lokal gesichert. Bitte JSON Backup exportieren.");
+        saveErrorShown = true;
+      }
+    }catch(e2){
+      setSaveState("Speichern fehlgeschlagen", true);
+      if(!silent && !saveErrorShown){
+        alert("Speichern fehlgeschlagen. Bitte sofort JSON Backup exportieren.");
+        saveErrorShown = true;
+      }
+    }
+  }
+}
 
-    data.forEach(row => {
 
-        const li =
-        document.createElement("li");
+function scheduleAutosave(){
+  syncFormToSelected();
+  setSaveState("Änderungen noch nicht gespeichert ...");
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => persistData(true), 300);
+}
 
-        li.innerText =
-            row.firma +
-            " – " +
-            row.plz +
-            " " +
-            row.ort;
+function tryLoadPayload(raw){
+  try{
+    const parsed = JSON.parse(raw);
+    if(Array.isArray(parsed)){
+      contacts = sanitizeContacts(parsed);
+      selectedId = contacts.length ? contacts[0].id : null;
+      return true;
+    }
+    if(parsed && Array.isArray(parsed.contacts)){
+      contacts = sanitizeContacts(parsed.contacts);
+      selectedId = contacts.find(c => c.id === parsed.selectedId)?.id || (contacts.length ? contacts[0].id : null);
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
 
-        list.appendChild(li);
+function loadFromSnapshots(){
+  try{
+    const index = JSON.parse(localStorage.getItem(BACKUP_INDEX_KEY) || "[]");
+    for(const item of index){
+      const raw = localStorage.getItem(item.key);
+      if(raw && tryLoadPayload(raw)) return true;
+    }
+  }catch(e){}
+  return false;
+}
 
+function loadPersistedData(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved && tryLoadPayload(saved)) return true;
+  for(const legacyKey of LEGACY_STORAGE_KEYS){
+    const legacy = localStorage.getItem(legacyKey);
+    if(legacy && tryLoadPayload(legacy)){
+      persistData(true);
+      return true;
+    }
+  }
+  if(loadFromSnapshots()) return true;
+  return false;
+}
+
+function updateStats(){
+  document.getElementById("s_gesamt").textContent = contacts.length;
+  document.getElementById("s_rot").textContent = contacts.filter(c => c.kundentyp === "Sonstiges").length;
+  document.getElementById("s_orange").textContent = contacts.filter(c => c.status === "Telefonat ausgemacht").length;
+  document.getElementById("s_violett").textContent = contacts.filter(c => c.status === "Unterlagen versendet").length;
+  document.getElementById("s_gelb").textContent = contacts.filter(c => c.status === "Termin vereinbart").length;
+  document.getElementById("s_gruen").textContent = contacts.filter(c => c.kundentyp === "B2B").length;
+  const today = todayStr();
+  document.getElementById("s_faellig").textContent = contacts.filter(c => c.naechsterkontakt && c.naechsterkontakt === today).length;
+}
+function sortBy(field){ currentSort = field; renderList(); }
+function clearSearch(){ document.getElementById("search").value=""; document.getElementById("statusFilter").value="Alle"; document.getElementById("kundentypFilter").value="Alle"; document.getElementById("regionFilter").value=""; renderList(); }
+function filteredContacts(){
+  const search = document.getElementById("search").value.toLowerCase().trim();
+  const statusFilter = document.getElementById("statusFilter").value;
+  const kundentypFilter = document.getElementById("kundentypFilter").value;
+  const region = document.getElementById("regionFilter").value.toLowerCase().trim();
+  let arr = contacts.filter(c => {
+    const hay = [c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,c.notizen].join(" ").toLowerCase();
+    const sOk = search === "" ? true : hay.includes(search);
+    const stOk = statusFilter === "Alle" ? !c.archived : (statusFilter === "Archiviert" ? !!c.archived : c.status === statusFilter && !c.archived);
+    const ktOk = kundentypFilter === "Alle" ? true : c.kundentyp === kundentypFilter;
+    const rOk = region === "" ? true : [c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region);
+    return sOk && stOk && ktOk && rOk;
+  });
+  if(currentSort){ arr.sort((a,b) => String(a[currentSort] || "").localeCompare(String(b[currentSort] || ""), 'de')); }
+  return arr;
+}
+function renderList(){
+  updateStats();
+  showDueTodayBanner();
+  const list = document.getElementById("contactList");
+  const arr = filteredContacts();
+  const search = document.getElementById("search").value.trim();
+  const statusFilter = document.getElementById("statusFilter").value;
+  const kundentypFilter = document.getElementById("kundentypFilter").value;
+  const region = document.getElementById("regionFilter").value.trim();
+  const showRecent = document.getElementById("showRecent").checked;
+  const hasFilter = search !== "" || statusFilter !== "Alle" || kundentypFilter !== "Alle" || region !== "";
+  const selectionInfo = document.getElementById("selectionInfo");
+  if(selectionInfo) selectionInfo.textContent = selectedIds.size + " markiert";
+
+  if(!hasFilter && !showRecent){
+    list.innerHTML = '<div class="empty">Die Kontaktliste ist ausgeblendet. Suche nach Firma, Ort oder Bezirk — oder aktiviere „letzte 8 Kontakte anzeigen“.</div>';
+    return;
+  }
+  let visible = arr;
+  if(!hasFilter && showRecent){ visible = [...arr].slice(-8).reverse(); }
+  if(!visible.length){ list.innerHTML = '<div class="empty">Keine Kontakte gefunden.</div>'; return; }
+
+  list.innerHTML = visible.map(c => `
+    <div class="contact-item ${selectedId === c.id ? 'active' : ''}" onclick="selectContact(${c.id})">
+      <div class="contact-item-top">
+        <input class="contact-select" type="checkbox" ${selectedIds.has(c.id) ? 'checked' : ''} onclick="event.stopPropagation();" onchange="toggleSelectContact(${c.id})">
+        <div class="contact-main">
+          <div class="contact-row">
+            <div><div style="font-weight:700">${esc(c.firma)}</div><div class="meta-small">${esc([c.vorname,c.nachname].filter(Boolean).join(" "))}</div></div>
+            <div><div>${esc(c.kundentyp || "")}</div><div class="meta-small">${esc(c.bundesland || "")}</div></div>
+            <div><div>${esc(c.bezirk || "")}</div><div class="meta-small">${esc(c.ort || "")}</div></div>
+            <div><div>${esc(c.mobil || c.telefon || "")}</div><div class="meta-small">${esc(c.email || "")}</div></div>
+            <div><span class="badge ${c.archived ? 'violett' : statusBadgeClass(c.status)}">${esc(c.archived ? 'Archiviert' : c.status)}</span></div>
+          </div>
+        </div>
+        <div class="contact-actions" onclick="event.stopPropagation();">
+          <button class="icon-btn archive" title="Archivieren" onclick="archiveSingle(${c.id})">Archiv</button>
+          <button class="icon-btn danger" title="Löschen" onclick="deleteSingle(${c.id})">🗑</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+function selectContact(id){ selectedId = id; fillForm(); renderList(); }
+
+function fillForm(){
+  const c = getSelected();
+  if(!c){
+    document.getElementById("pageTitle").textContent = "Mini CRM Vertrieb";
+    document.getElementById("pageStatus").textContent = "Kein Kontakt";
+    document.getElementById("pageStatus").className = "badge orange";
+    document.getElementById("sideStatus").textContent = "Kein Kontakt";
+    document.getElementById("sideStatus").className = "badge orange";
+    document.getElementById("selectedInfo").innerHTML = "Kein Kontakt ausgewählt.";
+    ["firma","nachname","vorname","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","kontaktart","weclapp","potenzial"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el.tagName === "SELECT"){ el.selectedIndex = 0; } else { el.value = ""; }
     });
-
+    document.getElementById("attachmentList").innerHTML = "";
+    const nd=document.getElementById("noteDate"); if(nd) nd.value=todayStr();
+    const nt=document.getElementById("noteType"); if(nt) nt.value="Telefonat";
+    const ntx=document.getElementById("noteText"); if(ntx) ntx.value="";
+    renderNoteHistory();
+    renderSubContacts();
+    return;
+  }
+  document.getElementById("pageTitle").textContent = c.firma || "Mini CRM Vertrieb";
+  document.getElementById("pageStatus").textContent = c.archived ? "Archiviert" : (c.status || "");
+  document.getElementById("pageStatus").className = "badge " + (c.archived ? "violett" : statusBadgeClass(c.status));
+  document.getElementById("sideStatus").textContent = c.archived ? "Archiviert" : (c.status || "");
+  document.getElementById("sideStatus").className = "badge " + (c.archived ? "violett" : statusBadgeClass(c.status));
+  document.getElementById("selectedInfo").innerHTML = `
+    <div><strong>${esc(c.firma || "")}</strong></div>
+    <div class="hint">${esc([c.vorname,c.nachname].filter(Boolean).join(" "))}</div>
+    <div class="hint">${esc(c.kundentyp || "")}${c.kundenstatus ? " • " + esc(c.kundenstatus) : ""}</div>
+    <div class="hint">${esc(c.bundesland || "")}${c.bezirk ? " • " + esc(c.bezirk) : ""}</div>
+    <div class="hint">Nächster Kontakt: ${esc(c.naechsterkontakt || "-")}${c.kontaktart ? " • " + esc(c.kontaktart) : ""}</div>
+    <div class="hint">Potenzial: ${esc(c.potenzial || "-")}</div>
+    <div class="hint">In weclapp: ${esc(c.weclapp || "Nein")}</div>
+    <div class="hint">Anhänge: ${(c.attachments || []).length}</div>
+    <div class="hint">Weitere Ansprechpartner: ${(c.weitere_kontakte || []).length}</div>
+  `;
+  ["firma","nachname","vorname","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","kontaktart","weclapp","potenzial"].forEach(id => {
+    document.getElementById(id).value = c[id] || "";
+  });
+  renderAttachments();
+  const nd=document.getElementById("noteDate"); if(nd) nd.value=todayStr();
+  const nt=document.getElementById("noteType"); if(nt) nt.value="Telefonat";
+  const ntx=document.getElementById("noteText"); if(ntx) ntx.value="";
+  renderNoteHistory();
+  renderSubContacts();
 }
 
-loadContacts();
 
+
+function renderSubContacts(){
+  const c = getSelected();
+  const box = document.getElementById("subContactList");
+  if(!box) return;
+  if(!c){
+    box.innerHTML = "";
+    return;
+  }
+  const list = Array.isArray(c.weitere_kontakte) ? c.weitere_kontakte : [];
+  if(!list.length){
+    box.innerHTML = '<div class="empty">Noch keine weiteren Ansprechpartner vorhanden.</div>';
+    return;
+  }
+  box.innerHTML = list.map((p, i) => `
+    <div class="subcontact-card">
+      <div class="subcontact-head">
+        <strong>Ansprechpartner ${i+1}</strong>
+        <button type="button" class="icon-btn danger" onclick="removeSubContact(${i})">Löschen</button>
+      </div>
+      <div class="subcontact-grid">
+        <div><label>Vorname</label><input value="${esc(p.vorname || "")}" onblur="updateSubContact(${i}, 'vorname', this.value)"></div>
+        <div><label>Ansprechpartner</label><input value="${esc(p.nachname || "")}" onblur="updateSubContact(${i}, 'nachname', this.value)"></div>
+        <div><label>Rolle / Position</label><input value="${esc(p.position || "")}" onblur="updateSubContact(${i}, 'position', this.value)"></div>
+        <div><label>Telefon</label><input value="${esc(p.telefon || "")}" onblur="updateSubContact(${i}, 'telefon', this.value)"></div>
+        <div><label>Mobil</label><input value="${esc(p.mobil || "")}" onblur="updateSubContact(${i}, 'mobil', this.value)"></div>
+        <div><label>E-Mail</label><input value="${esc(p.email || "")}" onblur="updateSubContact(${i}, 'email', this.value)"></div>
+        <div style="grid-column:1 / -1"><label>Notiz</label><input value="${esc(p.notiz || "")}" onblur="updateSubContact(${i}, 'notiz', this.value)"></div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function addSubContact(){
+  const c = getSelected();
+  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
+  contacts = contacts.map(x => x.id === selectedId ? {
+    ...x,
+    weitere_kontakte: [...(x.weitere_kontakte || []), {vorname:"", nachname:"", telefon:"", mobil:"", email:"", position:"", notiz:""}]
+  } : x);
+  persistData(true);
+  fillForm();
+  renderList();
+}
+
+function updateSubContact(index, field, value){
+  contacts = contacts.map(x => {
+    if(x.id !== selectedId) return x;
+    const weitere = [...(x.weitere_kontakte || [])];
+    weitere[index] = { ...(weitere[index] || {}), [field]: value };
+    return { ...x, weitere_kontakte: weitere };
+  });
+  persistData(false);
+}
+
+function removeSubContact(index){
+  contacts = contacts.map(x => {
+    if(x.id !== selectedId) return x;
+    const weitere = [...(x.weitere_kontakte || [])];
+    weitere.splice(index, 1);
+    return { ...x, weitere_kontakte: weitere };
+  });
+  persistData(true);
+  fillForm();
+  renderList();
+}
+
+function renderAttachments(){
+  const c = getSelected();
+  const list = document.getElementById("attachmentList");
+  if(!c || !(c.attachments || []).length){
+    list.innerHTML = '<div class="empty">Noch keine Anhänge für diesen Kunden.</div>';
+    return;
+  }
+  list.innerHTML = c.attachments.map((a, i) => `
+    <div class="attachment-item">
+      <div class="attachment-meta">
+        <div class="attachment-name">${esc(a.name || "Datei")}</div>
+        <div class="attachment-sub">${esc(a.type || "Datei")} • ${esc(humanSize(a.size || 0))}</div>
+      </div>
+      <div class="attachment-actions">
+        <button onclick="openAttachment(${i}); event.stopPropagation();">Öffnen</button>
+        <button class="delete" onclick="removeAttachment(${i}); event.stopPropagation();">Löschen</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+
+
+
+function applyTimelineLogic(noteType, noteDate){
+  const type = String(noteType || "").toLowerCase();
+  const date = noteDate || "";
+  const statusEl = document.getElementById("status");
+  const nextDateEl = document.getElementById("naechsterkontakt");
+  const kontaktartEl = document.getElementById("kontaktart");
+
+  if(type.includes("persönlicher termin") || type.includes("persoenlicher termin")){
+    if(statusEl) statusEl.value = "Termin vereinbart";
+    if(nextDateEl && date) nextDateEl.value = date;
+    if(kontaktartEl) kontaktartEl.value = "Persönlicher Termin";
+  }else if(type.includes("rückruf") || type.includes("rueckruf")){
+    if(statusEl) statusEl.value = "Telefonat ausgemacht";
+    if(nextDateEl && date) nextDateEl.value = date;
+    if(kontaktartEl) kontaktartEl.value = "Rückruf";
+  }else if(type.includes("unterlagen")){
+    if(statusEl) statusEl.value = "Unterlagen versendet";
+  }else if(type.includes("telefonat")){
+    if(statusEl) statusEl.value = "Telefonat ausgemacht";
+  }else{
+    if(statusEl && !statusEl.value) statusEl.value = "Sonstiges";
+  }
+}
+
+
+function formatDateDisplay(v){
+  if(!v) return "-";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v)){
+    const [y,m,d] = v.split("-");
+    return `${d}.${m}.${y}`;
+  }
+  return v;
+}
+
+
+function renderNoteHistory(){
+  const c = getSelected();
+  const box = document.getElementById("noteHistory");
+  if(!box) return;
+  if(!c || !(c.notes_history || []).length){
+    box.innerHTML = '<div class="empty">Noch keine datierten Notizen vorhanden.</div>';
+    return;
+  }
+  box.innerHTML = [...(c.notes_history || [])].map((n, i) => {
+    const autoInfo = [n.auto_status ? "Status: " + n.auto_status : "", n.auto_naechsterkontakt ? "Nächster Kontakt: " + n.auto_naechsterkontakt : "", n.auto_kontaktart ? "Art: " + n.auto_kontaktart : ""].filter(Boolean).join(" • ");
+    return `
+    <div class="note-entry">
+      <div class="note-entry-head">
+        <div>
+          <div class="note-entry-date">${esc(formatDateDisplay(n.date || ""))}</div>
+          <div class="note-entry-meta">${esc(n.type || "Notiz")}</div>
+          ${autoInfo ? `<div class="note-entry-meta">${esc(autoInfo)}</div>` : ""}
+        </div>
+        <button class="icon-btn danger" type="button" onclick="removeNoteEntry(${i})">Löschen</button>
+      </div>
+      <div class="note-entry-text">${esc(n.text || "")}</div>
+    </div>
+  `}).reverse().join("");
+}
+
+
+
+function addNoteEntry(){
+  const c = getSelected();
+  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
+
+  const date = document.getElementById("noteDate").value || todayStr();
+  const type = document.getElementById("noteType").value || "Sonstiges";
+  const text = document.getElementById("noteText").value.trim();
+  if(!text){ alert("Bitte eine Notiz eingeben."); return; }
+
+  applyTimelineLogic(type, date);
+
+  const currentStatus = document.getElementById("status") ? document.getElementById("status").value : "";
+  const currentNextDate = document.getElementById("naechsterkontakt") ? document.getElementById("naechsterkontakt").value : "";
+  const currentKontaktart = document.getElementById("kontaktart") ? document.getElementById("kontaktart").value : "";
+
+  contacts = contacts.map(x => {
+    if(x.id !== selectedId) return x;
+    const notes_history = Array.isArray(x.notes_history) ? [...x.notes_history] : [];
+    notes_history.push({
+      date,
+      type,
+      text,
+      auto_status: currentStatus,
+      auto_naechsterkontakt: currentNextDate,
+      auto_kontaktart: currentKontaktart
+    });
+    return {
+      ...x,
+      status: currentStatus,
+      naechsterkontakt: currentNextDate,
+      kontaktart: currentKontaktart,
+      notes_history
+    };
+  });
+
+  document.getElementById("noteDate").value = todayStr();
+  document.getElementById("noteType").value = "Telefonat";
+  document.getElementById("noteText").value = "";
+
+  persistData(true);
+  fillForm();
+  renderList();
+}
+
+
+function removeNoteEntry(index){
+  const c = getSelected();
+  if(!c) return;
+  contacts = contacts.map(x => {
+    if(x.id !== selectedId) return x;
+    const notes_history = [...(x.notes_history || [])];
+    notes_history.splice(index, 1);
+    return { ...x, notes_history };
+  });
+  persistData(true);
+  fillForm();
+  renderList();
+}
+
+
+function saveCurrentContact(){
+  const c = getSelected();
+  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
+  try{
+    syncFormToSelected();
+    fillForm();
+    renderList();
+    persistData(false);
+    alert("Kontakt aktualisiert.");
+  }catch(e){
+    console.error("saveCurrentContact failed", e);
+    alert("Speichern des Kontakts fehlgeschlagen. Bitte erneut versuchen.");
+  }
+}
+
+function newContact(){
+  const newId = Date.now();
+  contacts.unshift({
+    id:newId,firma:"",nachname:"",vorname:"",kundentyp:"Fachpartner",kundenstatus:"Interessent",bundesland:"Oberösterreich",bezirk:"",
+    telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Telefonat ausgemacht",
+    erstkontakt:"",naechsterkontakt:"",kontaktart:"Persönlicher Termin",weclapp:"Nein",potenzial:"mittel",notes_history:[],attachments:[],weitere_kontakte:[],archived:false
+  });
+  selectedId = newId; fillForm(); renderList(); persistData(true); scheduleAutosave();
+}
+function deleteCurrent(){
+  if(selectedId === null){ alert("Kein Kontakt ausgewählt."); return; }
+  if(!confirm("Kontakt wirklich löschen?")) return;
+  contacts = contacts.filter(c => c.id !== selectedId);
+  selectedId = contacts.length ? contacts[0].id : null;
+  fillForm(); renderList(); scheduleAutosave();
+}
+function duplicateContact(){
+  const c = getSelected();
+  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
+  const copy = JSON.parse(JSON.stringify(c));
+  copy.id = Date.now();
+  copy.firma = (copy.firma || "") + " Kopie";
+  contacts.unshift(copy); selectedId = copy.id; fillForm(); renderList(); scheduleAutosave();
+}
+function saveData(){
+  try{
+    syncFormToSelected();
+    persistData(false);
+    alert("Daten gespeichert.");
+  }catch(e){
+    console.error("saveData failed", e);
+    alert("Speichern fehlgeschlagen.");
+  }
+}
+
+function loadData(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(!saved){ alert("Keine gespeicherten Daten gefunden."); return; }
+  try{
+    const parsed = JSON.parse(saved);
+    const incoming = Array.isArray(parsed) ? parsed : (parsed.contacts || []);
+    contacts = sanitizeContacts(incoming);
+    selectedId = contacts.length ? contacts[0].id : null;
+    fillForm(); renderList(); alert("Anrufliste geladen.");
+  }catch(e){ alert("Gespeicherte Daten konnten nicht geladen werden."); }
+}
+
+function exportCSV(){
+  const headers = ["Firma","Nachname","Vorname","Kundentyp","Bundesland","Bezirk","Telefon","Mobil","E-Mail","Straße","PLZ","Ort","Status","Erstkontakt","Letzter Kontakt","Nächster Kontakt","Rückruf","In weclapp übernommen","Potenzial","Notizen","Anzahl Anhänge"];
+  const rows = contacts.map(c => [c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,c.status,c.erstkontakt,c.letzterkontakt,c.naechsterkontakt,c.rueckruf,c.weclapp,c.potenzial,c.notizen,(c.attachments || []).length]);
+  const csv = [headers, ...rows].map(row => row.map(v => `"${String(v ?? "").replace(/"/g,'""')}"`).join(";")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "mini_crm_vertrieb_layout_anhaenge.csv"; a.click(); URL.revokeObjectURL(url);
+}
+
+function exportJSONBackup(){
+  syncFormToSelected();
+  const payload = buildBackupPayload();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  a.href = url;
+  a.download = `mini_crm_backup_${stamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  setSaveState("JSON Backup exportiert");
+}
+
+function importJSONBackupFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    try{
+      const parsed = JSON.parse(evt.target.result);
+      if(!parsed || !Array.isArray(parsed.contacts)) throw new Error("Ungültige Backup-Datei");
+      contacts = sanitizeContacts(parsed.contacts);
+      selectedId = contacts.find(c => c.id === parsed.selectedId)?.id || (contacts.length ? contacts[0].id : null);
+      fillForm();
+      renderList();
+      persistData(true);
+      setSaveState("JSON Backup wiederhergestellt");
+      alert("Backup erfolgreich wiederhergestellt: " + contacts.length + " Kontakte geladen.");
+    }catch(e){
+      alert("JSON-Backup konnte nicht geladen werden.");
+    }
+  };
+  reader.readAsText(file, "UTF-8");
+}
+
+function addAttachmentsToCurrent(files){
+  const c = getSelected();
+  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
+  if(!files || !files.length) return;
+
+  const fileArray = Array.from(files);
+  let processed = 0;
+
+  fileArray.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e){
+      contacts = contacts.map(x => {
+        if(x.id !== selectedId) return x;
+        const attachments = [...(x.attachments || []), {
+          name: file.name,
+          type: file.type || "Datei",
+          size: file.size || 0,
+          data: e.target.result
+        }];
+        return { ...x, attachments };
+      });
+      processed += 1;
+      if(processed === fileArray.length){
+        fillForm();
+        renderList();
+        scheduleAutosave();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleAttachmentInput(event){
+  addAttachmentsToCurrent(event.target.files);
+  event.target.value = "";
+}
+
+function openAttachment(index){
+  const c = getSelected();
+  if(!c || !(c.attachments || [])[index]) return;
+  const a = document.createElement("a");
+  a.href = c.attachments[index].data;
+  a.download = c.attachments[index].name || "anhang";
+  a.click();
+}
+
+function removeAttachment(index){
+  const c = getSelected();
+  if(!c) return;
+  contacts = contacts.map(x => {
+    if(x.id !== selectedId) return x;
+    const attachments = [...(x.attachments || [])];
+    attachments.splice(index, 1);
+    return { ...x, attachments };
+  });
+  fillForm();
+  renderList();
+  scheduleAutosave();
+}
+
+const dropzone = document.getElementById("dropzone");
+dropzone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropzone.classList.add("dragover");
+});
+dropzone.addEventListener("dragleave", () => {
+  dropzone.classList.remove("dragover");
+});
+dropzone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropzone.classList.remove("dragover");
+  if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){
+    addAttachmentsToCurrent(e.dataTransfer.files);
+  }
+});
+
+document.getElementById("fileInput").addEventListener("change", function(e){
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    const text = evt.target.result;
+    const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
+    if(lines.length < 2) return;
+    const headers = parseCsvLine(lines[0]).map(normalizeHeader);
+    function idx(nameList){ for(const n of nameList){ const i = headers.indexOf(n); if(i >= 0) return i; } return -1; }
+    const col = {
+      firma: idx(["firma"]), nachname: idx(["nachname"]), vorname: idx(["vorname"]), kundentyp: idx(["kundentyp","typ"]),
+      bundesland: idx(["bundesland"]), bezirk: idx(["bezirk"]), telefon: idx(["telefon"]), mobil: idx(["mobil","handy"]),
+      email: idx(["e-mail","email","mail"]), strasse: idx(["strasse","straße"]), plz: idx(["plz","postleitzahl"]),
+      ort: idx(["ort"]), status: idx(["status"]), erstkontakt: idx(["erstkontakt"]),
+      letzterkontakt: idx(["letzter kontakt","letzterkontakt"]), naechsterkontakt: idx(["naechster kontakt","nächster kontakt","naechsterkontakt","nächsterkontakt"]),
+      rueckruf: idx(["rueckruf","rückruf"]), weclapp: idx(["in weclapp uebernommen","in weclapp übernommen","weclapp"]), potenzial: idx(["potenzial"]), notizen: idx(["notizen","notiz"])
+    };
+    contacts = [];
+    for(let i=1;i<lines.length;i++){
+      const row = parseCsvLine(lines[i]);
+      contacts.push({
+        id: Date.now() + i,
+        firma: col.firma >= 0 ? (row[col.firma] || "") : "",
+        nachname: col.nachname >= 0 ? (row[col.nachname] || "") : "",
+        vorname: col.vorname >= 0 ? (row[col.vorname] || "") : "",
+        kundentyp: col.kundentyp >= 0 ? (row[col.kundentyp] || "Fachpartner") : "Fachpartner",
+        kundenstatus: "Interessent",
+        bundesland: col.bundesland >= 0 ? (row[col.bundesland] || "Oberösterreich") : "Oberösterreich",
+        bezirk: col.bezirk >= 0 ? (row[col.bezirk] || "") : "",
+        telefon: col.telefon >= 0 ? (row[col.telefon] || "") : "",
+        mobil: col.mobil >= 0 ? (row[col.mobil] || "") : "",
+        email: col.email >= 0 ? (row[col.email] || "") : "",
+        strasse: col.strasse >= 0 ? (row[col.strasse] || "") : "",
+        plz: col.plz >= 0 ? (row[col.plz] || "") : "",
+        ort: col.ort >= 0 ? (row[col.ort] || "") : "",
+        status: col.status >= 0 ? (row[col.status] || "Telefonat ausgemacht") : "Telefonat ausgemacht",
+        erstkontakt: col.erstkontakt >= 0 ? (row[col.erstkontakt] || "") : "",
+        naechsterkontakt: col.naechsterkontakt >= 0 ? (row[col.naechsterkontakt] || "") : "",
+        kontaktart: "Persönlicher Termin",
+        weclapp: col.weclapp >= 0 ? (row[col.weclapp] || "Nein") : "Nein",
+        potenzial: col.potenzial >= 0 ? (row[col.potenzial] || "mittel") : "mittel",
+        notes_history: (col.notizen >= 0 && (row[col.notizen] || "").trim() !== "") ? [{ date: col.erstkontakt >= 0 ? (row[col.erstkontakt] || "") : "", type: "Import", text: row[col.notizen] || "" }] : [],
+        attachments: [], weitere_kontakte: [], archived:false
+      });
+    }
+    selectedId = contacts.length ? contacts[0].id : null;
+    fillForm(); renderList(); scheduleAutosave(); alert("Import abgeschlossen: " + contacts.length + " Kontakte geladen.");
+  };
+  reader.readAsText(file, "UTF-8");
+});
+
+[
+  "firma","nachname","vorname","kundentyp","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","letzterkontakt","naechsterkontakt","rueckruf","weclapp","potenzial","notizen"
+].forEach(id => {
+  document.getElementById(id).addEventListener("input", scheduleAutosave);
+  document.getElementById(id).addEventListener("change", scheduleAutosave);
+});
+
+document.getElementById("jsonFileInput").addEventListener("change", function(e){
+  importJSONBackupFile(e.target.files[0]);
+  e.target.value = "";
+});
+
+window.addEventListener("beforeunload", () => {
+  try{ persistData(true); }catch(e){}
+});
+
+const hasLoadedData = loadPersistedData();
+if(!hasLoadedData){
+  contacts = [
+    {id:1,firma:"Elektro Muster GmbH",nachname:"Huber",vorname:"Max",kundentyp:"Fachpartner",bundesland:"Oberösterreich",bezirk:"Linz-Land",telefon:"+43 732 123456",mobil:"+43 660 1234567",email:"max@elektro-muster.at",strasse:"Musterstraße 1",plz:"4020",ort:"Linz",status:"Telefonat ausgemacht",erstkontakt:"",naechsterkontakt:"",kontaktart:"Persönlicher Termin",weclapp:"Nein",potenzial:"mittel",notes_history:[{date:"",type:"Import",text:"PV und Speicher interessant"}],attachments:[],weitere_kontakte:[],archived:false},
+    {id:2,firma:"Bauhof Beispiel GmbH",nachname:"Mayer",vorname:"Thomas",kundentyp:"B2B",kundenstatus:"Kunde",bundesland:"Steiermark",bezirk:"Graz-Umgebung",telefon:"",mobil:"+43 664 222333",email:"office@bauhof-beispiel.at",strasse:"Industriestraße 8",plz:"8054",ort:"Seiersberg",status:"Unterlagen versendet",erstkontakt:"2026-04-15",naechsterkontakt:"2026-04-22",kontaktart:"Rückruf",weclapp:"Ja",potenzial:"groß",notes_history:[{date:"2026-04-16",type:"Import",text:"Gespräch zu Gewerbespeicher"}],attachments:[],weitere_kontakte:[{vorname:"Sabine",nachname:"Mayer",telefon:"",mobil:"+43 664 555666",email:"s.mayer@bauhof-beispiel.at",position:"Assistenz",notiz:"Zusätzliche Ansprechpartnerin"}],archived:false}
+  ];
+  selectedId = 1;
+  persistData(true);
+}
+fillForm();
+renderList();
+showDueTodayBanner();
+setSaveState(hasLoadedData ? "Gespeicherte Daten geladen" : "Beispieldaten geladen");
+
+
+function downloadJSON(filename, payload){
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function createDeletionBackup(scopeLabel, ids){
+  const idSet = new Set(ids || []);
+  const backupContacts = contacts.filter(c => idSet.has(c.id));
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const payload = {
+    app: "Mini CRM Vertrieb",
+    version: 25,
+    type: "deletion-backup",
+    scope: scopeLabel,
+    exportedAt: new Date().toISOString(),
+    contactCount: backupContacts.length,
+    contacts: backupContacts
+  };
+  downloadJSON(`mini_crm_loeschbackup_${scopeLabel}_${stamp}.json`, payload);
+}
+
+function toggleSelectContact(id){
+  if(selectedIds.has(id)){ selectedIds.delete(id); } else { selectedIds.add(id); }
+  renderList();
+}
+
+function toggleSelectAllVisible(){
+  const visibleIds = filteredContacts().map(c => c.id);
+  const allSelected = visibleIds.length && visibleIds.every(id => selectedIds.has(id));
+  if(allSelected){
+    visibleIds.forEach(id => selectedIds.delete(id));
+  }else{
+    visibleIds.forEach(id => selectedIds.add(id));
+  }
+  renderList();
+}
+
+function archiveSingle(id){
+  contacts = contacts.map(c => c.id === id ? { ...c, archived: true } : c);
+  if(selectedId === id){
+    const next = contacts.find(c => c.id === id);
+    selectedId = next ? next.id : selectedId;
+  }
+  persistData(true);
+  fillForm();
+  renderList();
+}
+
+function deleteSingle(id){
+  const item = contacts.find(c => c.id === id);
+  if(!item) return;
+  createDeletionBackup("einzeln", [id]);
+  if(!confirm(`Kontakt "${item.firma || [item.vorname, item.nachname].filter(Boolean).join(" ") || id}" wirklich löschen?`)) return;
+  contacts = contacts.filter(c => c.id !== id);
+  selectedIds.delete(id);
+  if(selectedId === id){ selectedId = contacts.length ? contacts[0].id : null; }
+  persistData(true);
+  fillForm();
+  renderList();
+}
+
+function archiveSelected(){
+  const ids = Array.from(selectedIds);
+  if(!ids.length){ alert("Bitte zuerst Kontakte markieren."); return; }
+  contacts = contacts.map(c => ids.includes(c.id) ? { ...c, archived: true } : c);
+  selectedIds.clear();
+  persistData(true);
+  fillForm();
+  renderList();
+  alert(ids.length + " Kontakte archiviert.");
+}
+
+function deleteSelected(){
+  const ids = Array.from(selectedIds);
+  if(!ids.length){ alert("Bitte zuerst Kontakte markieren."); return; }
+  createDeletionBackup("auswahl", ids);
+  if(!confirm(ids.length + " markierte Kontakte wirklich löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
+  contacts = contacts.filter(c => !selectedIds.has(c.id));
+  if(selectedId !== null && !contacts.find(c => c.id === selectedId)){
+    selectedId = contacts.length ? contacts[0].id : null;
+  }
+  selectedIds.clear();
+  persistData(true);
+  fillForm();
+  renderList();
+  alert("Ausgewählte Kontakte wurden gelöscht.");
+}
+
+function showArchivedOnly(){
+  document.getElementById("statusFilter").value = "Archiviert";
+  renderList();
+}
+
+function hideArchivedFilter(){
+  document.getElementById("statusFilter").value = "Alle";
+  renderList();
+}
+
+
+
+function safeJoin(arr, sep=" "){
+  return (arr || []).filter(v => String(v || "").trim() !== "").join(sep);
+}
+
+function getLatestNoteText(contact){
+  const notes = Array.isArray(contact.notes_history) ? contact.notes_history : [];
+  if(!notes.length) return "";
+  const sorted = [...notes].sort((a,b) => String(b.date || "").localeCompare(String(a.date || "")));
+  const latest = sorted[0] || {};
+  return [latest.type || "", latest.text || ""].filter(Boolean).join(": ");
+}
+
+function buildDailyReportContacts(){
+  const today = todayStr();
+  return contacts.filter(c => {
+    const hasDueToday = c.naechsterkontakt && c.naechsterkontakt === today;
+    const hasTodayNote = (c.notes_history || []).some(n => (n.date || "") === today);
+    return hasDueToday || hasTodayNote;
+  });
+}
+
+function generateDailyReport(){
+  const today = todayStr();
+  const reportContacts = buildDailyReportContacts();
+
+  if(!reportContacts.length){
+    alert("Für heute wurden keine Kontakte mit 'Nächster Kontakt = heute' oder Historieneinträgen von heute gefunden.");
+    return;
+  }
+
+  const rows = reportContacts.map(c => {
+    const firm = c.firma || "-";
+    const ort = safeJoin([c.plz, c.ort], " ");
+    const ansprechpartner = safeJoin([c.vorname, c.nachname], " ");
+    const vereinbart = c.status || "-";
+    const naechsterSchritt = c.kontaktart || "-";
+    const naechsterKontakt = c.naechsterkontakt || "-";
+    const letzteNotiz = getLatestNoteText(c) || "-";
+
+    return `
+      <tr>
+        <td>${esc(firm)}</td>
+        <td>${esc(ort)}</td>
+        <td>${esc(ansprechpartner)}</td>
+        <td>${esc(vereinbart)}</td>
+        <td>${esc(naechsterSchritt)}</td>
+        <td>${esc(naechsterKontakt)}</td>
+        <td>${esc(letzteNotiz)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const reportHtml = `
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+      <meta charset="UTF-8">
+      <title>Tagesbericht Vertrieb ${today}</title>
+      <style>
+        body{font-family:Arial,Helvetica,sans-serif;margin:28px;color:#111827}
+        h1{margin:0 0 10px 0;font-size:28px}
+        .meta{margin-bottom:18px;font-size:14px}
+        .meta div{margin:4px 0}
+        table{width:100%;border-collapse:collapse;margin-top:14px}
+        th,td{border:1px solid #cfd8e3;padding:8px;vertical-align:top;text-align:left;font-size:12px}
+        th{background:#eef2f6}
+        .footer{margin-top:20px;font-size:12px;color:#4b5563}
+        .actions{margin:16px 0}
+        .actions button{padding:10px 14px;border:none;background:#5f7897;color:#fff;border-radius:6px;cursor:pointer;font-weight:700}
+        @media print{
+          .actions{display:none}
+          body{margin:10mm}
+        }
+      
+/* --- v21 layout overrides --- */
+.layout{
+  display:grid !important;
+  grid-template-columns:minmax(760px,1.05fr) minmax(680px,0.95fr) !important;
+  gap:14px !important;
+  align-items:start !important;
+}
+.contact-item-top{
+  display:grid !important;
+  grid-template-columns:34px minmax(0,1fr) 92px !important;
+  align-items:center !important;
+  gap:12px !important;
+  width:100% !important;
+}
+.contact-select{
+  margin:0 !important;
+  justify-self:center !important;
+  align-self:center !important;
+}
+.contact-main{
+  min-width:0 !important;
+  width:100% !important;
+}
+.contact-main .contact-row{
+  display:grid !important;
+  grid-template-columns:minmax(260px,2fr) minmax(130px,0.9fr) minmax(130px,0.9fr) minmax(220px,1.2fr) minmax(140px,0.9fr) !important;
+  gap:10px !important;
+  align-items:center !important;
+  width:100% !important;
+}
+.contact-main .contact-row > div{
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+.contact-main .contact-row > div > div,
+.contact-main .contact-row > div .meta-small{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+.contact-actions{
+  display:flex !important;
+  gap:6px !important;
+  justify-self:end !important;
+  justify-content:flex-end !important;
+  align-items:center !important;
+  min-width:92px !important;
+  white-space:nowrap !important;
+}
+.side-card{
+  position:sticky !important;
+  top:14px !important;
+  align-self:start !important;
+  max-height:calc(100vh - 28px) !important;
+  overflow:auto !important;
+}
+.side-card .section{
+  padding:16px !important;
+}
+.side-card .sub-title,
+.side-card .section-title{
+  font-size:18px !important;
+  margin-bottom:12px !important;
+}
+.note-grid{
+  display:grid !important;
+  grid-template-columns:150px 170px 1fr auto !important;
+  gap:10px !important;
+  align-items:end !important;
+}
+.subcontact-grid{
+  display:grid !important;
+  grid-template-columns:1fr 1fr 1fr !important;
+  gap:10px !important;
+}
+.subcontact-card{
+  margin-top:8px !important;
+}
+.subcontact-head{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  margin-bottom:8px !important;
+}
+.stats{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+}
+.stats .stat .label.long{
+  font-size:11px !important;
+  line-height:1.2 !important;
+}
+@media (max-width: 1550px){
+  .layout{grid-template-columns:1fr !important;}
+  .side-card{position:static !important;max-height:none !important;}
+}
+@media (max-width: 900px){
+  .toolbar,.grid-4,.group-grid-4,.group-grid-3,.stats,.subcontact-grid,.note-grid,.contact-main .contact-row{
+    grid-template-columns:1fr !important;
+  }
+  .contact-item-top{
+    grid-template-columns:1fr !important;
+  }
+  .contact-actions{
+    justify-self:start !important;
+  }
+  .contact-select{
+    justify-self:start !important;
+  }
+}
+
+
+/* --- v22 overrides --- */
+.layout{
+  grid-template-columns:minmax(860px,1.15fr) minmax(560px,0.85fr) !important;
+}
+.main-card .section-title{
+  font-size:22px !important;
+}
+
+
+/* --- v23 overrides --- */
+.main-card .section > div[style*="display:flex"][style*="justify-content:space-between"] button{
+  white-space:nowrap;
+}
+
+</style>
+    </head>
+    <body>
+      <h1>Tagesbericht Vertrieb</h1>
+      <div class="meta">
+        <div><strong>Datum:</strong> ${esc(today)}</div>
+        <div><strong>Anzahl Kontakte:</strong> ${reportContacts.length}</div>
+      </div>
+
+      <div class="actions">
+        <button onclick="window.print()">Drucken / als PDF speichern</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Kunde / Firma</th>
+            <th>Ort</th>
+            <th>Ansprechpartner</th>
+            <th>Vereinbart / Status</th>
+            <th>Nächster Schritt</th>
+            <th>Nächster Kontakt</th>
+            <th>Letzte Notiz</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+
+      <div class="footer">
+        Erstellt aus Mini CRM Vertrieb am ${esc(today)}.
+      </div>
+    
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function isUuid(value){
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+}
+
+function normalizeDate(value){
+  const v = String(value || "").trim();
+  return v === "" ? null : v;
+}
+
+function baseCompanyPayload(contact){
+  return {
+    firma: contact.firma || "",
+    strasse: contact.strasse || "",
+    plz: contact.plz || "",
+    ort: contact.ort || "",
+    bezirk: contact.bezirk || "",
+    bundesland: contact.bundesland || "",
+    kundentyp: contact.kundentyp || "",
+    kundenstatus: contact.kundenstatus || "",
+    status: contact.status || "",
+    erstkontakt: normalizeDate(contact.erstkontakt),
+    naechsterkontakt: normalizeDate(contact.naechsterkontakt),
+    kontaktart: contact.kontaktart || "",
+    weclapp: contact.weclapp || "",
+    potenzial: contact.potenzial || "",
+    updated_at: new Date().toISOString()
+  };
+}
+
+function mapDbToContact(firma, ansprechpartnerRows, historieRows){
+  const rows = (ansprechpartnerRows || []).filter(r => r.firma_id === firma.id);
+  const historie = (historieRows || []).filter(r => r.firma_id === firma.id);
+  const haupt = rows.find(r => r.hauptkontakt) || rows[0] || {};
+  const weitere = rows.filter(r => !r.hauptkontakt).map(r => ({
+    vorname: r.vorname || "",
+    nachname: r.nachname || "",
+    telefon: r.telefon || "",
+    mobil: r.mobil || "",
+    email: r.email || "",
+    position: r.rolle || "",
+    notiz: ""
+  }));
+
+  return sanitizeContacts([{
+    id: firma.id,
+    firma: firma.firma || "",
+    strasse: firma.strasse || "",
+    plz: firma.plz || "",
+    ort: firma.ort || "",
+    bezirk: firma.bezirk || "",
+    bundesland: firma.bundesland || "Oberösterreich",
+    kundentyp: firma.kundentyp || "Fachpartner",
+    kundenstatus: firma.kundenstatus || "Interessent",
+    status: firma.status || "Telefonat ausgemacht",
+    erstkontakt: firma.erstkontakt || "",
+    naechsterkontakt: firma.naechsterkontakt || "",
+    kontaktart: firma.kontaktart || "Persönlicher Termin",
+    weclapp: firma.weclapp || "Nein",
+    potenzial: firma.potenzial || "mittel",
+    nachname: haupt.nachname || "",
+    vorname: haupt.vorname || "",
+    rolle: haupt.rolle || "",
+    telefon: haupt.telefon || "",
+    mobil: haupt.mobil || "",
+    email: haupt.email || "",
+    notes_history: historie.map(h => ({
+      date: h.datum || "",
+      type: h.art || "",
+      text: h.notiz || "",
+      auto_status: h.auto_status || "",
+      auto_naechsterkontakt: h.auto_naechsterkontakt || "",
+      auto_kontaktart: h.auto_kontaktart || ""
+    })),
+    weitere_kontakte: weitere,
+    attachments: [],
+    archived: false
+  }])[0];
+}
+
+async function loadAllFromSupabase(){
+  setSaveState("Lade aus Supabase ...");
+  const [{ data: firmen, error: firmenError }, { data: ansprechpartner, error: ansprechpartnerError }, { data: historie, error: historieError }] = await Promise.all([
+    supabaseClient.from("crm_firmen").select("*").order("firma", { ascending: true }),
+    supabaseClient.from("crm_ansprechpartner").select("*").order("created_at", { ascending: true }),
+    supabaseClient.from("crm_historie").select("*").order("datum", { ascending: true }),
+  ]);
+
+  if (firmenError) throw firmenError;
+  if (ansprechpartnerError) throw ansprechpartnerError;
+  if (historieError) throw historieError;
+
+  contacts = (firmen || []).map(f => mapDbToContact(f, ansprechpartner || [], historie || []));
+  selectedId = contacts.length ? contacts[0].id : null;
+  fillForm();
+  renderList();
+  showDueTodayBanner();
+  setSaveState("Aus Supabase geladen");
+}
+
+async function saveOneContactToSupabase(contact){
+  let firmaId = isUuid(contact.id) ? contact.id : null;
+  const payload = baseCompanyPayload(contact);
+
+  let savedFirma;
+  if (firmaId){
+    const { data, error } = await supabaseClient
+      .from("crm_firmen")
+      .update(payload)
+      .eq("id", firmaId)
+      .select()
+      .single();
+    if (error) throw error;
+    savedFirma = data;
+  } else {
+    const { data, error } = await supabaseClient
+      .from("crm_firmen")
+      .insert(payload)
+      .select()
+      .single();
+    if (error) throw error;
+    savedFirma = data;
+    firmaId = data.id;
+  }
+
+  const { error: delAnError } = await supabaseClient.from("crm_ansprechpartner").delete().eq("firma_id", firmaId);
+  if (delAnError) throw delAnError;
+
+  const ansprechpartnerRows = [];
+  if ([contact.vorname, contact.nachname, contact.rolle, contact.telefon, contact.mobil, contact.email].some(v => String(v || "").trim() !== "")){
+    ansprechpartnerRows.push({
+      firma_id: firmaId,
+      vorname: contact.vorname || "",
+      nachname: contact.nachname || "",
+      rolle: contact.rolle || "",
+      telefon: contact.telefon || "",
+      mobil: contact.mobil || "",
+      email: contact.email || "",
+      hauptkontakt: true
+    });
+  }
+  (contact.weitere_kontakte || []).forEach(p => {
+    if (![p.vorname, p.nachname, p.position, p.telefon, p.mobil, p.email, p.notiz].some(v => String(v || "").trim() !== "")) return;
+    ansprechpartnerRows.push({
+      firma_id: firmaId,
+      vorname: p.vorname || "",
+      nachname: p.nachname || "",
+      rolle: p.position || "",
+      telefon: p.telefon || "",
+      mobil: p.mobil || "",
+      email: p.email || "",
+      hauptkontakt: false
+    });
+  });
+  if (ansprechpartnerRows.length){
+    const { error } = await supabaseClient.from("crm_ansprechpartner").insert(ansprechpartnerRows);
+    if (error) throw error;
+  }
+
+  const { error: delHisError } = await supabaseClient.from("crm_historie").delete().eq("firma_id", firmaId);
+  if (delHisError) throw delHisError;
+
+  const historieRows = (contact.notes_history || [])
+    .filter(n => String(n.text || "").trim() !== "" || String(n.type || "").trim() !== "" || String(n.date || "").trim() !== "")
+    .map(n => ({
+      firma_id: firmaId,
+      datum: normalizeDate(n.date),
+      art: n.type || "",
+      notiz: n.text || "",
+      auto_status: n.auto_status || "",
+      auto_naechsterkontakt: normalizeDate(n.auto_naechsterkontakt),
+      auto_kontaktart: n.auto_kontaktart || ""
+    }));
+  if (historieRows.length){
+    const { error } = await supabaseClient.from("crm_historie").insert(historieRows);
+    if (error) throw error;
+  }
+
+  contacts = contacts.map(x => x.id === contact.id ? { ...x, id: firmaId } : x);
+  if (selectedId === contact.id) selectedId = firmaId;
+  return firmaId;
+}
+
+async function saveCurrentContact(){
+  const c = getSelected();
+  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
+  try{
+    syncFormToSelected();
+    const current = getSelected();
+    setSaveState("Speichere in Supabase ...");
+    await saveOneContactToSupabase(current);
+    fillForm();
+    renderList();
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    setSaveState("In Supabase gespeichert");
+    alert("Kontakt in Supabase gespeichert.");
+  }catch(e){
+    console.error("saveCurrentContact failed", e);
+    setSaveState("Supabase-Speichern fehlgeschlagen", true);
+    alert("Speichern in Supabase fehlgeschlagen.");
+  }
+}
+
+async function saveData(){
+  try{
+    syncFormToSelected();
+    setSaveState("Speichere alle Kontakte in Supabase ...");
+    for (const contact of [...contacts]){
+      await saveOneContactToSupabase(contact);
+    }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Alle Kontakte in Supabase gespeichert");
+    alert("Alle Kontakte in Supabase gespeichert.");
+  }catch(e){
+    console.error("saveData failed", e);
+    setSaveState("Supabase-Speichern fehlgeschlagen", true);
+    alert("Speichern in Supabase fehlgeschlagen.");
+  }
+}
+
+async function loadData(){
+  try{
+    await loadAllFromSupabase();
+    alert("Daten aus Supabase geladen.");
+  }catch(e){
+    console.error("loadData failed", e);
+    setSaveState("Supabase-Laden fehlgeschlagen", true);
+    alert("Laden aus Supabase fehlgeschlagen.");
+  }
+}
+
+async function deleteSingle(id){
+  const item = contacts.find(c => c.id === id);
+  if(!item) return;
+  createDeletionBackup("einzeln", [id]);
+  if(!confirm(`Kontakt "${item.firma || [item.vorname, item.nachname].filter(Boolean).join(" ") || id}" wirklich löschen?`)) return;
+  try{
+    if (isUuid(id)){
+      const { error } = await supabaseClient.from("crm_firmen").delete().eq("id", id);
+      if (error) throw error;
+    }
+    contacts = contacts.filter(c => c.id !== id);
+    selectedIds.delete(id);
+    if(selectedId === id){ selectedId = contacts.length ? contacts[0].id : null; }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Kontakt gelöscht");
+  }catch(e){
+    console.error("deleteSingle failed", e);
+    alert("Löschen in Supabase fehlgeschlagen.");
+  }
+}
+
+async function deleteSelected(){
+  const ids = Array.from(selectedIds);
+  if(!ids.length){ alert("Bitte zuerst Kontakte markieren."); return; }
+  createDeletionBackup("auswahl", ids);
+  if(!confirm(ids.length + " markierte Kontakte wirklich löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
+  try{
+    const uuidIds = ids.filter(isUuid);
+    if (uuidIds.length){
+      const { error } = await supabaseClient.from("crm_firmen").delete().in("id", uuidIds);
+      if (error) throw error;
+    }
+    contacts = contacts.filter(c => !selectedIds.has(c.id));
+    if(selectedId !== null && !contacts.find(c => c.id === selectedId)){
+      selectedId = contacts.length ? contacts[0].id : null;
+    }
+    selectedIds.clear();
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Ausgewählte Kontakte gelöscht");
+    alert("Ausgewählte Kontakte wurden gelöscht.");
+  }catch(e){
+    console.error("deleteSelected failed", e);
+    alert("Löschen in Supabase fehlgeschlagen.");
+  }
+}
+
+async function clearAllData(){
+  if(!contacts.length){ alert("Keine Kontakte vorhanden."); return; }
+  createDeletionBackup("alle", contacts.map(c => c.id));
+  if(!confirm("ACHTUNG: Wirklich alle Kontakte und Daten löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
+  try{
+    const uuidIds = contacts.map(c => c.id).filter(isUuid);
+    if (uuidIds.length){
+      const { error } = await supabaseClient.from("crm_firmen").delete().in("id", uuidIds);
+      if (error) throw error;
+    }
+    contacts = [];
+    selectedIds.clear();
+    selectedId = null;
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Alle Kontakte gelöscht");
+    alert("Alle Kontakte wurden gelöscht.");
+  }catch(e){
+    console.error("clearAllData failed", e);
+    alert("Komplettes Löschen in Supabase fehlgeschlagen.");
+  }
+}
+
+async function initSupabaseMode(){
+  try{
+    await loadAllFromSupabase();
+  }catch(e){
+    console.error("initSupabaseMode failed", e);
+    setSaveState("Supabase noch leer oder nicht erreichbar", true);
+  }
+}
+
+initSupabaseMode();
+</script>
+
+</body>
+    </html>
+  `;
+
+  const win = window.open("", "_blank");
+  if(!win){
+    alert("Popup wurde blockiert. Bitte Popups für diese Datei erlauben.");
+    return;
+  }
+  win.document.open();
+  win.document.write(reportHtml);
+  win.document.close();
+}
+
+
+function getTodayDueContacts(){
+  const today = todayStr();
+  return contacts.filter(c => c.naechsterkontakt && c.naechsterkontakt === today);
+}
+
+function showDueTodayBanner(){
+  const banner = document.getElementById("dueBanner");
+  if(!banner) return;
+
+  const dueContacts = getTodayDueContacts();
+  if(!dueContacts.length){
+    banner.className = "due-banner";
+    banner.innerHTML = "";
+    return;
+  }
+
+  const items = dueContacts.slice(0, 8).map(c => {
+    const firm = c.firma || "-";
+    const person = [c.vorname, c.nachname].filter(Boolean).join(" ");
+    const ort = [c.plz, c.ort].filter(Boolean).join(" ");
+    const extra = [c.kontaktart || "", ort].filter(Boolean).join(" • ");
+    return `<li><strong>${esc(firm)}</strong>${person ? " – " + esc(person) : ""}${extra ? " (" + esc(extra) + ")" : ""}</li>`;
+  }).join("");
+
+  const more = dueContacts.length > 8 ? `<div style="margin-top:6px;font-size:12px;">+ ${dueContacts.length - 8} weitere heute fällige Kontakte</div>` : "";
+
+  banner.innerHTML = `
+    <div class="due-banner-title">Heute fällige Kontakte: ${dueContacts.length}</div>
+    <ul class="due-banner-list">${items}</ul>
+    ${more}
+    <div class="due-banner-actions">
+      <button type="button" onclick="filterDueToday()">Heute fällige anzeigen</button>
+      <button type="button" onclick="document.getElementById('dueBanner').className='due-banner';">Hinweis schließen</button>
+    </div>
+  `;
+  banner.className = "due-banner show";
+}
+
+function filterDueToday(){
+  const today = todayStr();
+  document.getElementById("search").value = "";
+  document.getElementById("statusFilter").value = "Alle";
+  document.getElementById("kundentypFilter").value = "Alle";
+  document.getElementById("regionFilter").value = "";
+  document.getElementById("showRecent").checked = true;
+
+  const dueIds = new Set(contacts.filter(c => c.naechsterkontakt === today).map(c => c.id));
+  const originalFilteredContacts = filteredContacts;
+  filteredContacts = function(){
+    let arr = originalFilteredContacts();
+    return arr.filter(c => dueIds.has(c.id));
+  };
+  renderList();
+  setTimeout(() => { filteredContacts = originalFilteredContacts; }, 0);
+}
+
+function clearAllData(){
+  if(!contacts.length){ alert("Keine Kontakte vorhanden."); return; }
+  createDeletionBackup("alle", contacts.map(c => c.id));
+  if(confirm("ACHTUNG: Wirklich alle Kontakte und Daten löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")){
+    localStorage.clear();
+    contacts = [];
+    selectedIds.clear();
+    selectedId = null;
+    fillForm();
+    renderList();
+    setSaveState("Alle Kontakte gelöscht");
+    alert("Alle Kontakte wurden gelöscht.");
+  }
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function isUuid(value){
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+}
+
+function normalizeDate(value){
+  const v = String(value || "").trim();
+  return v === "" ? null : v;
+}
+
+function baseCompanyPayload(contact){
+  return {
+    firma: contact.firma || "",
+    strasse: contact.strasse || "",
+    plz: contact.plz || "",
+    ort: contact.ort || "",
+    bezirk: contact.bezirk || "",
+    bundesland: contact.bundesland || "",
+    kundentyp: contact.kundentyp || "",
+    kundenstatus: contact.kundenstatus || "",
+    status: contact.status || "",
+    erstkontakt: normalizeDate(contact.erstkontakt),
+    naechsterkontakt: normalizeDate(contact.naechsterkontakt),
+    kontaktart: contact.kontaktart || "",
+    weclapp: contact.weclapp || "",
+    potenzial: contact.potenzial || "",
+    updated_at: new Date().toISOString()
+  };
+}
+
+function mapDbToContact(firma, ansprechpartnerRows, historieRows){
+  const rows = (ansprechpartnerRows || []).filter(r => r.firma_id === firma.id);
+  const historie = (historieRows || []).filter(r => r.firma_id === firma.id);
+  const haupt = rows.find(r => r.hauptkontakt) || rows[0] || {};
+  const weitere = rows.filter(r => !r.hauptkontakt).map(r => ({
+    vorname: r.vorname || "",
+    nachname: r.nachname || "",
+    telefon: r.telefon || "",
+    mobil: r.mobil || "",
+    email: r.email || "",
+    position: r.rolle || "",
+    notiz: ""
+  }));
+
+  return sanitizeContacts([{
+    id: firma.id,
+    firma: firma.firma || "",
+    strasse: firma.strasse || "",
+    plz: firma.plz || "",
+    ort: firma.ort || "",
+    bezirk: firma.bezirk || "",
+    bundesland: firma.bundesland || "Oberösterreich",
+    kundentyp: firma.kundentyp || "Fachpartner",
+    kundenstatus: firma.kundenstatus || "Interessent",
+    status: firma.status || "Telefonat ausgemacht",
+    erstkontakt: firma.erstkontakt || "",
+    naechsterkontakt: firma.naechsterkontakt || "",
+    kontaktart: firma.kontaktart || "Persönlicher Termin",
+    weclapp: firma.weclapp || "Nein",
+    potenzial: firma.potenzial || "mittel",
+    nachname: haupt.nachname || "",
+    vorname: haupt.vorname || "",
+    rolle: haupt.rolle || "",
+    telefon: haupt.telefon || "",
+    mobil: haupt.mobil || "",
+    email: haupt.email || "",
+    notes_history: historie.map(h => ({
+      date: h.datum || "",
+      type: h.art || "",
+      text: h.notiz || "",
+      auto_status: h.auto_status || "",
+      auto_naechsterkontakt: h.auto_naechsterkontakt || "",
+      auto_kontaktart: h.auto_kontaktart || ""
+    })),
+    weitere_kontakte: weitere,
+    attachments: [],
+    archived: false
+  }])[0];
+}
+
+async function loadAllFromSupabase(){
+  setSaveState("Lade aus Supabase ...");
+  const [{ data: firmen, error: firmenError }, { data: ansprechpartner, error: ansprechpartnerError }, { data: historie, error: historieError }] = await Promise.all([
+    supabaseClient.from("crm_firmen").select("*").order("firma", { ascending: true }),
+    supabaseClient.from("crm_ansprechpartner").select("*").order("created_at", { ascending: true }),
+    supabaseClient.from("crm_historie").select("*").order("datum", { ascending: true }),
+  ]);
+
+  if (firmenError) throw firmenError;
+  if (ansprechpartnerError) throw ansprechpartnerError;
+  if (historieError) throw historieError;
+
+  contacts = (firmen || []).map(f => mapDbToContact(f, ansprechpartner || [], historie || []));
+  selectedId = contacts.length ? contacts[0].id : null;
+  fillForm();
+  renderList();
+  showDueTodayBanner();
+  setSaveState("Aus Supabase geladen");
+}
+
+async function saveOneContactToSupabase(contact){
+  let firmaId = isUuid(contact.id) ? contact.id : null;
+  const payload = baseCompanyPayload(contact);
+
+  let savedFirma;
+  if (firmaId){
+    const { data, error } = await supabaseClient
+      .from("crm_firmen")
+      .update(payload)
+      .eq("id", firmaId)
+      .select()
+      .single();
+    if (error) throw error;
+    savedFirma = data;
+  } else {
+    const { data, error } = await supabaseClient
+      .from("crm_firmen")
+      .insert(payload)
+      .select()
+      .single();
+    if (error) throw error;
+    savedFirma = data;
+    firmaId = data.id;
+  }
+
+  const { error: delAnError } = await supabaseClient.from("crm_ansprechpartner").delete().eq("firma_id", firmaId);
+  if (delAnError) throw delAnError;
+
+  const ansprechpartnerRows = [];
+  if ([contact.vorname, contact.nachname, contact.rolle, contact.telefon, contact.mobil, contact.email].some(v => String(v || "").trim() !== "")){
+    ansprechpartnerRows.push({
+      firma_id: firmaId,
+      vorname: contact.vorname || "",
+      nachname: contact.nachname || "",
+      rolle: contact.rolle || "",
+      telefon: contact.telefon || "",
+      mobil: contact.mobil || "",
+      email: contact.email || "",
+      hauptkontakt: true
+    });
+  }
+  (contact.weitere_kontakte || []).forEach(p => {
+    if (![p.vorname, p.nachname, p.position, p.telefon, p.mobil, p.email, p.notiz].some(v => String(v || "").trim() !== "")) return;
+    ansprechpartnerRows.push({
+      firma_id: firmaId,
+      vorname: p.vorname || "",
+      nachname: p.nachname || "",
+      rolle: p.position || "",
+      telefon: p.telefon || "",
+      mobil: p.mobil || "",
+      email: p.email || "",
+      hauptkontakt: false
+    });
+  });
+  if (ansprechpartnerRows.length){
+    const { error } = await supabaseClient.from("crm_ansprechpartner").insert(ansprechpartnerRows);
+    if (error) throw error;
+  }
+
+  const { error: delHisError } = await supabaseClient.from("crm_historie").delete().eq("firma_id", firmaId);
+  if (delHisError) throw delHisError;
+
+  const historieRows = (contact.notes_history || [])
+    .filter(n => String(n.text || "").trim() !== "" || String(n.type || "").trim() !== "" || String(n.date || "").trim() !== "")
+    .map(n => ({
+      firma_id: firmaId,
+      datum: normalizeDate(n.date),
+      art: n.type || "",
+      notiz: n.text || "",
+      auto_status: n.auto_status || "",
+      auto_naechsterkontakt: normalizeDate(n.auto_naechsterkontakt),
+      auto_kontaktart: n.auto_kontaktart || ""
+    }));
+  if (historieRows.length){
+    const { error } = await supabaseClient.from("crm_historie").insert(historieRows);
+    if (error) throw error;
+  }
+
+  contacts = contacts.map(x => x.id === contact.id ? { ...x, id: firmaId } : x);
+  if (selectedId === contact.id) selectedId = firmaId;
+  return firmaId;
+}
+
+async function saveCurrentContact(){
+  const c = getSelected();
+  if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
+  try{
+    syncFormToSelected();
+    const current = getSelected();
+    setSaveState("Speichere in Supabase ...");
+    await saveOneContactToSupabase(current);
+    fillForm();
+    renderList();
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    setSaveState("In Supabase gespeichert");
+    alert("Kontakt in Supabase gespeichert.");
+  }catch(e){
+    console.error("saveCurrentContact failed", e);
+    setSaveState("Supabase-Speichern fehlgeschlagen", true);
+    alert("Speichern in Supabase fehlgeschlagen.");
+  }
+}
+
+async function saveData(){
+  try{
+    syncFormToSelected();
+    setSaveState("Speichere alle Kontakte in Supabase ...");
+    for (const contact of [...contacts]){
+      await saveOneContactToSupabase(contact);
+    }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Alle Kontakte in Supabase gespeichert");
+    alert("Alle Kontakte in Supabase gespeichert.");
+  }catch(e){
+    console.error("saveData failed", e);
+    setSaveState("Supabase-Speichern fehlgeschlagen", true);
+    alert("Speichern in Supabase fehlgeschlagen.");
+  }
+}
+
+async function loadData(){
+  try{
+    await loadAllFromSupabase();
+    alert("Daten aus Supabase geladen.");
+  }catch(e){
+    console.error("loadData failed", e);
+    setSaveState("Supabase-Laden fehlgeschlagen", true);
+    alert("Laden aus Supabase fehlgeschlagen.");
+  }
+}
+
+async function deleteSingle(id){
+  const item = contacts.find(c => c.id === id);
+  if(!item) return;
+  createDeletionBackup("einzeln", [id]);
+  if(!confirm(`Kontakt "${item.firma || [item.vorname, item.nachname].filter(Boolean).join(" ") || id}" wirklich löschen?`)) return;
+  try{
+    if (isUuid(id)){
+      const { error } = await supabaseClient.from("crm_firmen").delete().eq("id", id);
+      if (error) throw error;
+    }
+    contacts = contacts.filter(c => c.id !== id);
+    selectedIds.delete(id);
+    if(selectedId === id){ selectedId = contacts.length ? contacts[0].id : null; }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Kontakt gelöscht");
+  }catch(e){
+    console.error("deleteSingle failed", e);
+    alert("Löschen in Supabase fehlgeschlagen.");
+  }
+}
+
+async function deleteSelected(){
+  const ids = Array.from(selectedIds);
+  if(!ids.length){ alert("Bitte zuerst Kontakte markieren."); return; }
+  createDeletionBackup("auswahl", ids);
+  if(!confirm(ids.length + " markierte Kontakte wirklich löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
+  try{
+    const uuidIds = ids.filter(isUuid);
+    if (uuidIds.length){
+      const { error } = await supabaseClient.from("crm_firmen").delete().in("id", uuidIds);
+      if (error) throw error;
+    }
+    contacts = contacts.filter(c => !selectedIds.has(c.id));
+    if(selectedId !== null && !contacts.find(c => c.id === selectedId)){
+      selectedId = contacts.length ? contacts[0].id : null;
+    }
+    selectedIds.clear();
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Ausgewählte Kontakte gelöscht");
+    alert("Ausgewählte Kontakte wurden gelöscht.");
+  }catch(e){
+    console.error("deleteSelected failed", e);
+    alert("Löschen in Supabase fehlgeschlagen.");
+  }
+}
+
+async function clearAllData(){
+  if(!contacts.length){ alert("Keine Kontakte vorhanden."); return; }
+  createDeletionBackup("alle", contacts.map(c => c.id));
+  if(!confirm("ACHTUNG: Wirklich alle Kontakte und Daten löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
+  try{
+    const uuidIds = contacts.map(c => c.id).filter(isUuid);
+    if (uuidIds.length){
+      const { error } = await supabaseClient.from("crm_firmen").delete().in("id", uuidIds);
+      if (error) throw error;
+    }
+    contacts = [];
+    selectedIds.clear();
+    selectedId = null;
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
+    fillForm();
+    renderList();
+    setSaveState("Alle Kontakte gelöscht");
+    alert("Alle Kontakte wurden gelöscht.");
+  }catch(e){
+    console.error("clearAllData failed", e);
+    alert("Komplettes Löschen in Supabase fehlgeschlagen.");
+  }
+}
+
+async function initSupabaseMode(){
+  try{
+    await loadAllFromSupabase();
+  }catch(e){
+    console.error("initSupabaseMode failed", e);
+    setSaveState("Supabase noch leer oder nicht erreichbar", true);
+  }
+}
+
+initSupabaseMode();
 </script>
 
 </body>
