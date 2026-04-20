@@ -1446,6 +1446,7 @@ function buildDailyReportContacts(){
   });
 }
 
+
 function generateDailyReport(){
   const today = todayStr();
   const reportContacts = buildDailyReportContacts();
@@ -1482,7 +1483,6 @@ function generateDailyReport(){
     <html lang="de">
     <head>
       <meta charset="UTF-8">
-<meta name="robots" content="noindex,nofollow">
       <title>Tagesbericht Vertrieb ${today}</title>
       <style>
         body{font-family:Arial,Helvetica,sans-serif;margin:28px;color:#111827}
@@ -1499,14 +1499,49 @@ function generateDailyReport(){
           .actions{display:none}
           body{margin:10mm}
         }
-      
-/* --- v21 layout overrides --- */
-.layout{
-  display:grid !important;
-  grid-template-columns:minmax(760px,1.05fr) minmax(680px,0.95fr) !important;
-  gap:14px !important;
-  align-items:start !important;
+      </style>
+    </head>
+    <body>
+      <h1>Tagesbericht Vertrieb</h1>
+      <div class="meta">
+        <div><strong>Datum:</strong> ${esc(today)}</div>
+        <div><strong>Anzahl Kontakte:</strong> ${reportContacts.length}</div>
+      </div>
+
+      <div class="actions">
+        <button onclick="window.print()">Drucken / als PDF speichern</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Kunde / Firma</th>
+            <th>Ort</th>
+            <th>Ansprechpartner</th>
+            <th>Vereinbart / Status</th>
+            <th>Nächster Schritt</th>
+            <th>Nächster Kontakt</th>
+            <th>Letzte Notiz</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div class="footer">Erstellt aus Mini CRM Vertrieb am ${esc(today)}.</div>
+    </body>
+    </html>
+  `;
+
+  const win = window.open("", "_blank");
+  if(!win){
+    alert("Popup wurde blockiert. Bitte Popups für diese Datei erlauben.");
+    return;
+  }
+  win.document.open();
+  win.document.write(reportHtml);
+  win.document.close();
 }
+
 .contact-item-top{
   display:grid !important;
   grid-template-columns:34px minmax(0,1fr) 92px !important;
@@ -1661,204 +1696,6 @@ function generateDailyReport(){
         Erstellt aus Mini CRM Vertrieb am ${esc(today)}.
       </div>
     
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-function isUuid(value){
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
-}
-function normalizeDate(value){
-  const v = String(value || "").trim();
-  return v === "" ? null : v;
-}
-function baseCompanyPayload(contact){
-  return {
-    firma: contact.firma || "",
-    strasse: contact.strasse || "",
-    plz: contact.plz || "",
-    ort: contact.ort || "",
-    bezirk: contact.bezirk || "",
-    bundesland: contact.bundesland || "",
-    kundentyp: contact.kundentyp || "",
-    kundenstatus: contact.kundenstatus || "",
-    status: contact.status || "",
-    erstkontakt: normalizeDate(contact.erstkontakt),
-    naechsterkontakt: normalizeDate(contact.naechsterkontakt),
-    kontaktart: contact.kontaktart || "",
-    weclapp: contact.weclapp || "",
-    potenzial: contact.potenzial || "",
-    updated_at: new Date().toISOString()
-  };
-}
-function mapDbToContact(firma, ansprechpartnerRows, historieRows){
-  const rows = (ansprechpartnerRows || []).filter(r => r.firma_id === firma.id);
-  const historie = (historieRows || []).filter(r => r.firma_id === firma.id).sort((a,b) => String(a.datum||"").localeCompare(String(b.datum||"")));
-  const haupt = rows.find(r => r.hauptkontakt) || rows[0] || {};
-  const weitere = rows.filter(r => !r.hauptkontakt).map(r => ({
-    vorname: r.vorname || "",
-    nachname: r.nachname || "",
-    telefon: r.telefon || "",
-    mobil: r.mobil || "",
-    email: r.email || "",
-    position: r.rolle || "",
-    notiz: ""
-  }));
-  return sanitizeContacts([{
-    id: firma.id,
-    firma: firma.firma || "",
-    strasse: firma.strasse || "",
-    plz: firma.plz || "",
-    ort: firma.ort || "",
-    bezirk: firma.bezirk || "",
-    bundesland: firma.bundesland || "Oberösterreich",
-    kundentyp: firma.kundentyp || "Fachpartner",
-    kundenstatus: firma.kundenstatus || "Interessent",
-    status: firma.status || "Telefonat ausgemacht",
-    erstkontakt: firma.erstkontakt || "",
-    naechsterkontakt: firma.naechsterkontakt || "",
-    kontaktart: firma.kontaktart || "Persönlicher Termin",
-    weclapp: firma.weclapp || "Nein",
-    potenzial: firma.potenzial || "mittel",
-    nachname: haupt.nachname || "",
-    vorname: haupt.vorname || "",
-    rolle: haupt.rolle || "",
-    telefon: haupt.telefon || "",
-    mobil: haupt.mobil || "",
-    email: haupt.email || "",
-    notes_history: historie.map(h => ({
-      date: h.datum || "",
-      type: h.art || "",
-      text: h.notiz || "",
-      auto_status: h.auto_status || "",
-      auto_naechsterkontakt: h.auto_naechsterkontakt || "",
-      auto_kontaktart: h.auto_kontaktart || ""
-    })),
-    weitere_kontakte: weitere,
-    attachments: [],
-    archived: false
-  }])[0];
-}
-async function loadAllFromSupabase(){
-  setSaveState("Lade aus Supabase ...");
-  const [{ data: firmen, error: firmenError }, { data: ansprechpartner, error: ansprechpartnerError }, { data: historie, error: historieError }] = await Promise.all([
-    supabaseClient.from("crm_firmen").select("*").order("firma", { ascending: true }),
-    supabaseClient.from("crm_ansprechpartner").select("*").order("created_at", { ascending: true }),
-    supabaseClient.from("crm_historie").select("*").order("datum", { ascending: true })
-  ]);
-  if (firmenError) throw firmenError;
-  if (ansprechpartnerError) throw ansprechpartnerError;
-  if (historieError) throw historieError;
-  contacts = (firmen || []).map(f => mapDbToContact(f, ansprechpartner || [], historie || []));
-  selectedId = contacts.length ? contacts[0].id : null;
-  fillForm();
-  renderList();
-  showDueTodayBanner();
-  setSaveState("Aus Supabase geladen");
-}
-async function saveOneContactToSupabase(contact){
-  let firmaId = isUuid(contact.id) ? contact.id : null;
-  const payload = baseCompanyPayload(contact);
-  if (firmaId){
-    const { error } = await supabaseClient.from("crm_firmen").update(payload).eq("id", firmaId);
-    if (error) throw error;
-  } else {
-    const { data, error } = await supabaseClient.from("crm_firmen").insert(payload).select().single();
-    if (error) throw error;
-    firmaId = data.id;
-  }
-
-  const { error: delAnError } = await supabaseClient.from("crm_ansprechpartner").delete().eq("firma_id", firmaId);
-  if (delAnError) throw delAnError;
-
-  const ansprechpartnerRows = [];
-  if ([contact.vorname, contact.nachname, contact.rolle, contact.telefon, contact.mobil, contact.email].some(v => String(v || "").trim() !== "")){
-    ansprechpartnerRows.push({
-      firma_id: firmaId,
-      vorname: contact.vorname || "",
-      nachname: contact.nachname || "",
-      rolle: contact.rolle || "",
-      telefon: contact.telefon || "",
-      mobil: contact.mobil || "",
-      email: contact.email || "",
-      hauptkontakt: true
-    });
-  }
-  (contact.weitere_kontakte || []).forEach(p => {
-    if (![p.vorname, p.nachname, p.position, p.telefon, p.mobil, p.email, p.notiz].some(v => String(v || "").trim() !== "")) return;
-    ansprechpartnerRows.push({
-      firma_id: firmaId,
-      vorname: p.vorname || "",
-      nachname: p.nachname || "",
-      rolle: p.position || "",
-      telefon: p.telefon || "",
-      mobil: p.mobil || "",
-      email: p.email || "",
-      hauptkontakt: false
-    });
-  });
-  if (ansprechpartnerRows.length){
-    const { error } = await supabaseClient.from("crm_ansprechpartner").insert(ansprechpartnerRows);
-    if (error) throw error;
-  }
-
-  const { error: delHisError } = await supabaseClient.from("crm_historie").delete().eq("firma_id", firmaId);
-  if (delHisError) throw delHisError;
-
-  const historieRows = (contact.notes_history || [])
-    .filter(n => String(n.text || "").trim() !== "" || String(n.type || "").trim() !== "" || String(n.date || "").trim() !== "")
-    .map(n => ({
-      firma_id: firmaId,
-      datum: normalizeDate(n.date),
-      art: n.type || "",
-      notiz: n.text || "",
-      auto_status: n.auto_status || "",
-      auto_naechsterkontakt: normalizeDate(n.auto_naechsterkontakt),
-      auto_kontaktart: n.auto_kontaktart || ""
-    }));
-  if (historieRows.length){
-    const { error } = await supabaseClient.from("crm_historie").insert(historieRows);
-    if (error) throw error;
-  }
-
-  contacts = contacts.map(x => x.id === contact.id ? { ...x, id: firmaId } : x);
-  if (selectedId === contact.id) selectedId = firmaId;
-}
-clearAllData = async function(){
-  if(!contacts.length){ alert("Keine Kontakte vorhanden."); return; }
-  createDeletionBackup("alle", contacts.map(c => c.id));
-  if(!confirm("ACHTUNG: Wirklich alle Kontakte und Daten löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")) return;
-  try{
-    const uuidIds = contacts.map(c => c.id).filter(isUuid);
-    if (uuidIds.length){
-      const { error } = await supabaseClient.from("crm_firmen").delete().in("id", uuidIds);
-      if (error) throw error;
-    }
-    contacts = [];
-    selectedIds.clear();
-    selectedId = null;
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false))); }catch(e){}
-    fillForm();
-    renderList();
-    setSaveState("Alle Kontakte gelöscht");
-    alert("Alle Kontakte wurden gelöscht.");
-  }catch(e){
-    console.error("clearAllData failed", e);
-    alert("Komplettes Löschen in Supabase fehlgeschlagen.");
-  }
-};
-
-window.addEventListener("load", async () => {
-  try{
-    await loadAllFromSupabase();
-  }catch(e){
-    console.error("initSupabaseMode failed", e);
-    setSaveState("Supabase noch leer oder nicht erreichbar", true);
-  }
-});
-</script>
 
 </body>
     </html>
@@ -1932,21 +1769,12 @@ function filterDueToday(){
 }
 
 function clearAllData(){
-  if(!contacts.length){ alert("Keine Kontakte vorhanden."); return; }
-  createDeletionBackup("alle", contacts.map(c => c.id));
-  if(confirm("ACHTUNG: Wirklich alle Kontakte und Daten löschen? Vorher wurde automatisch ein JSON-Backup erstellt.")){
-    localStorage.clear();
-    contacts = [];
-    selectedIds.clear();
-    selectedId = null;
-    fillForm();
-    renderList();
-    setSaveState("Alle Kontakte gelöscht");
-    alert("Alle Kontakte wurden gelöscht.");
-  }
+  alert("Löschfunktion wird initialisiert ...");
 }
 
 </script>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
