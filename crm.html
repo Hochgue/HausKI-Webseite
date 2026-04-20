@@ -9,20 +9,47 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body{font-family:Arial,Helvetica,sans-serif;background:#eef2f6;margin:0;padding:20px}
-.card{background:white;border:1px solid #d8e0e8;border-radius:8px;padding:16px;max-width:900px}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-button{padding:10px 14px;border:none;border-radius:4px;background:#5f7897;color:white;font-weight:bold;cursor:pointer}
-button:hover{background:#6f87a3}
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#eef2f6;
+    margin:0;
+    padding:20px
+}
+.card{
+    background:white;
+    border:1px solid #d8e0e8;
+    border-radius:8px;
+    padding:16px;
+    max-width:900px
+}
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:12px
+}
+button{
+    padding:10px 14px;
+    border:none;
+    border-radius:4px;
+    background:#5f7897;
+    color:white;
+    font-weight:bold;
+    cursor:pointer
+}
+button:hover{
+    background:#6f87a3
+}
 </style>
 
 </head>
 <body>
 
 <div class="card">
+
 <h2>HausKI CRM – Testversion Supabase</h2>
 
 <div class="grid">
+
 <div>
 <label>Firma</label>
 <input id="firma">
@@ -37,6 +64,7 @@ button:hover{background:#6f87a3}
 <label>PLZ</label>
 <input id="plz">
 </div>
+
 </div>
 
 <br>
@@ -54,23 +82,35 @@ button:hover{background:#6f87a3}
 
 <script>
 
-const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
+const SUPABASE_URL =
+"https://wuizcshgkdolkngqoutj.supabase.co";
 
-const supabase = window.supabase.createClient(
+const SUPABASE_KEY =
+"DEIN_ANON_KEY_HIER";
+
+const supabaseClient =
+window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
 async function saveContact(){
 
-    const firma = document.getElementById("firma").value;
-    const ort = document.getElementById("ort").value;
-    const plz = document.getElementById("plz").value;
+    const firma =
+    document.getElementById("firma").value;
 
-    document.getElementById("status").innerText = "Speichern ...";
+    const ort =
+    document.getElementById("ort").value;
 
-    const { data, error } = await supabase
+    const plz =
+    document.getElementById("plz").value;
+
+    document.getElementById("status")
+    .innerText =
+    "Speichern ...";
+
+    const { data, error } =
+    await supabaseClient
         .from("crm_firmen")
         .insert([
             {
@@ -83,8 +123,10 @@ async function saveContact(){
     if(error){
 
         console.log(error);
-        document.getElementById("status").innerText =
-            "Fehler beim Speichern";
+
+        document.getElementById("status")
+        .innerText =
+        "Fehler beim Speichern";
 
         alert("Speichern fehlgeschlagen");
 
@@ -92,8 +134,9 @@ async function saveContact(){
 
     }
 
-    document.getElementById("status").innerText =
-        "Gespeichert";
+    document.getElementById("status")
+    .innerText =
+    "Gespeichert";
 
     alert("Kontakt gespeichert");
 
@@ -103,7 +146,8 @@ async function saveContact(){
 
 async function loadContacts(){
 
-    const { data, error } = await supabase
+    const { data, error } =
+    await supabaseClient
         .from("crm_firmen")
         .select("*")
         .order("firma");
@@ -111,19 +155,20 @@ async function loadContacts(){
     if(error){
 
         console.log(error);
+
         return;
 
     }
 
     const list =
-        document.getElementById("list");
+    document.getElementById("list");
 
     list.innerHTML = "";
 
     data.forEach(row => {
 
         const li =
-            document.createElement("li");
+        document.createElement("li");
 
         li.innerText =
             row.firma +
