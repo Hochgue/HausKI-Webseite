@@ -306,7 +306,6 @@
           <button onclick="hideArchivedFilter()">Archivfilter zurücksetzen</button>
           <span class="small-note" id="selectionInfo">0 markiert</span>
         </div>
-
       </div>
 
       <div class="section">
@@ -347,11 +346,13 @@
       </div>
 
       <div class="section">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;"><div class="section-title" style="margin:0;">Ansprechpartner</div><button type="button" onclick="addSubContact()">+ Ansprechpartner</button></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;">
+          <div class="section-title" style="margin:0;">Ansprechpartner</div>
+          <button type="button" onclick="addSubContact()">+ Ansprechpartner</button>
+        </div>
         <div class="group-grid-3">
           <div><label>Ansprechpartner</label><input id="nachname"></div>
           <div><label>Vorname</label><input id="vorname"></div>
-          <!-- FIX: rolle-Feld war korrekt im HTML, fehlte aber in syncFormToSelected() -->
           <div><label>Rolle / Position</label><input id="rolle" type="text"></div>
           <div><label>Telefon</label><input id="telefon"></div>
           <div><label>Mobil</label><input id="mobil"></div>
@@ -396,6 +397,7 @@
             </select>
           </div>
         </div>
+
         <div style="margin-top:12px">
           <label>Kontakt-Historie / Notizen</label>
           <div class="note-grid">
@@ -477,10 +479,14 @@
 </div>
 
 <script>
-const STORAGE_KEY = "mini_crm_vertrieb_layout_v8";
-const LEGACY_STORAGE_KEYS = ["mini_crm_vertrieb_layout_v7", "mini_crm_vertrieb_layout_v4"];
-const BACKUP_INDEX_KEY = "mini_crm_vertrieb_layout_v8_backup_index";
-const SNAPSHOT_PREFIX = "mini_crm_vertrieb_layout_v8_snapshot_";
+const STORAGE_KEY = "mini_crm_vertrieb_layout_v9";
+const LEGACY_STORAGE_KEYS = [
+  "mini_crm_vertrieb_layout_v8",
+  "mini_crm_vertrieb_layout_v7",
+  "mini_crm_vertrieb_layout_v4"
+];
+const BACKUP_INDEX_KEY = "mini_crm_vertrieb_layout_v9_backup_index";
+const SNAPSHOT_PREFIX = "mini_crm_vertrieb_layout_v9_snapshot_";
 const MAX_SNAPSHOTS = 5;
 let contacts = [];
 let autosaveTimer = null;
@@ -502,12 +508,9 @@ function buildStoragePayload(includeAttachmentData = true){
 }
 
 let saveErrorShown = false;
-
 let currentSort = "";
 let selectedId = null;
 let selectedIds = new Set();
-
-// FIX: Eigener Due-Today-Filter-State statt Funktion überschreiben
 let dueFilterActive = false;
 
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0'); }
@@ -554,7 +557,6 @@ function sanitizeContacts(list){
   }));
 }
 
-// FIX: syncFormToSelected ergänzt um 'rolle'-Feld
 function syncFormToSelected(){
   const c = getSelected();
   if(!c) return;
@@ -569,7 +571,7 @@ function syncFormToSelected(){
     firma: String(getVal("firma")).trim(),
     nachname: String(getVal("nachname")).trim(),
     vorname: String(getVal("vorname")).trim(),
-    rolle: String(getVal("rolle")).trim(),   // FIX: rolle war bisher nicht synchronisiert
+    rolle: String(getVal("rolle")).trim(),
     kundentyp: getVal("kundentyp"),
     kundenstatus: getVal("kundenstatus"),
     bundesland: getVal("bundesland"),
@@ -617,12 +619,16 @@ function writeSnapshot(payload){
 
 function persistData(silent = true){
   try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(true)));
+    const payload = buildStoragePayload(true);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    writeSnapshot({ ...payload, contactCount: contacts.length });
     setSaveState("Gespeichert");
     saveErrorShown = false;
   }catch(e){
     try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(buildStoragePayload(false)));
+      const payload = buildStoragePayload(false);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      writeSnapshot({ ...payload, contactCount: contacts.length });
       setSaveState("Gespeichert ohne Anhänge", true);
       if(!silent && !saveErrorShown){
         alert("Browser-Speicher war zu klein. Kontakte wurden gespeichert, Anhänge aber nur ohne Dateiinhalte lokal gesichert. Bitte JSON Backup exportieren.");
@@ -699,12 +705,13 @@ function updateStats(){
 }
 
 function sortBy(field){ currentSort = field; renderList(); }
+
 function clearSearch(){
   document.getElementById("search").value="";
   document.getElementById("statusFilter").value="Alle";
   document.getElementById("kundentypFilter").value="Alle";
   document.getElementById("regionFilter").value="";
-  dueFilterActive = false;  // FIX: Filter zurücksetzen
+  dueFilterActive = false;
   renderList();
 }
 
@@ -716,7 +723,6 @@ function filteredContacts(){
   const today = todayStr();
 
   let arr = contacts.filter(c => {
-    // FIX: Eigener Due-Filter-State statt Funktionsüberschreibung
     if(dueFilterActive && c.naechsterkontakt !== today) return false;
 
     const noteTexts = (c.notes_history || []).map(n => n.text || "").join(" ");
@@ -755,9 +761,9 @@ function renderList(){
   if(!visible.length){ list.innerHTML = '<div class="empty">Keine Kontakte gefunden.</div>'; return; }
 
   list.innerHTML = visible.map(c => `
-    <div class="contact-item ${selectedId === c.id ? 'active' : ''}" onclick="selectContact(${c.id})">
+    <div class="contact-item ${selectedId === c.id ? 'active' : ''}" onclick="selectContact('${c.id}')">
       <div class="contact-item-top">
-        <input class="contact-select" type="checkbox" ${selectedIds.has(c.id) ? 'checked' : ''} onclick="event.stopPropagation();" onchange="toggleSelectContact(${c.id})">
+        <input class="contact-select" type="checkbox" ${selectedIds.has(c.id) ? 'checked' : ''} onclick="event.stopPropagation();" onchange="toggleSelectContact('${c.id}')">
         <div class="contact-main">
           <div class="contact-row">
             <div><div style="font-weight:700">${esc(c.firma)}</div><div class="meta-small">${esc([c.vorname,c.nachname].filter(Boolean).join(" "))}</div></div>
@@ -768,8 +774,8 @@ function renderList(){
           </div>
         </div>
         <div class="contact-actions" onclick="event.stopPropagation();">
-          <button class="icon-btn archive" title="Archivieren" onclick="archiveSingle(${c.id})">Archiv</button>
-          <button class="icon-btn danger" title="Löschen" onclick="deleteSingle(${c.id})">🗑</button>
+          <button class="icon-btn archive" title="Archivieren" onclick="archiveSingle('${c.id}')">Archiv</button>
+          <button class="icon-btn danger" title="Löschen" onclick="deleteSingle('${c.id}')">🗑</button>
         </div>
       </div>
     </div>
@@ -816,7 +822,6 @@ function fillForm(){
     <div class="hint">Anhänge: ${(c.attachments || []).length}</div>
     <div class="hint">Weitere Ansprechpartner: ${(c.weitere_kontakte || []).length}</div>
   `;
-  // FIX: rolle in Feldliste ergänzt
   ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","kontaktart","weclapp","potenzial"].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.value = c[id] || "";
@@ -842,7 +847,6 @@ function renderSubContacts(){
     box.innerHTML = '<div class="empty">Noch keine weiteren Ansprechpartner vorhanden.</div>';
     return;
   }
-  // FIX: DOM-Elemente statt innerHTML-Strings für Input-Values (XSS-sicher)
   box.innerHTML = "";
   list.forEach((p, i) => {
     const card = document.createElement("div");
@@ -862,7 +866,6 @@ function renderSubContacts(){
         <div style="grid-column:1 / -1"><label>Notiz</label><input data-field="notiz" data-idx="${i}"></div>
       </div>
     `;
-    // FIX: Werte via .value setzen statt in HTML-Attributen (verhindert XSS)
     card.querySelectorAll("input[data-field]").forEach(input => {
       const field = input.dataset.field;
       input.value = p[field] || "";
@@ -1069,7 +1072,7 @@ async function saveCurrentContact(){
 }
 
 function newContact(){
-  const newId = Date.now();
+  const newId = Date.now().toString();
   contacts.unshift({
     id:newId,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Interessent",bundesland:"Oberösterreich",bezirk:"",
     telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Telefonat ausgemacht",
@@ -1090,7 +1093,7 @@ function duplicateContact(){
   const c = getSelected();
   if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
   const copy = JSON.parse(JSON.stringify(c));
-  copy.id = Date.now();
+  copy.id = Date.now().toString();
   copy.firma = (copy.firma || "") + " Kopie";
   contacts.unshift(copy); selectedId = copy.id; fillForm(); renderList(); scheduleAutosave();
 }
@@ -1099,7 +1102,6 @@ async function saveData(){
   try{
     syncFormToSelected();
     setSaveState("Speichere alle Kontakte in Supabase ...");
-    // FIX: Fehler sammeln statt beim ersten Fehler abbrechen
     const errors = [];
     for (const contact of [...contacts]){
       try{
@@ -1281,7 +1283,7 @@ document.getElementById("fileInput").addEventListener("change", function(e){
     for(let i=1;i<lines.length;i++){
       const row = parseCsvLine(lines[i]);
       contacts.push({
-        id: Date.now() + i,
+        id: String(Date.now() + i),
         firma: col.firma >= 0 ? (row[col.firma] || "") : "",
         nachname: col.nachname >= 0 ? (row[col.nachname] || "") : "",
         vorname: col.vorname >= 0 ? (row[col.vorname] || "") : "",
@@ -1333,10 +1335,10 @@ window.addEventListener("beforeunload", () => {
 const hasLoadedData = loadPersistedData();
 if(!hasLoadedData){
   contacts = [
-    {id:1,firma:"Elektro Muster GmbH",nachname:"Huber",vorname:"Max",rolle:"Geschäftsführer",kundentyp:"Fachpartner",bundesland:"Oberösterreich",bezirk:"Linz-Land",telefon:"+43 732 123456",mobil:"+43 660 1234567",email:"max@elektro-muster.at",strasse:"Musterstraße 1",plz:"4020",ort:"Linz",status:"Telefonat ausgemacht",erstkontakt:"",naechsterkontakt:"",kontaktart:"Persönlicher Termin",weclapp:"Nein",potenzial:"mittel",notes_history:[{date:"",type:"Import",text:"PV und Speicher interessant"}],attachments:[],weitere_kontakte:[],archived:false,kundenstatus:"Interessent"},
-    {id:2,firma:"Bauhof Beispiel GmbH",nachname:"Mayer",vorname:"Thomas",rolle:"Einkauf",kundentyp:"B2B",kundenstatus:"Kunde",bundesland:"Steiermark",bezirk:"Graz-Umgebung",telefon:"",mobil:"+43 664 222333",email:"office@bauhof-beispiel.at",strasse:"Industriestraße 8",plz:"8054",ort:"Seiersberg",status:"Unterlagen versendet",erstkontakt:"2026-04-15",naechsterkontakt:"2026-04-22",kontaktart:"Rückruf",weclapp:"Ja",potenzial:"groß",notes_history:[{date:"2026-04-16",type:"Import",text:"Gespräch zu Gewerbespeicher"}],attachments:[],weitere_kontakte:[{vorname:"Sabine",nachname:"Mayer",telefon:"",mobil:"+43 664 555666",email:"s.mayer@bauhof-beispiel.at",position:"Assistenz",notiz:"Zusätzliche Ansprechpartnerin"}],archived:false}
+    {id:"1",firma:"Elektro Muster GmbH",nachname:"Huber",vorname:"Max",rolle:"Geschäftsführer",kundentyp:"Fachpartner",bundesland:"Oberösterreich",bezirk:"Linz-Land",telefon:"+43 732 123456",mobil:"+43 660 1234567",email:"max@elektro-muster.at",strasse:"Musterstraße 1",plz:"4020",ort:"Linz",status:"Telefonat ausgemacht",erstkontakt:"",naechsterkontakt:"",kontaktart:"Persönlicher Termin",weclapp:"Nein",potenzial:"mittel",notes_history:[{date:"",type:"Import",text:"PV und Speicher interessant"}],attachments:[],weitere_kontakte:[],archived:false,kundenstatus:"Interessent"},
+    {id:"2",firma:"Bauhof Beispiel GmbH",nachname:"Mayer",vorname:"Thomas",rolle:"Einkauf",kundentyp:"B2B",kundenstatus:"Kunde",bundesland:"Steiermark",bezirk:"Graz-Umgebung",telefon:"",mobil:"+43 664 222333",email:"office@bauhof-beispiel.at",strasse:"Industriestraße 8",plz:"8054",ort:"Seiersberg",status:"Unterlagen versendet",erstkontakt:"2026-04-15",naechsterkontakt:"2026-04-22",kontaktart:"Rückruf",weclapp:"Ja",potenzial:"groß",notes_history:[{date:"2026-04-16",type:"Import",text:"Gespräch zu Gewerbespeicher"}],attachments:[],weitere_kontakte:[{vorname:"Sabine",nachname:"Mayer",telefon:"",mobil:"+43 664 555666",email:"s.mayer@bauhof-beispiel.at",position:"Assistenz",notiz:"Zusätzliche Ansprechpartnerin"}],archived:false}
   ];
-  selectedId = 1;
+  selectedId = "1";
   persistData(true);
 }
 fillForm();
@@ -1466,7 +1468,6 @@ function buildDailyReportContacts(){
   });
 }
 
-// FIX: generateDailyReport nur einmal definiert, sauberes HTML ohne eingebettete Styles aus dem Haupt-CSS
 function generateDailyReport(){
   const today = todayStr();
   const reportContacts = buildDailyReportContacts();
@@ -1498,7 +1499,6 @@ function generateDailyReport(){
     `;
   }).join("");
 
-  // FIX: Sauberes standalone HTML ohne eingebettete CSS-Regeln aus dem Haupt-Dokument
   const reportHtml = `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -1593,7 +1593,6 @@ function showDueTodayBanner(){
   banner.className = "due-banner show";
 }
 
-// FIX: Kein Überschreiben von filteredContacts() mehr – eigener State-Flag
 function filterDueToday(){
   document.getElementById("search").value = "";
   document.getElementById("statusFilter").value = "Alle";
@@ -1604,11 +1603,9 @@ function filterDueToday(){
   renderList();
 }
 
-// FIX: clearAllData als Stub – wird unten durch Supabase-Version überschrieben
 function clearAllData(){
   alert("Supabase noch nicht bereit oder Script nicht geladen.");
 }
-
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1777,7 +1774,6 @@ async function saveOneContactToSupabase(contact){
   if (selectedId === contact.id) selectedId = firmaId;
 }
 
-// FIX: clearAllData wird hier sauber überschrieben (kein doppelter Stub-Aufruf)
 clearAllData = async function(){
   if(!contacts.length){ alert("Keine Kontakte vorhanden."); return; }
   createDeletionBackup("alle", contacts.map(c => c.id));
@@ -1801,15 +1797,6 @@ clearAllData = async function(){
     alert("Komplettes Löschen in Supabase fehlgeschlagen.");
   }
 };
-
-window.addEventListener("load", async () => {
-  try{
-    await loadAllFromSupabase();
-  }catch(e){
-    console.error("initSupabaseMode failed", e);
-    setSaveState("Supabase noch leer oder nicht erreichbar", true);
-  }
-});
 </script>
 
 </body>
