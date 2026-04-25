@@ -3,476 +3,501 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>HausKI – Automationen</title>
-  <meta name="robots" content="noindex,nofollow" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta name="description" content="HausKI Automationen: Rasenroboter, Geschirrspüler, Heizung, Klingel und PV-Überschuss – echte Praxislösungen aus einem intelligenten Zuhause.">
+  <meta name="robots" content="index, follow">
 
   <style>
     *{box-sizing:border-box}
     :root{
       --bg:#040911;
-      --bg2:#0a1320;
-      --card:rgba(11,22,37,0.85);
-      --line:rgba(33,200,255,0.18);
+      --panel:rgba(9,20,36,.86);
+      --panel2:rgba(8,18,32,.96);
+      --line:rgba(33,200,255,.20);
+      --line-soft:rgba(255,255,255,.08);
       --text:#ecf6ff;
       --muted:#9db2c9;
       --accent:#21c8ff;
-      --shadow:0 20px 60px rgba(0,0,0,0.35);
+      --accent2:#6af0c7;
+      --warning:#ffd76a;
+      --red:#ff6b81;
+      --shadow:0 22px 70px rgba(0,0,0,.38);
+      --radius:24px;
     }
 
-    html{
-      scroll-behavior:smooth;
-    }
-
+    html{scroll-behavior:smooth}
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
-      background:
-        radial-gradient(circle at 20% 10%, rgba(33,200,255,0.14), transparent 24%),
-        radial-gradient(circle at 80% 0%, rgba(106,240,199,0.08), transparent 20%),
-        linear-gradient(180deg,#050911 0%,#09111d 45%,#050911 100%);
       color:var(--text);
+      background:
+        radial-gradient(circle at 18% 10%, rgba(33,200,255,.18), transparent 26%),
+        radial-gradient(circle at 86% 0%, rgba(106,240,199,.10), transparent 24%),
+        linear-gradient(180deg,#040911 0%,#081426 50%,#040911 100%);
+      min-height:100vh;
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size:28px 28px;
+      pointer-events:none;
+      opacity:.75;
+      z-index:0;
     }
 
-    .container{
-      width:min(1100px, calc(100% - 32px));
-      margin:0 auto;
-      padding:40px 0;
-    }
+    a{color:inherit}
+    .container{width:min(1180px, calc(100% - 32px)); margin:0 auto; position:relative; z-index:1}
 
-    .hero{
-      margin-bottom:24px;
-      padding:22px;
-      border-radius:18px;
-      background:var(--card);
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+      padding:16px 28px;
+      background:rgba(4,9,17,.82);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line-soft);
+      box-shadow:0 5px 22px rgba(0,0,0,.24);
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      font-weight:900;
+      color:var(--accent);
+      letter-spacing:.4px;
+      white-space:nowrap;
+    }
+    .logo-mark{
+      width:36px;
+      height:36px;
+      border-radius:13px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg, var(--accent), #206cff);
+      color:#03101b;
+      box-shadow:0 0 28px rgba(33,200,255,.32);
+    }
+    .nav-links{
+      display:flex;
+      gap:18px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .nav-links a{
+      color:#dcefff;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:700;
+      opacity:.9;
+      transition:.2s;
+      white-space:nowrap;
+    }
+    .nav-links a:hover,
+    .nav-links a.active{color:var(--accent); opacity:1}
+
+    .hero{padding:70px 0 30px}
+    .panel{
+      background:linear-gradient(180deg, rgba(12,24,42,.88), rgba(6,15,28,.94));
       border:1px solid var(--line);
+      border-radius:var(--radius);
       box-shadow:var(--shadow);
     }
-
-    h1{
-      margin:0 0 10px;
-      font-size:clamp(24px,3vw,34px);
-      line-height:1.1;
+    .hero-box{
+      padding:44px;
+      position:relative;
+      overflow:hidden;
     }
-
+    .hero-box:after{
+      content:"";
+      position:absolute;
+      right:-120px;
+      top:-120px;
+      width:340px;
+      height:340px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(33,200,255,.18), transparent 66%);
+      pointer-events:none;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:rgba(33,200,255,.08);
+      border:1px solid rgba(33,200,255,.18);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:1px;
+      text-transform:uppercase;
+    }
+    h1{
+      margin:18px 0 16px;
+      font-size:clamp(38px,5vw,62px);
+      line-height:1.02;
+      letter-spacing:-2.2px;
+      max-width:13ch;
+    }
     .lead{
       margin:0;
       color:var(--muted);
-      line-height:1.65;
-      max-width:75ch;
-      font-size:15px;
+      font-size:18px;
+      line-height:1.72;
+      max-width:72ch;
     }
 
-    .status{
-      margin-bottom:18px;
-      padding:14px 16px;
-      border-radius:14px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.08);
+    .section{padding:28px 0}
+    .section-head{margin-bottom:18px}
+    .section-head h2{
+      margin:12px 0 8px;
+      font-size:clamp(28px,4vw,42px);
+      letter-spacing:-1.2px;
+    }
+    .section-head p{
+      margin:0;
       color:var(--muted);
+      line-height:1.7;
+      max-width:780px;
     }
 
-    .toolbar{
+    .auto-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:18px;
+    }
+    .automation-card{
+      min-height:330px;
+      border-radius:24px;
+      overflow:hidden;
+      background:var(--panel);
+      border:1px solid var(--line);
+      box-shadow:0 14px 42px rgba(0,0,0,.28);
+      display:grid;
+      grid-template-columns:1fr 1.2fr;
+      text-decoration:none;
+      transition:.22s;
+    }
+    .automation-card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(33,200,255,.44);
+    }
+    .auto-image{
+      min-height:260px;
+      background:#081424 center/cover no-repeat;
+      border-right:1px solid rgba(255,255,255,.08);
+      position:relative;
+    }
+    .auto-image:after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(33,200,255,.13), rgba(0,0,0,.20));
+    }
+    .img-dishwasher{background-image:url("bilder/geschirrspueler-pv.jpg")}
+    .img-mower{background-image:url("bilder/rasenmaeher.jpg")}
+    .img-heating{background-image:url("bilder/heizung.jpg")}
+    .img-doorbell{background-image:url("bilder/klingel.jpg")}
+    .img-energy{background-image:url("bilder/energie.jpg")}
+
+    .auto-body{
+      padding:24px;
       display:flex;
-      gap:10px;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .auto-body h3{
+      margin:12px 0 10px;
+      font-size:28px;
+      line-height:1.13;
+      letter-spacing:-.8px;
+    }
+    .auto-body p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.68;
+    }
+    .chips{
+      display:flex;
       flex-wrap:wrap;
-      margin-bottom:18px;
+      gap:8px;
+      margin-top:14px;
     }
-
-    .input{
-      width:100%;
-      min-height:48px;
-      border-radius:14px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.10);
-      color:var(--text);
-      padding:0 14px;
-      outline:none;
-    }
-
-    .input:focus{
-      border-color:rgba(33,200,255,0.45);
-      box-shadow:0 0 0 3px rgba(33,200,255,0.08);
-    }
-
-    .button-outline{
+    .chip{
+      min-height:30px;
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      min-height:46px;
-      padding:0 16px;
-      border-radius:14px;
-      text-decoration:none;
-      font-weight:700;
-      transition:.2s;
-      cursor:pointer;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.12);
-      color:var(--text);
+      padding:0 11px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.09);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+    }
+    .linkline{
+      color:var(--accent);
+      font-weight:900;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
     }
 
-    .button-outline:hover{
-      transform:translateY(-2px);
+    .wide{
+      grid-column:1 / -1;
+      grid-template-columns:.85fr 1.15fr;
     }
 
-    .list{
+    .logic-box{
       display:grid;
-      gap:16px;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
     }
-
-    .item{
+    .logic{
       padding:18px;
-      border-radius:18px;
-      background:var(--card);
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
-      scroll-margin-top:24px;
-      transition:border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+      border-radius:20px;
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .logic strong{
+      display:block;
+      color:var(--accent);
+      margin-bottom:8px;
+    }
+    .logic span{
+      display:block;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
     }
 
-    .item:target{
-      border-color:rgba(33,200,255,0.65);
-      box-shadow:0 0 0 3px rgba(33,200,255,0.12), var(--shadow);
-      transform:translateY(-2px);
+    footer{
+      margin-top:32px;
+      padding:28px 0 44px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
     }
-
-    .item.highlight{
-      border-color:rgba(33,200,255,0.65);
-      box-shadow:0 0 0 3px rgba(33,200,255,0.12), var(--shadow);
-    }
-
-    .item-head{
+    .footer-line{
       display:flex;
       justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-      margin-bottom:12px;
-    }
-
-    .item-head h2{
-      margin:0;
-      font-size:22px;
-    }
-
-    .meta{
-      color:var(--muted);
-      font-size:13px;
-      margin-top:6px;
-    }
-
-    .chip{
-      display:inline-flex;
+      gap:14px;
+      flex-wrap:wrap;
       align-items:center;
-      min-height:28px;
-      padding:0 10px;
-      border-radius:999px;
-      background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.15);
+    }
+    .footer-line a{
       color:var(--accent);
-      font-size:12px;
-      font-weight:700;
-      white-space:nowrap;
+      text-decoration:none;
+      font-weight:800;
     }
 
-    .placeholder-hints{
-      margin:0 0 14px;
-      padding:14px 16px;
-      border-radius:14px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.08);
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.6;
+    @media(max-width:1050px){
+      .auto-grid{grid-template-columns:1fr}
+      .automation-card,.wide{grid-template-columns:1fr}
+      .auto-image{border-right:none; border-bottom:1px solid rgba(255,255,255,.08)}
+      .logic-box{grid-template-columns:1fr 1fr}
     }
+    @media(max-width:680px){
+      .nav{flex-direction:column; align-items:flex-start; padding:14px 16px}
+      .nav-links{gap:12px}
+      .hero{padding-top:38px}
+      .hero-box,.auto-body{padding:24px}
+      .logic-box{grid-template-columns:1fr}
+      h1{letter-spacing:-1.4px}
+    }
+  
+.logo-img{
+  height:72px;
+  width:auto;
+  display:block;
+  filter: drop-shadow(0 0 12px rgba(33,200,255,.35));
+  transition:.2s;
+}
+.logo-img:hover{
+  transform:scale(1.03);
+}
 
-    .placeholder-hints strong{
-      color:var(--text);
-    }
-
-    .placeholder-hints ul{
-      margin:8px 0 0;
-      padding-left:18px;
-    }
-
-    .placeholder-hints li{
-      margin:4px 0;
-    }
-
-    .placeholder{
-      color:#21c8ff;
-      font-weight:700;
-      background:rgba(33,200,255,0.08);
-      padding:2px 6px;
-      border-radius:6px;
-    }
-
-    pre{
-      margin:0;
-      padding:16px;
-      border-radius:14px;
-      background:rgba(4,11,20,0.92);
-      border:1px solid rgba(255,255,255,0.08);
-      color:#d7f0ff;
-      overflow:auto;
-      white-space:pre-wrap;
-      word-break:break-word;
-      font-family:Consolas, monospace;
-      font-size:13px;
-      line-height:1.7;
-    }
-
-    .empty{
-      padding:18px;
-      border-radius:18px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.08);
-      color:var(--muted);
-    }
-
-    @media (max-width:760px){
-      .item-head{
-        flex-direction:column;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <main class="container">
-    <section class="hero">
-      <h1>HausKI Automationen</h1>
+  <nav class="nav">
+    <a class="logo" href="index.html">
+  <img src="bilder/logo-hauski.jpeg" alt="HausKI Logo" class="logo-img">
+</a>
+    <div class="nav-links">
+      <a href="index.html">Start</a>
+      <a class="active" href="automationen.html">Automationen</a>
+      <a href="blog.html">Blog</a>
+      <a href="architektur.html">Projekt</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="ueber.html">Über</a>
+    </div>
+  </nav>
+
+  <header class="hero container">
+    <div class="panel hero-box">
+      <span class="badge">Praxislösungen aus HausKI</span>
+      <h1>Automationen, die im Alltag wirklich helfen.</h1>
       <p class="lead">
-        Auf dieser Seite werden meine YAML-Automationen geladen.<br>
-        Die Entitäten sind bewusst anonymisiert und müssen an die eigene Umgebung angepasst werden.
+        Hier sammle ich die wichtigsten HausKI-Automationen: nicht als Technikshow,
+        sondern als nachvollziehbare Lösungen für Energie, Komfort und Kontrolle.
       </p>
-    </section>
-
-    <div id="status" class="status">Automationen werden geladen …</div>
-
-    <div class="toolbar">
-      <input id="search" class="input" type="search" placeholder="Automationen filtern …">
     </div>
+  </header>
 
-    <div id="viewControls" class="toolbar" style="display:none;">
-      <button id="showAllBtn" class="button-outline" type="button">
-        Alle Automationen anzeigen
-      </button>
-    </div>
+  <main>
+    <section class="section container">
+      <div class="section-head">
+        <span class="badge">Aktuelle Lösungen</span>
+        <h2>HausKI-Automationen</h2>
+        <p>Kurze Übersicht statt Textwüste. Jede Kachel zeigt: Was macht die Automation und welchen Nutzen hat sie?</p>
+      </div>
 
-    <section id="automationList" class="list"></section>
-  </main>
+      <div class="auto-grid">
 
-  <script>
-    const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const ui = {
-      status: document.getElementById('status'),
-      search: document.getElementById('search'),
-      list: document.getElementById('automationList'),
-      viewControls: document.getElementById('viewControls'),
-      showAllBtn: document.getElementById('showAllBtn')
-    };
-
-    let automations = [];
-
-    ui.search.addEventListener('input', renderAutomations);
-
-    ui.showAllBtn.addEventListener('click', () => {
-      history.replaceState(null, '', '/automationen.html');
-      ui.search.value = '';
-      renderAutomations();
-      ui.status.textContent = `${automations.length} Automation(en) geladen.`;
-    });
-
-    loadAutomations();
-
-    async function loadAutomations(){
-      ui.status.textContent = 'Automationen werden geladen …';
-
-      const { data, error } = await supabaseClient
-        .from('automationen')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if(error){
-        ui.status.textContent = `Fehler beim Laden: ${error.message}`;
-        ui.list.innerHTML = '<div class="empty">Es konnten keine Automationen geladen werden.</div>';
-        return;
-      }
-
-      automations = data || [];
-
-      if(!automations.length){
-        ui.status.textContent = 'Noch keine Automationen gespeichert.';
-        ui.list.innerHTML = '<div class="empty">Noch keine Einträge vorhanden.</div>';
-        return;
-      }
-
-      renderAutomations();
-
-      requestAnimationFrame(() => {
-        highlightHashTarget();
-      });
-    }
-
-    function renderAutomations(){
-      const term = ui.search.value.trim().toLowerCase();
-      const hash = decodeURIComponent(window.location.hash || '').replace('#', '').trim();
-
-      let filtered = automations.filter(item => {
-        if(!term) return true;
-        return [item.title, item.id, item.yaml_code].join(' ').toLowerCase().includes(term);
-      });
-
-      if(hash){
-        filtered = filtered.filter(item => item.id === hash);
-        ui.viewControls.style.display = 'flex';
-      } else {
-        ui.viewControls.style.display = 'none';
-      }
-
-      if(hash && filtered.length === 1){
-        ui.status.textContent = `Direktansicht: ${filtered[0].title || filtered[0].id}`;
-      } else if(hash && !filtered.length){
-        ui.status.textContent = 'Die verlinkte Automation wurde nicht gefunden.';
-      } else {
-        ui.status.textContent = `${filtered.length} Automation(en) geladen.`;
-      }
-
-      if(!filtered.length){
-        ui.list.innerHTML = '<div class="empty">Keine passenden Automationen gefunden.</div>';
-        return;
-      }
-
-      ui.list.innerHTML = filtered.map(item => `
-        <article class="item" id="${escapeHtml(item.id || '')}">
-          <div class="item-head">
+        <a class="automation-card wide" href="blog.html">
+          <div class="auto-image img-dishwasher" role="img" aria-label="Geschirrspüler bei PV-Überschuss"></div>
+          <div class="auto-body">
             <div>
-              <h2>${escapeHtml(item.title || 'Ohne Titel')}</h2>
-              <div class="meta">
-                ID: ${escapeHtml(item.id || '')}
-                ${item.created_at ? ` · ${new Date(item.created_at).toLocaleString('de-AT')}` : ''}
+              <span class="badge">PV-Überschuss</span>
+              <h3>Geschirrspüler startet automatisch</h3>
+              <p>
+                Programm wählen, per Taster stromlos schalten – bei PV-Überschuss bekommt die Steckdose wieder Strom
+                und der Geschirrspüler läuft los.
+              </p>
+              <div class="chips">
+                <span class="chip">PV</span>
+                <span class="chip">Taster</span>
+                <span class="chip">Steckdose</span>
+                <span class="chip">Alltag</span>
               </div>
             </div>
-            <span class="chip">YAML</span>
+            <div class="linkline">Details ansehen →</div>
           </div>
+        </a>
 
-          ${renderPlaceholderHints(item.yaml_code || '')}
-          <pre>${formatYaml(item.yaml_code || '')}</pre>
-        </article>
-      `).join('');
-    }
+        <a class="automation-card" href="blog.html">
+          <div class="auto-image img-mower" role="img" aria-label="Rasenroboter Automation"></div>
+          <div class="auto-body">
+            <div>
+              <span class="badge">Lokal + Wetter</span>
+              <h3>Rasenroboter mäht nur wenn es passt</h3>
+              <p>
+                Start nur bei passender Temperatur, keinem Regen, aktivem Zeitfenster und sinnvoller Energie-Situation.
+              </p>
+              <div class="chips">
+                <span class="chip">Bluetooth</span>
+                <span class="chip">Regen</span>
+                <span class="chip">Temperatur</span>
+              </div>
+            </div>
+            <div class="linkline">Automation ansehen →</div>
+          </div>
+        </a>
 
-    function getPlaceholdersFromYaml(yaml){
-      const known = [
-        'Dein Regensensor',
-        'Dein Mäher',
-        'Deine PV-Leistung',
-        'Dein Temperatursensor',
-        'Dein Licht',
-        'Dein Timer',
-        'Deine Heizung',
-        'Dein Fensterkontakt',
-        'Dein Türkontakt',
-        'Dein Bewegungssensor',
-        'Dein Rauchmelder',
-        'Dein Wassersensor',
-        'Deine Kamera',
-        'Dein Schloss',
-        'Deine Person',
-        'Dein Lautsprecher',
-        'Dein Schalter',
-        'Dein Rollladen',
-        'Dein Lüfter',
-        'Dein Benachrichtigungsdienst',
-        'Dein Script',
-        'Deine Szene',
-        'Deine Automation',
-        'Dein Dienst 1',
-        'Dein Dienst 2',
-        'Dein Dienst 3',
-        'Dein Gerät',
-        'Dein Bereich'
-      ];
+        <a class="automation-card" href="blog.html">
+          <div class="auto-image img-heating" role="img" aria-label="Heizungslogik"></div>
+          <div class="auto-body">
+            <div>
+              <span class="badge">Heizung</span>
+              <h3>Heizung reagiert auf Alltag</h3>
+              <p>
+                Präsenz, Fenster, Licht und Außentemperatur bestimmen, ob Komfortbetrieb oder Absenkung sinnvoll ist.
+              </p>
+              <div class="chips">
+                <span class="chip">Präsenz</span>
+                <span class="chip">Fenster</span>
+                <span class="chip">Temperatur</span>
+              </div>
+            </div>
+            <div class="linkline">Logik ansehen →</div>
+          </div>
+        </a>
 
-      const found = new Set();
+        <a class="automation-card" href="blog.html">
+          <div class="auto-image img-doorbell" role="img" aria-label="Klingel Automation"></div>
+          <div class="auto-body">
+            <div>
+              <span class="badge">Klingel</span>
+              <h3>Eine Klingel, zwei Gongs, klare Lösung</h3>
+              <p>
+                Aus Chaos wurde eine saubere Logik: Klingelereignis erkennen, Bild anzeigen und Verhalten nachvollziehbar machen.
+              </p>
+              <div class="chips">
+                <span class="chip">Shelly</span>
+                <span class="chip">Kamera</span>
+                <span class="chip">Benachrichtigung</span>
+              </div>
+            </div>
+            <div class="linkline">Beitrag ansehen →</div>
+          </div>
+        </a>
 
-      known.forEach(item => {
-        if (String(yaml || '').includes(item)) {
-          found.add(item);
-        }
-      });
+        <a class="automation-card" href="blog.html">
+          <div class="auto-image img-energy" role="img" aria-label="PV und Energie Logik"></div>
+          <div class="auto-body">
+            <div>
+              <span class="badge">Energie</span>
+              <h3>PV-Überschuss als Freigabe</h3>
+              <p>
+                Nicht jedes Gerät muss smart sein. Oft reicht eine saubere Freigabe: Überschuss vorhanden – Aktion erlaubt.
+              </p>
+              <div class="chips">
+                <span class="chip">PV</span>
+                <span class="chip">Boolean</span>
+                <span class="chip">Freigabe</span>
+              </div>
+            </div>
+            <div class="linkline">Mehr erfahren →</div>
+          </div>
+        </a>
 
-      const genericEntityMatches = String(yaml || '').match(/Deine Entität \d+/g) || [];
-      genericEntityMatches.forEach(item => found.add(item));
+      </div>
+    </section>
 
-      const genericServiceMatches = String(yaml || '').match(/Dein Dienst \d+/g) || [];
-      genericServiceMatches.forEach(item => found.add(item));
+    <section class="section container">
+      <div class="section-head">
+        <span class="badge">Prinzip</span>
+        <h2>Wie HausKI-Automationen gedacht sind</h2>
+      </div>
 
-      return Array.from(found);
-    }
-
-    function renderPlaceholderHints(yaml){
-      const placeholders = getPlaceholdersFromYaml(yaml);
-
-      if (!placeholders.length) return '';
-
-      return `
-        <div class="placeholder-hints">
-          <strong>Das musst du anpassen:</strong>
-          <ul>
-            ${placeholders.map(item => `<li><span class="placeholder">${escapeHtml(item)}</span></li>`).join('')}
-          </ul>
+      <div class="logic-box">
+        <div class="logic">
+          <strong>1. Beobachten</strong>
+          <span>Was passiert im Haus wirklich?</span>
         </div>
-      `;
-    }
+        <div class="logic">
+          <strong>2. Entscheiden</strong>
+          <span>Welche Bedingung macht Sinn?</span>
+        </div>
+        <div class="logic">
+          <strong>3. Automatisieren</strong>
+          <span>Nur so viel Technik wie nötig.</span>
+        </div>
+        <div class="logic">
+          <strong>4. Kontrolle behalten</strong>
+          <span>Manuell übersteuerbar bleibt wichtig.</span>
+        </div>
+      </div>
+    </section>
+  </main>
 
-    function formatYaml(value){
-      let text = escapeHtml(value || '');
-
-      const placeholders = getPlaceholdersFromYaml(value || '');
-
-      placeholders
-        .sort((a, b) => b.length - a.length)
-        .forEach(p => {
-          const escaped = escapeHtml(p);
-          text = text.replaceAll(
-            escaped,
-            `<span class="placeholder">${escaped}</span>`
-          );
-        });
-
-      return text;
-    }
-
-    function highlightHashTarget(){
-      const hash = decodeURIComponent(window.location.hash || '').replace('#', '').trim();
-      if(!hash) return;
-
-      const target = document.getElementById(hash);
-      if(!target) return;
-
-      target.classList.add('highlight');
-
-      setTimeout(() => {
-        target.classList.remove('highlight');
-      }, 2500);
-    }
-
-    window.addEventListener('hashchange', () => {
-      renderAutomations();
-      highlightHashTarget();
-    });
-
-    function escapeHtml(value){
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-  </script>
+  <footer>
+    <div class="container footer-line">
+      <span>© 2026 HausKI • Günther Hochreiter</span>
+      <span><a href="index.html">Start</a> · <a href="blog.html">Blog</a> · <a href="ueber.html">Über</a></span>
+    </div>
+  </footer>
 </body>
 </html>

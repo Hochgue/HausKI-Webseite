@@ -1,804 +1,189 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HausKI – Roadmap</title>
-  <meta name="description" content="Die Roadmap von HausKI: Entwicklungsstand, aktuelle Phase und langfristige Vision einer lernfähigen Hausplattform.">
-
-  <style>
-    *{
-      box-sizing:border-box;
-    }
-
-    :root{
-      --bg:#040911;
-      --bg2:#0a1320;
-      --card:rgba(11,22,37,0.85);
-      --card-strong:rgba(9,18,31,0.94);
-      --line:rgba(33,200,255,0.18);
-      --text:#ecf6ff;
-      --muted:#9db2c9;
-      --accent:#21c8ff;
-      --accent2:#6af0c7;
-      --shadow:0 20px 60px rgba(0,0,0,0.35);
-    }
-
-    html{
-      scroll-behavior:smooth;
-    }
-
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:
-        radial-gradient(circle at 20% 10%, rgba(33,200,255,0.14), transparent 24%),
-        radial-gradient(circle at 80% 0%, rgba(106,240,199,0.08), transparent 20%),
-        linear-gradient(180deg,#050911 0%,#09111d 45%,#050911 100%);
-      color:var(--text);
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size:26px 26px;
-      pointer-events:none;
-      mask-image:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
-      z-index:0;
-    }
-
-    .nav{
-      position:sticky;
-      top:0;
-      left:0;
-      width:100%;
-      background:rgba(6,15,26,0.82);
-      backdrop-filter:blur(12px);
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:16px 28px;
-      box-shadow:0 5px 20px rgba(0,0,0,0.25);
-      z-index:100;
-    }
-
-    .nav-logo{
-      font-size:18px;
-      font-weight:bold;
-      color:var(--accent);
-      letter-spacing:0.5px;
-    }
-
-    .nav-links{
-      display:flex;
-      flex-wrap:wrap;
-      gap:18px;
-    }
-
-    .nav-links a{
-      color:#e6f2ff;
-      text-decoration:none;
-      font-size:14px;
-      white-space:nowrap;
-      transition:0.2s;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active{
-      color:var(--accent);
-    }
-
-    .container{
-      width:min(1180px, calc(100% - 32px));
-      margin:0 auto;
-      position:relative;
-      z-index:1;
-    }
-
-    .panel{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:22px;
-      box-shadow:var(--shadow);
-    }
-
-    .hero{
-      padding:72px 0 28px;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.1fr 0.9fr;
-      gap:26px;
-      align-items:stretch;
-    }
-
-    .hero-main{
-      padding:40px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .hero-main::after{
-      content:"";
-      position:absolute;
-      right:-120px;
-      top:-120px;
-      width:320px;
-      height:320px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(33,200,255,0.16), transparent 65%);
-      pointer-events:none;
-    }
-
-    .hero-side{
-      padding:22px;
-      display:grid;
-      gap:16px;
-      align-content:start;
-    }
-
-    .eyebrow{
-      display:inline-block;
-      padding:10px 14px;
-      border-radius:999px;
-      background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.18);
-      color:var(--accent);
-      font-size:12px;
-      letter-spacing:1px;
-      text-transform:uppercase;
-      margin-bottom:18px;
-    }
-
-    h1{
-      font-size:clamp(34px,5vw,52px);
-      line-height:1.04;
-      margin:0 0 18px;
-      letter-spacing:-1.8px;
-    }
-
-    .hero-text{
-      color:var(--muted);
-      font-size:18px;
-      line-height:1.75;
-      max-width:62ch;
-      margin:0;
-    }
-
-    .hero-subtext{
-      margin:14px 0 0;
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.7;
-      max-width:60ch;
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-top:28px;
-    }
-
-    .button,
-    .button-outline{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:48px;
-      padding:0 18px;
-      border-radius:14px;
-      text-decoration:none;
-      font-weight:700;
-      transition:0.2s;
-    }
-
-    .button{
-      background:linear-gradient(135deg,var(--accent),#1da1ff);
-      color:#04111b;
-      box-shadow:0 10px 30px rgba(33,200,255,0.28);
-    }
-
-    .button-outline{
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.12);
-      color:var(--text);
-    }
-
-    .button:hover,
-    .button-outline:hover{
-      transform:translateY(-2px);
-    }
-
-    .quick-nav{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:22px;
-    }
-
-    .quick-nav a{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:42px;
-      padding:0 16px;
-      border-radius:12px;
-      text-decoration:none;
-      color:var(--text);
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.10);
-      transition:.2s;
-      font-size:14px;
-      font-weight:600;
-    }
-
-    .quick-nav a:hover{
-      transform:translateY(-2px);
-      border-color:var(--accent);
-      color:var(--accent);
-    }
-
-    .side-title{
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:1px;
-      color:var(--muted);
-    }
-
-    .info-card{
-      padding:18px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,0.08);
-      background:rgba(255,255,255,0.03);
-    }
-
-    .info-card h3{
-      margin:0 0 12px;
-      font-size:18px;
-    }
-
-    .info-list{
-      list-style:none;
-      padding:0;
-      margin:0;
-      display:grid;
-      gap:10px;
-    }
-
-    .info-list li{
-      display:flex;
-      justify-content:space-between;
-      gap:14px;
-      padding:10px 12px;
-      border-radius:12px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.06);
-      color:var(--muted);
-    }
-
-    .info-list span:last-child{
-      color:var(--text);
-      font-weight:600;
-      text-align:right;
-    }
-
-    .section{
-      padding:18px 0 0;
-      margin-bottom:58px;
-    }
-
-    .section-head{
-      margin-bottom:24px;
-    }
-
-    .section-badge{
-      display:inline-block;
-      padding:8px 14px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      color:var(--accent);
-      font-size:0.78rem;
-      font-weight:700;
-      letter-spacing:0.04em;
-      text-transform:uppercase;
-      background:rgba(33,200,255,0.08);
-      margin-bottom:14px;
-    }
-
-    .section-head h2{
-      margin:0;
-      font-size:clamp(28px,4vw,40px);
-      letter-spacing:-1px;
-    }
-
-    .section-head p{
-      margin:10px 0 0;
-      color:var(--muted);
-      line-height:1.75;
-      max-width:940px;
-    }
-
-    .timeline{
-      position:relative;
-      display:grid;
-      gap:18px;
-      margin-top:26px;
-    }
-
-    .timeline::before{
-      content:"";
-      position:absolute;
-      left:18px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:linear-gradient(180deg, rgba(33,200,255,0.35), rgba(33,200,255,0.08));
-    }
-
-    .timeline-item{
-      position:relative;
-      margin-left:44px;
-      padding:24px;
-      border-radius:22px;
-      background:var(--card);
-      border:1px solid var(--line);
-      box-shadow:0 12px 35px rgba(0,0,0,0.22);
-    }
-
-    .timeline-item::before{
-      content:"";
-      position:absolute;
-      left:-36px;
-      top:30px;
-      width:16px;
-      height:16px;
-      border-radius:50%;
-      background:var(--accent);
-      box-shadow:0 0 0 6px rgba(33,200,255,0.12);
-    }
-
-    .timeline-year{
-      display:inline-block;
-      margin-bottom:10px;
-      padding:6px 12px;
-      border-radius:999px;
-      background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.18);
-      color:var(--accent);
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-    }
-
-    .timeline-status{
-      display:inline-block;
-      margin:0 0 14px 10px;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-      vertical-align:middle;
-    }
-
-    .status-done{
-      color:#6af0c7;
-      background:rgba(106,240,199,0.10);
-      border:1px solid rgba(106,240,199,0.22);
-    }
-
-    .status-almost{
-      color:#9fe870;
-      background:rgba(159,232,112,0.10);
-      border:1px solid rgba(159,232,112,0.22);
-    }
-
-    .status-active{
-      color:#21c8ff;
-      background:rgba(33,200,255,0.10);
-      border:1px solid rgba(33,200,255,0.22);
-    }
-
-    .status-started{
-      color:#ffd166;
-      background:rgba(255,209,102,0.10);
-      border:1px solid rgba(255,209,102,0.22);
-    }
-
-    .status-future{
-      color:#c9a7ff;
-      background:rgba(201,167,255,0.10);
-      border:1px solid rgba(201,167,255,0.22);
-    }
-
-    .timeline-item.done{
-      border-color:rgba(106,240,199,0.20);
-    }
-
-    .timeline-item.almost-done{
-      border-color:rgba(159,232,112,0.20);
-    }
-
-    .timeline-item.active-phase{
-      border-color:rgba(33,200,255,0.28);
-      box-shadow:0 0 0 1px rgba(33,200,255,0.08), 0 12px 35px rgba(0,0,0,0.22);
-    }
-
-    .timeline-item.started{
-      border-color:rgba(255,209,102,0.18);
-    }
-
-    .timeline-item.future-phase{
-      border-color:rgba(201,167,255,0.18);
-    }
-
-    .timeline-item h3{
-      margin:0 0 10px;
-      font-size:1.28rem;
-    }
-
-    .timeline-item p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.8;
-    }
-
-    .timeline-tags{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:18px;
-    }
-
-    .timeline-tags span{
-      display:inline-flex;
-      align-items:center;
-      min-height:34px;
-      padding:0 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,0.10);
-      background:rgba(255,255,255,0.03);
-      color:var(--text);
-      font-size:13px;
-      font-weight:600;
-    }
-
-    .highlight-card{
-      padding:26px;
-      border-radius:24px;
-      background:linear-gradient(180deg, rgba(12,22,37,0.92), rgba(7,15,28,0.96));
-      border:1px solid var(--line);
-      box-shadow:0 18px 60px rgba(0,0,0,0.28);
-    }
-
-    .highlight-card h3{
-      margin:0 0 12px;
-      font-size:1.4rem;
-    }
-
-    .highlight-card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.8;
-      max-width:82ch;
-    }
-
-    .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(33,200,255,0.18);
-      background:rgba(33,200,255,0.08);
-      color:var(--accent);
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.05em;
-      text-transform:uppercase;
-      margin-bottom:14px;
-    }
-
-    .footer{
-      padding:24px 0 60px;
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .footer-line{
-      border-top:1px solid rgba(255,255,255,0.08);
-      padding-top:22px;
-      display:flex;
-      justify-content:space-between;
-      gap:20px;
-      flex-wrap:wrap;
-    }
-
-    @media (max-width:1024px){
-      .hero-grid{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width:640px){
-      .nav{
-        padding:14px 16px;
-        align-items:flex-start;
-        flex-direction:column;
-        gap:12px;
-      }
-
-      .hero-main,
-      .hero-side,
-      .timeline-item,
-      .highlight-card{
-        padding:20px;
-      }
-
-      .hero-actions{
-        flex-direction:column;
-      }
-
-      .button,
-      .button-outline{
-        width:100%;
-      }
-
-      .quick-nav{
-        flex-direction:column;
-      }
-
-      .quick-nav a{
-        width:100%;
-      }
-
-      .info-list li{
-        flex-direction:column;
-        align-items:flex-start;
-      }
-
-      .info-list span:last-child{
-        text-align:left;
-      }
-
-      .timeline::before{
-        left:12px;
-      }
-
-      .timeline-item{
-        margin-left:30px;
-      }
-
-      .timeline-item::before{
-        left:-24px;
-      }
-
-      .timeline-status{
-        display:block;
-        margin:0 0 14px;
-        width:fit-content;
-      }
-    }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HausKI – Roadmap</title>
+<meta name="description" content="Die kompakte Roadmap von HausKI: aktueller Stand, nächste Schritte und langfristige Richtung.">
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#040911;
+  --panel:rgba(9,20,36,.86);
+  --panel2:rgba(8,18,32,.96);
+  --line:rgba(33,200,255,.20);
+  --line-soft:rgba(255,255,255,.08);
+  --text:#ecf6ff;
+  --muted:#9db2c9;
+  --accent:#21c8ff;
+  --accent2:#6af0c7;
+  --warn:#ffd76a;
+  --danger:#ff6b81;
+  --ok:#6af0c7;
+  --shadow:0 22px 70px rgba(0,0,0,.38);
+  --radius:24px;
+}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(33,200,255,.18), transparent 26%),
+    radial-gradient(circle at 86% 0%, rgba(106,240,199,.10), transparent 24%),
+    linear-gradient(180deg,#040911 0%,#081426 50%,#040911 100%);
+  min-height:100vh;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;
+  opacity:.75;
+  z-index:0;
+}
+a{color:inherit}
+.container{width:min(1180px, calc(100% - 32px)); margin:0 auto; position:relative; z-index:1}
+.nav{
+  position:sticky; top:0; z-index:20;
+  display:flex; justify-content:space-between; align-items:center; gap:18px;
+  padding:16px 28px;
+  background:rgba(4,9,17,.82);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-soft);
+  box-shadow:0 5px 22px rgba(0,0,0,.24);
+}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:900;color:var(--accent);letter-spacing:.4px;white-space:nowrap}
+.logo-mark{
+  width:36px;height:36px;border-radius:13px;display:grid;place-items:center;
+  background:linear-gradient(135deg, var(--accent), #206cff);
+  color:#03101b;box-shadow:0 0 28px rgba(33,200,255,.32);
+}
+.nav-links{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.nav-links a{color:#dcefff;text-decoration:none;font-size:14px;font-weight:700;opacity:.9;transition:.2s;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{color:var(--accent);opacity:1}
+.hero{padding:70px 0 30px}
+.panel{
+  background:linear-gradient(180deg, rgba(12,24,42,.88), rgba(6,15,28,.94));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.hero-box{padding:44px;position:relative;overflow:hidden}
+.hero-box:after{
+  content:"";position:absolute;right:-120px;top:-120px;width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle, rgba(33,200,255,.18), transparent 66%);
+  pointer-events:none;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;
+  background:rgba(33,200,255,.08);border:1px solid rgba(33,200,255,.18);
+  color:var(--accent);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;
+}
+h1{margin:18px 0 16px;font-size:clamp(38px,5vw,62px);line-height:1.02;letter-spacing:-2.2px;max-width:14ch}
+.lead{margin:0;color:var(--muted);font-size:18px;line-height:1.72;max-width:76ch}
+.section{padding:28px 0}
+.section-head{margin-bottom:18px}
+.section-head h2{margin:12px 0 8px;font-size:clamp(28px,4vw,42px);letter-spacing:-1.2px}
+.section-head p{margin:0;color:var(--muted);line-height:1.7;max-width:780px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{
+  padding:24px;border-radius:24px;background:var(--panel);border:1px solid var(--line);
+  box-shadow:0 14px 42px rgba(0,0,0,.28);
+}
+.card h3{margin:0 0 10px;font-size:24px;line-height:1.18;letter-spacing:-.6px}
+.card p{margin:0;color:var(--muted);line-height:1.68}
+.icon{
+  width:54px;height:54px;border-radius:18px;display:grid;place-items:center;font-size:26px;
+  background:rgba(33,200,255,.08);border:1px solid rgba(33,200,255,.18);margin-bottom:18px;
+}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{
+  min-height:30px;display:inline-flex;align-items:center;padding:0 11px;border-radius:999px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+  color:var(--muted);font-size:12px;font-weight:800;
+}
+.btn{
+  min-height:46px;padding:0 16px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;
+  text-decoration:none;font-weight:900;font-size:14px;transition:.2s;border:0;cursor:pointer;
+}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#1d8cff);color:#03111d;box-shadow:0 12px 34px rgba(33,200,255,.28)}
+.btn.secondary{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.btn.danger{background:rgba(255,107,129,.12);border:1px solid rgba(255,107,129,.28);color:#ffdce2}
+.btn:hover{transform:translateY(-2px)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+footer{margin-top:32px;padding:28px 0 44px;border-top:1px solid rgba(255,255,255,.08);color:var(--muted)}
+.footer-line{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+.footer-line a{color:var(--accent);text-decoration:none;font-weight:800}
+@media(max-width:980px){.grid-2,.grid-3{grid-template-columns:1fr}}
+@media(max-width:680px){
+  .nav{flex-direction:column;align-items:flex-start;padding:14px 16px}
+  .nav-links{gap:12px}
+  .hero{padding-top:38px}
+  .hero-box,.card{padding:24px}
+  h1{letter-spacing:-1.4px}
+}
+
+.timeline{display:grid;gap:16px}
+.step{display:grid;grid-template-columns:120px 1fr;gap:18px;align-items:start;padding:22px;border-radius:22px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
+.step strong{color:var(--accent);font-size:18px}
+.step h3{margin:0 0 8px;font-size:24px}
+.step p{margin:0;color:var(--muted);line-height:1.65}
+@media(max-width:680px){.step{grid-template-columns:1fr}}
+
+.logo-img{
+  height:72px;
+  width:auto;
+  display:block;
+  filter: drop-shadow(0 0 12px rgba(33,200,255,.35));
+  transition:.2s;
+}
+.logo-img:hover{
+  transform:scale(1.03);
+}
+
+</style>
 </head>
 <body>
-
-  <nav class="nav">
-    <div class="nav-logo">HausKI</div>
-    <div class="nav-links">
-      <a href="index.html">Start</a>
-      <a href="architektur.html">Architektur</a>
-      <a href="blog.html">Blog</a>
-      <a href="roadmap.html" class="active">Roadmap</a>
-      <a href="dashboard.html">Live Dashboard</a>
-      <a href="ueber.html">Über</a>
-    </div>
-  </nav>
-
-  <header class="hero">
-    <div class="container hero-grid">
-      <div class="panel hero-main">
-        <div class="eyebrow">Entwicklungspfad von HausKI</div>
-
-        <h1>Wie sich HausKI Schritt für Schritt entwickelt</h1>
-
-        <p class="hero-text">
-          Die Roadmap von HausKI beschreibt keinen allgemeinen Wunschzustand,
-          sondern den realen Ausbau eines laufenden Systems. Im Mittelpunkt stehen
-          technischer Fortschritt, bessere Zusammenhänge und ein Haus, das mit jeder
-          Stufe verständlicher und nützlicher wird.
-        </p>
-
-        <p class="hero-subtext">
-          Entscheidend ist nicht nur, was bereits funktioniert, sondern wie aus
-          einzelnen Automationen nach und nach eine Plattform mit echter Systemlogik wird.
-        </p>
-
-        <div class="hero-actions">
-          <a class="button" href="architektur.html">Architektur ansehen</a>
-          <a class="button-outline" href="dashboard.html">Dashboard ansehen</a>
-        </div>
-
-        <div class="quick-nav">
-          <a href="index.html">Startseite</a>
-          <a href="architektur.html">Architektur</a>
-          <a href="dashboard.html">Dashboard</a>
-          <a href="ueber.html">Über HausKI</a>
-        </div>
-      </div>
-
-      <aside class="panel hero-side">
-        <div class="side-title">Roadmap • Überblick</div>
-
-        <div class="info-card">
-          <h3>Aktuelle Einordnung</h3>
-          <ul class="info-list">
-            <li><span>Phase 1</span><span>Abgeschlossen</span></li>
-            <li><span>Phase 2</span><span>Fast abgeschlossen</span></li>
-            <li><span>Phase 3</span><span>Aktuell im Ausbau</span></li>
-            <li><span>Phase 4-5</span><span>Begonnen / Vision</span></li>
-          </ul>
-        </div>
-
-        <div class="info-card">
-          <h3>Zielrichtung</h3>
-          <ul class="info-list">
-            <li><span>Kurzfristig</span><span>Mehr Verknüpfung</span></li>
-            <li><span>Mittelfristig</span><span>Mehr Analyse</span></li>
-            <li><span>Langfristig</span><span>HausKI 2.0</span></li>
-          </ul>
-        </div>
-      </aside>
-    </div>
-  </header>
-
-  <main class="container">
-
-    <section class="section">
-      <div class="section-head">
-        <span class="section-badge">ENTWICKLUNGSLINIE</span>
-        <h2>Wo HausKI steht und wohin es wächst</h2>
-        <p>
-          Die Entwicklung von HausKI lässt sich in klar erkennbare Phasen einteilen.
-          Einige Grundlagen sind bereits abgeschlossen, andere befinden sich im aktiven
-          Ausbau – und die späteren Stufen definieren die Richtung für HausKI 2.0.
-        </p>
-      </div>
-
-      <div class="timeline">
-
-        <article class="timeline-item done">
-          <span class="timeline-year">Phase 1 • Basis</span>
-          <span class="timeline-status status-done">Abgeschlossen</span>
-          <h3>Technisches Fundament aufbauen</h3>
-          <p>
-            Zu Beginn steht eine stabile Home-Assistant-Struktur mit eingebundenen
-            Geräten, Sensoren, Automationen, Dashboards und sauberer Grundlogik.
-            Diese Phase schafft die technische Basis, auf der alle weiteren
-            Funktionen zuverlässig aufbauen können.
-          </p>
-          <div class="timeline-tags">
-            <span>Home Assistant</span>
-            <span>Geräteintegration</span>
-            <span>Automationen</span>
-            <span>Dashboard-Basis</span>
-          </div>
-        </article>
-
-        <article class="timeline-item almost-done">
-          <span class="timeline-year">Phase 2 • Sichtbarkeit</span>
-          <span class="timeline-status status-almost">Fast abgeschlossen</span>
-          <h3>Hauszustände und Energie sichtbar machen</h3>
-          <p>
-            Energieflüsse, Hausstatus, Sicherheitszustände, Präsenz und
-            Geräteinformationen werden so aufbereitet, dass das Haus nicht nur
-            reagiert, sondern nachvollziehbar wird. Diese Phase ist weit fortgeschritten
-            und nähert sich ihrem Feinschliff.
-          </p>
-          <div class="timeline-tags">
-            <span>Energiefluss</span>
-            <span>Hausstatus</span>
-            <span>Sicherheit</span>
-            <span>Visualisierung</span>
-          </div>
-        </article>
-
-        <article class="timeline-item active-phase">
-          <span class="timeline-year">Phase 3 • Verknüpfung</span>
-          <span class="timeline-status status-active">Aktuell im Ausbau</span>
-          <h3>Kontext statt Einzelautomation</h3>
-          <p>
-            Einzelne Geräte und Zustände werden zunehmend miteinander verknüpft.
-            Präsenz, Türstatus, Kameraereignisse, Heizungsdaten, Meldungen,
-            Komfortszenen und Sprachaktionen greifen immer stärker als gemeinsames
-            System ineinander. Genau hier befindet sich HausKI aktuell im Kern.
-          </p>
-          <div class="timeline-tags">
-            <span>Präsenzlogik</span>
-            <span>Klingel & Snapshot</span>
-            <span>Sicherheit</span>
-            <span>Komfortszenen</span>
-          </div>
-        </article>
-
-        <article class="timeline-item started">
-          <span class="timeline-year">Phase 4 • Analyse</span>
-          <span class="timeline-status status-started">Begonnen</span>
-          <h3>Aus Rohdaten werden Zusammenhänge</h3>
-          <p>
-            HausKI entwickelt sich vom reinen Schalten zur technischen Auswertung.
-            Energieflüsse, Heizungsverhalten, Zustandswechsel und Muster sollen
-            nicht nur erfasst, sondern interpretiert werden. Erste Grundlagen sind
-            gelegt, die eigentliche Tiefe dieser Phase entsteht jedoch erst jetzt.
-          </p>
-          <div class="timeline-tags">
-            <span>Heizungsverhalten</span>
-            <span>Mustererkennung</span>
-            <span>Energiebewertung</span>
-            <span>Kontext</span>
-          </div>
-        </article>
-
-        <article class="timeline-item future-phase">
-          <span class="timeline-year">Phase 5 • Assistenz</span>
-          <span class="timeline-status status-future">Vision</span>
-          <h3>HausKI 2.0 als lernfähige Plattform</h3>
-          <p>
-            Langfristig soll HausKI zu einer Plattform werden, die Energie,
-            Heizung, Hausstatus und technische Zusammenhänge nicht nur darstellt,
-            sondern aktiv erklärt, bewertet und unterstützt. Diese Phase ist
-            das erklärte Zielbild der gesamten Entwicklung.
-          </p>
-          <div class="timeline-tags">
-            <span>HausKI 2.0</span>
-            <span>Agenten</span>
-            <span>Erklärbarkeit</span>
-            <span>Unterstützung</span>
-          </div>
-        </article>
-
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <span class="section-badge">VISION</span>
-        <h2>Das erklärte Ziel von HausKI</h2>
-        <p>
-          Die Roadmap endet nicht bei mehr Automationen. Das eigentliche Ziel
-          ist ein Zuhause, das technische Zustände, Energieflüsse, Sicherheit
-          und Alltag nicht nur abbildet, sondern systematisch versteht.
-        </p>
-      </div>
-
-      <div class="highlight-card">
-        <span class="pill">HausKI 2.0</span>
-        <h3>Von der Steuerung zur verständigen Hausplattform</h3>
-        <p>
-          Langfristig soll HausKI eine Plattform werden, die Muster erkennt,
-          Zusammenhänge erklärt, technische Auffälligkeiten besser einordnet
-          und den Nutzer nicht nur informiert, sondern aktiv unterstützt.
-          Der Weg dahin führt über Struktur, saubere Datenbasis, Auswertung,
-          Kontextlogik und schrittweise mehr Erklärbarkeit.
-        </p>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="footer container">
-    <div class="footer-line">
-      <div>© 2026 HausKI • Günther Hochreiter</div>
-      <div>Roadmap • Entwicklungslinie • Status • Vision</div>
-    </div>
-  </footer>
-
-</body>
-</html>
+<nav class="nav">
+  <a class="logo" href="index.html">
+  <img src="bilder/logo-hauski.jpeg" alt="HausKI Logo" class="logo-img">
+</a>
+  <div class="nav-links">
+    <a class="" href="index.html">Start</a><a class="" href="automationen.html">Automationen</a><a class="" href="blog.html">Blog</a><a class="active" href="projekt.html">Projekt</a><a class="" href="ueber.html">Über</a>
+  </div>
+</nav>
+<header class="hero container"><div class="panel hero-box">
+<span class="badge">Projektstand</span>
+<h1>Roadmap</h1>
+<p class="lead">HausKI entwickelt sich Schritt für Schritt: erst beobachten, dann verstehen, dann automatisieren. Diese Seite zeigt nur die Richtung – kompakt und verständlich.</p>
+</div></header>
+<main>
+<section class="section container">
+<div class="section-head"><span class="badge">Phasen</span><h2>So entwickelt sich HausKI</h2><p>Keine starre Planung, sondern ein wachsendes Praxisprojekt.</p></div>
+<div class="timeline">
+  <div class="step"><strong>Phase 1</strong><div><h3>Grundsystem stabilisieren</h3><p>Home Assistant, Sensoren, Dashboard, Kameras, Heizung und Energie sichtbar machen.</p><div class="chips"><span class="chip">Basis</span><span class="chip">läuft</span></div></div></div>
+  <div class="step"><strong>Phase 2</strong><div><h3>Alltag automatisieren</h3><p>Alltägliche Abläufe im Haus werden mit einfachen, robusten Regeln unterstützt und sinnvoll automatisiert.</p><div class="chips"><span class="chip">aktiv</span><span class="chip">Praxis</span></div></div></div>
+  <div class="step"><strong>Phase 3</strong><div><h3>Energie besser nutzen</h3><p>PV-Überschuss, Speicher, Tarife und Verbraucher sollen sinnvoll zusammenspielen – ohne Komfortverlust.</p><div class="chips"><span class="chip">PV</span><span class="chip">Überschuss</span></div></div></div>
+  <div class="step"><strong>Phase 4</strong><div><h3>HausKI 2.0</h3><p>Mehr Auswertung, bessere Erklärungen und später ein eigener HausKI-Chat/Agent für Energie, Heizung und Hausstatus.</p><div class="chips"><span class="chip">Zukunft</span><span class="chip">KI</span></div></div></div>
+</div>
+</section>
+<section class="section container">
+<div class="grid-3">
+  <div class="card"><div class="icon">✅</div><h3>Was bleibt</h3><p>HausKI bleibt privat, praxisnah und unabhängig.</p></div>
+  <div class="card"><div class="icon">🧭</div><h3>Was zählt</h3><p>Übersicht, Verständlichkeit und echte Alltagserfahrungen.</p></div>
+  <div class="card"><div class="icon">🏠</div><h3>Was ist HausKI?</h3><p>Ein echtes Wohnhaus, das mit Home Assistant und vorhandener beziehungsweise kommerzieller Verkabelung Schritt für Schritt zum Smart Home weiterentwickelt wurde.</p></div>
+</div>
+</section>
+</main>
+<footer>
+  <div class="container footer-line">
+    <span>© 2026 HausKI • Günther Hochreiter</span>
+    <span><a href="blog.html">Blog</a> · <a href="automationen.html">Automationen</a> · <a href="ueber.html">Über</a></span>
+  </div>
+</footer>
+</body></html>

@@ -1,1077 +1,235 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HausKI – Admin</title>
-  <meta name="robots" content="noindex,nofollow" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    *{box-sizing:border-box}
-    :root{
-      --bg:#040911;
-      --bg2:#0a1320;
-      --card:rgba(11,22,37,0.85);
-      --card-strong:rgba(9,18,31,0.94);
-      --line:rgba(33,200,255,0.18);
-      --text:#ecf6ff;
-      --muted:#9db2c9;
-      --accent:#21c8ff;
-      --accent2:#6af0c7;
-      --danger:#ff7d7d;
-      --warning:#ffd36b;
-      --ok:#8ef3c7;
-      --shadow:0 20px 60px rgba(0,0,0,0.35);
-    }
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:
-        radial-gradient(circle at 20% 10%, rgba(33,200,255,0.14), transparent 24%),
-        radial-gradient(circle at 80% 0%, rgba(106,240,199,0.08), transparent 20%),
-        linear-gradient(180deg,#050911 0%,#09111d 45%,#050911 100%);
-      color:var(--text);
-    }
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size:26px 26px;
-      pointer-events:none;
-      mask-image:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
-      z-index:0;
-    }
-    .nav{
-      position:sticky; top:0; left:0; width:100%; z-index:100;
-      background:rgba(6,15,26,0.82); backdrop-filter:blur(12px);
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      display:flex; justify-content:space-between; align-items:center;
-      padding:16px 28px; box-shadow:0 5px 20px rgba(0,0,0,0.25);
-    }
-    .nav-logo{font-size:18px;font-weight:bold;color:var(--accent);letter-spacing:.5px}
-    .nav-links{display:flex;flex-wrap:wrap;gap:18px}
-    .nav-links a{color:#e6f2ff;text-decoration:none;font-size:14px;transition:.2s}
-    .nav-links a:hover,.nav-links a.active{color:var(--accent)}
-    .container{width:min(1320px, calc(100% - 32px)); margin:0 auto; position:relative; z-index:1}
-    .panel{background:var(--card); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow)}
-    .hero{padding:36px 0 20px}
-    .hero-box{padding:30px; position:relative; overflow:hidden}
-    .hero-box::after{
-      content:""; position:absolute; right:-120px; top:-120px; width:320px; height:320px; border-radius:50%;
-      background:radial-gradient(circle, rgba(33,200,255,0.16), transparent 65%); pointer-events:none;
-    }
-    .eyebrow{
-      display:inline-block; padding:10px 14px; border-radius:999px; background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.18); color:var(--accent); font-size:12px; letter-spacing:1px;
-      text-transform:uppercase; margin-bottom:18px;
-    }
-    h1{font-size:clamp(32px,4vw,46px); line-height:1.05; margin:0 0 14px; letter-spacing:-1.4px}
-    .lead{color:var(--muted); font-size:17px; line-height:1.75; margin:0; max-width:78ch}
-    .section{padding:18px 0 0; margin-bottom:24px}
-    .section-box{padding:22px}
-    .section-head{margin-bottom:18px}
-    .section-head h2{margin:0; font-size:28px; letter-spacing:-.8px}
-    .section-head p{margin:8px 0 0; color:var(--muted); line-height:1.7}
-    .grid-2{display:grid; grid-template-columns:1.2fr .95fr; gap:18px}
-    .stack{display:grid; gap:18px}
-    .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:18px}
-    .stat{padding:16px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03)}
-    .stat-label{font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--muted)}
-    .stat strong{display:block; margin-top:8px; font-size:28px; color:var(--accent)}
-    .status{
-      margin-bottom:14px; padding:14px 16px; border-radius:14px; background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.08); color:var(--muted)
-    }
-    .status.ok{border-color:rgba(142,243,199,.28); color:var(--ok); background:rgba(142,243,199,.07)}
-    .status.warn{border-color:rgba(255,211,107,.28); color:#ffe9b0; background:rgba(255,211,107,.08)}
-    .form-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
-    .full{grid-column:1 / -1}
-    .input,.select,.textarea{
-      width:100%; min-height:48px; border-radius:14px; background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.10); color:var(--text); padding:0 14px; outline:none;
-    }
-    .textarea{min-height:180px; resize:vertical; padding:14px; line-height:1.6}
-    .textarea.code{
-      min-height:260px;
-      font-family:Consolas, monospace;
-      font-size:13px;
-      background:rgba(4,11,20,0.92);
-    }
-    .input:focus,.select:focus,.textarea:focus{border-color:rgba(33,200,255,0.45); box-shadow:0 0 0 3px rgba(33,200,255,0.08)}
-    .button,.button-outline,.button-danger,.button-warning{
-      display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0 16px;
-      border-radius:14px; text-decoration:none; font-weight:700; transition:.2s; cursor:pointer;
-    }
-    .button{background:linear-gradient(135deg,var(--accent),#1da1ff); color:#04111b; border:none; box-shadow:0 10px 30px rgba(33,200,255,0.28)}
-    .button-outline{background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.12); color:var(--text)}
-    .button-danger{background:rgba(255,125,125,0.10); border:1px solid rgba(255,125,125,0.30); color:#ffdada}
-    .button-warning{background:rgba(255,211,107,0.10); border:1px solid rgba(255,211,107,0.30); color:#ffe9b0}
-    .button:hover,.button-outline:hover,.button-danger:hover,.button-warning:hover{transform:translateY(-2px)}
-    .toolbar,.action-row{display:flex; gap:10px; flex-wrap:wrap}
-    .toolbar{margin-bottom:14px}
-    .list{display:grid; gap:12px}
-    .post-item,.comment-item,.note-item,.automation-item{padding:16px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08)}
-    .item-head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:10px}
-    .item-head h3{margin:0; font-size:18px}
-    .meta{color:var(--muted); font-size:13px; display:flex; flex-wrap:wrap; gap:8px}
-    .chip{display:inline-flex; align-items:center; min-height:28px; padding:0 10px; border-radius:999px; background:rgba(33,200,255,0.08); border:1px solid rgba(33,200,255,0.15); color:var(--accent); font-size:12px; font-weight:700}
-    .chip.warn{color:#ffe9b0; border-color:rgba(255,211,107,0.30); background:rgba(255,211,107,0.10)}
-    .chip.danger{color:#ffdada; border-color:rgba(255,125,125,0.30); background:rgba(255,125,125,0.10)}
-    .small{color:var(--muted); font-size:13px; line-height:1.7}
-    .preview-image{width:100%; aspect-ratio:16/9; object-fit:cover; display:block; margin-top:12px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:#09111d}
-    .preview-wrap{
-      overflow:hidden;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,0.08);
-      background:linear-gradient(180deg, rgba(10,19,32,.96), rgba(6,11,19,.98));
-    }
-    .preview-hero{
-      padding:22px 22px 0;
-    }
-    .preview-badge{
-      display:inline-flex;
-      min-height:28px;
-      align-items:center;
-      padding:0 10px;
-      border-radius:999px;
-      background:rgba(33,200,255,0.08);
-      border:1px solid rgba(33,200,255,0.18);
-      color:var(--accent);
-      font-size:12px;
-      font-weight:700;
-      margin-bottom:14px;
-    }
-    .preview-title{
-      margin:0 0 10px;
-      font-size:30px;
-      line-height:1.1;
-      letter-spacing:-1px;
-    }
-    .preview-meta{
-      color:var(--muted);
-      font-size:13px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-    .preview-excerpt{
-      color:#dbeaff;
-      font-size:16px;
-      line-height:1.75;
-      margin:0 0 16px;
-    }
-    .preview-content{
-      padding:22px;
-      color:#eaf4ff;
-      line-height:1.8;
-      white-space:pre-wrap;
-    }
-    .code-preview{
-      margin-top:12px;
-      padding:14px;
-      border-radius:14px;
-      background:rgba(4,11,20,0.92);
-      border:1px solid rgba(255,255,255,0.08);
-      color:#d7f0ff;
-      overflow:auto;
-      font-family:Consolas, monospace;
-      font-size:13px;
-      white-space:pre-wrap;
-    }
-    .mono{font-family:Consolas, monospace; font-size:12px; word-break:break-all}
-    @media (max-width:1100px){.grid-2,.stats{grid-template-columns:1fr}}
-    @media (max-width:760px){
-      .nav{padding:14px 16px; align-items:flex-start; flex-direction:column; gap:12px}
-      .form-grid{grid-template-columns:1fr}
-      .hero-box,.section-box{padding:20px}
-      .item-head{flex-direction:column}
-    }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HausKI – Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#040911;
+  --panel:rgba(9,20,36,.86);
+  --panel2:rgba(8,18,32,.96);
+  --line:rgba(33,200,255,.20);
+  --line-soft:rgba(255,255,255,.08);
+  --text:#ecf6ff;
+  --muted:#9db2c9;
+  --accent:#21c8ff;
+  --accent2:#6af0c7;
+  --warn:#ffd76a;
+  --danger:#ff6b81;
+  --ok:#6af0c7;
+  --shadow:0 22px 70px rgba(0,0,0,.38);
+  --radius:24px;
+}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(33,200,255,.18), transparent 26%),
+    radial-gradient(circle at 86% 0%, rgba(106,240,199,.10), transparent 24%),
+    linear-gradient(180deg,#040911 0%,#081426 50%,#040911 100%);
+  min-height:100vh;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;
+  opacity:.75;
+  z-index:0;
+}
+a{color:inherit}
+.container{width:min(1180px, calc(100% - 32px)); margin:0 auto; position:relative; z-index:1}
+.nav{
+  position:sticky; top:0; z-index:20;
+  display:flex; justify-content:space-between; align-items:center; gap:18px;
+  padding:16px 28px;
+  background:rgba(4,9,17,.82);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-soft);
+  box-shadow:0 5px 22px rgba(0,0,0,.24);
+}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:900;color:var(--accent);letter-spacing:.4px;white-space:nowrap}
+.logo-mark{
+  width:36px;height:36px;border-radius:13px;display:grid;place-items:center;
+  background:linear-gradient(135deg, var(--accent), #206cff);
+  color:#03101b;box-shadow:0 0 28px rgba(33,200,255,.32);
+}
+.nav-links{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.nav-links a{color:#dcefff;text-decoration:none;font-size:14px;font-weight:700;opacity:.9;transition:.2s;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{color:var(--accent);opacity:1}
+.hero{padding:70px 0 30px}
+.panel{
+  background:linear-gradient(180deg, rgba(12,24,42,.88), rgba(6,15,28,.94));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.hero-box{padding:44px;position:relative;overflow:hidden}
+.hero-box:after{
+  content:"";position:absolute;right:-120px;top:-120px;width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle, rgba(33,200,255,.18), transparent 66%);
+  pointer-events:none;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;
+  background:rgba(33,200,255,.08);border:1px solid rgba(33,200,255,.18);
+  color:var(--accent);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;
+}
+h1{margin:18px 0 16px;font-size:clamp(38px,5vw,62px);line-height:1.02;letter-spacing:-2.2px;max-width:14ch}
+.lead{margin:0;color:var(--muted);font-size:18px;line-height:1.72;max-width:76ch}
+.section{padding:28px 0}
+.section-head{margin-bottom:18px}
+.section-head h2{margin:12px 0 8px;font-size:clamp(28px,4vw,42px);letter-spacing:-1.2px}
+.section-head p{margin:0;color:var(--muted);line-height:1.7;max-width:780px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{
+  padding:24px;border-radius:24px;background:var(--panel);border:1px solid var(--line);
+  box-shadow:0 14px 42px rgba(0,0,0,.28);
+}
+.card h3{margin:0 0 10px;font-size:24px;line-height:1.18;letter-spacing:-.6px}
+.card p{margin:0;color:var(--muted);line-height:1.68}
+.icon{
+  width:54px;height:54px;border-radius:18px;display:grid;place-items:center;font-size:26px;
+  background:rgba(33,200,255,.08);border:1px solid rgba(33,200,255,.18);margin-bottom:18px;
+}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{
+  min-height:30px;display:inline-flex;align-items:center;padding:0 11px;border-radius:999px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+  color:var(--muted);font-size:12px;font-weight:800;
+}
+.btn{
+  min-height:46px;padding:0 16px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;
+  text-decoration:none;font-weight:900;font-size:14px;transition:.2s;border:0;cursor:pointer;
+}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#1d8cff);color:#03111d;box-shadow:0 12px 34px rgba(33,200,255,.28)}
+.btn.secondary{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.btn.danger{background:rgba(255,107,129,.12);border:1px solid rgba(255,107,129,.28);color:#ffdce2}
+.btn:hover{transform:translateY(-2px)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+footer{margin-top:32px;padding:28px 0 44px;border-top:1px solid rgba(255,255,255,.08);color:var(--muted)}
+.footer-line{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+.footer-line a{color:var(--accent);text-decoration:none;font-weight:800}
+@media(max-width:980px){.grid-2,.grid-3{grid-template-columns:1fr}}
+@media(max-width:680px){
+  .nav{flex-direction:column;align-items:flex-start;padding:14px 16px}
+  .nav-links{gap:12px}
+  .hero{padding-top:38px}
+  .hero-box,.card{padding:24px}
+  h1{letter-spacing:-1.4px}
+}
+
+body{background:#040911;color:var(--text)}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.input,.textarea,.select{
+  width:100%;min-height:48px;border-radius:14px;background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.10);color:var(--text);padding:0 14px;outline:none;font:inherit;
+}
+.textarea{min-height:150px;padding:14px;resize:vertical;line-height:1.6}
+.form{display:grid;gap:12px}
+.list{display:grid;gap:12px}
+.item{padding:16px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
+.item strong{display:block;margin-bottom:6px}
+.item span{color:var(--muted);font-size:14px}
+.note{padding:14px 16px;border-radius:16px;background:rgba(255,215,106,.08);border:1px solid rgba(255,215,106,.22);color:#ffe9b0;line-height:1.6}
+@media(max-width:980px){.admin-grid{grid-template-columns:1fr}}
+
+.logo-img{
+  height:72px;
+  width:auto;
+  display:block;
+  filter: drop-shadow(0 0 12px rgba(33,200,255,.35));
+  transition:.2s;
+}
+.logo-img:hover{
+  transform:scale(1.03);
+}
+
+</style>
 </head>
 <body>
-  <nav class="nav">
-    <div class="nav-logo">HausKI Admin</div>
-    <div class="nav-links">
-      <a href="index.html">Start</a>
-      <a href="blog.html">Blog</a>
-      <a href="architektur.html">Architektur</a>
-      <a href="ueber.html">Über</a>
+<nav class="nav">
+  <a class="logo" href="index.html">
+  <img src="bilder/logo-hauski.jpeg" alt="HausKI Logo" class="logo-img">
+</a>
+  <div class="nav-links">
+    <a href="index.html">Start</a>
+    <a href="automationen.html">Automationen</a>
+    <a href="blog.html">Blog</a>
+    <a class="active" href="admin.html">Admin</a>
+  </div>
+</nav>
+<header class="hero container"><div class="panel hero-box">
+<span class="badge">Pflegezentrale</span>
+<h1>Blog & Automationen verwalten.</h1>
+<p class="lead">Diese Seite ist bewusst sachlicher und bleibt noindex. Sie ist die zentrale Pflegefläche für Beiträge und Automationen.</p>
+</div></header>
+<main>
+<section class="section container">
+<div class="note">Hinweis: Diese Version ist eine aufgeräumte Admin-Oberfläche als Basis. Deine bestehende Supabase-Logik muss hier wieder eingefügt werden, falls du sie 1:1 produktiv verwenden willst.</div>
+</section>
+<section class="section container">
+<div class="admin-grid">
+  <div class="card">
+    <span class="badge">Blog</span>
+    <h3>Beitrag anlegen</h3>
+    <form class="form">
+      <input class="input" placeholder="Titel">
+      <input class="input" placeholder="Slug / Direktlink">
+      <input class="input" placeholder="Bild-URL">
+      <textarea class="textarea" placeholder="Kurztext"></textarea>
+      <textarea class="textarea" placeholder="Beitragstext"></textarea>
+      <div class="actions"><button class="btn primary" type="button">Beitrag speichern</button><button class="btn secondary" type="button">Vorschau</button></div>
+    </form>
+  </div>
+  <div class="card">
+    <span class="badge">Automationen</span>
+    <h3>Automation anlegen</h3>
+    <form class="form">
+      <input class="input" placeholder="Name der Automation">
+      <input class="input" placeholder="Slug / Direktlink">
+      <select class="select"><option>Kategorie wählen</option><option>PV</option><option>Heizung</option><option>Rasenroboter</option><option>Klingel</option></select>
+      <textarea class="textarea" placeholder="Kurzbeschreibung"></textarea>
+      <textarea class="textarea" placeholder="YAML / Erklärung"></textarea>
+      <div class="actions"><button class="btn primary" type="button">Automation speichern</button><button class="btn secondary" type="button">Vorschau</button></div>
+    </form>
+  </div>
+</div>
+</section>
+<section class="section container">
+<div class="section-head"><span class="badge">Übersicht</span><h2>Zuletzt bearbeitet</h2></div>
+<div class="grid-2">
+  <div class="card">
+    <h3>Blogbeiträge</h3>
+    <div class="list">
+      <div class="item"><strong>Geschirrspüler bei PV-Überschuss</strong><span>Beitrag • veröffentlicht</span></div>
+      <div class="item"><strong>Rasenroboter lokal steuern</strong><span>Beitrag • veröffentlicht</span></div>
     </div>
-  </nav>
-
-  <header class="hero container">
-    <div class="panel hero-box">
-      <span class="eyebrow">Intern • Admin</span>
-      <h1>Beiträge pflegen, Bilder hochladen, Vorschau prüfen und Automationen verwalten.</h1>
-      <p class="lead">Diese Admin-Seite arbeitet direkt mit deinen Supabase-Tabellen <strong>posts</strong>, <strong>post_comments</strong>, <strong>post_likes</strong> und <strong>automationen</strong>. Ohne Login funktioniert das nur, wenn deine RLS-Policies anonyme Schreibzugriffe für diese Seite erlauben.</p>
-      <div class="stats">
-        <div class="stat"><div class="stat-label">Beiträge</div><strong id="statPosts">0</strong></div>
-        <div class="stat"><div class="stat-label">Veröffentlicht</div><strong id="statPublished">0</strong></div>
-        <div class="stat"><div class="stat-label">Entwürfe</div><strong id="statDrafts">0</strong></div>
-        <div class="stat"><div class="stat-label">Kommentare offen</div><strong id="statPendingComments">0</strong></div>
-      </div>
+  </div>
+  <div class="card">
+    <h3>Automationen</h3>
+    <div class="list">
+      <div class="item"><strong>PV-Freigabe Geschirrspüler</strong><span>Automation • aktiv</span></div>
+      <div class="item"><strong>Rasenroboter Wetterlogik</strong><span>Automation • aktiv</span></div>
     </div>
-  </header>
-
-  <main class="container">
-    <section class="section">
-      <div class="grid-2">
-        <div class="panel section-box">
-          <div class="section-head">
-            <h2>Beitrag anlegen oder bearbeiten</h2>
-            <p>Neue Artikel erstellen, Entwürfe pflegen, veröffentlichen und Bilder direkt in den Bucket <strong>blog-images</strong> laden.</p>
-          </div>
-
-          <div id="formStatus" class="status warn">Vor dem Speichern bitte in dieser Datei deinen echten <strong>SUPABASE_ANON_KEY</strong> eintragen.</div>
-
-          <form id="postForm" class="form-grid">
-            <input id="postId" type="hidden">
-            <input id="title" class="input full" type="text" placeholder="Titel" required>
-            <input id="date" class="input" type="date" required>
-            <input id="category" class="input" type="text" placeholder="Kategorie, z. B. Automation">
-            <select id="source" class="select">
-              <option value="Blog">Blog</option>
-              <option value="LinkedIn">LinkedIn</option>
-            </select>
-            <input id="type" class="input" type="text" placeholder="Tags, mit Beistrich getrennt">
-            <input id="excerpt" class="input full" type="text" placeholder="Kurztext / Teaser">
-            <input id="material" class="input full" type="text" placeholder="Verwendetes Material">
-            <input id="automationIdField" class="input full" type="text" placeholder="Automation-ID, z. B. rasenmaeher-automation">
-            <input id="linkedinUrl" class="input full" type="url" placeholder="LinkedIn URL (optional)">
-            <input id="image" class="input full" type="text" placeholder="Bildpfad oder URL">
-            <div class="full toolbar">
-              <input id="imageFile" class="input" type="file" accept="image/*">
-              <button id="uploadImageBtn" class="button-outline" type="button">Bild hochladen</button>
-            </div>
-            <textarea id="content" class="textarea full" placeholder="Inhalt. Du kannst hier auch längere Beiträge direkt schreiben." required></textarea>
-            <label class="small full" style="display:flex; gap:10px; align-items:center;">
-              <input id="published" type="checkbox"> Sofort veröffentlichen
-            </label>
-            <div class="action-row full">
-              <button class="button" type="submit">Beitrag speichern</button>
-              <button id="resetFormBtn" class="button-outline" type="button">Formular leeren</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="stack">
-          <div class="panel section-box">
-            <div class="section-head">
-              <h2>Vorschau</h2>
-              <p>So sieht dein Blogartikel vor dem Veröffentlichen ungefähr aus.</p>
-            </div>
-
-            <div class="preview-wrap">
-              <div class="preview-hero">
-                <span id="previewCategory" class="preview-badge">Kategorie</span>
-                <h3 id="previewTitle" class="preview-title">Titelvorschau</h3>
-                <div id="previewMeta" class="preview-meta"></div>
-                <p id="previewExcerpt" class="preview-excerpt">Hier erscheint dein Kurztext oder Teaser.</p>
-              </div>
-              <img id="previewImage" class="preview-image" alt="Vorschaubild" style="display:none;">
-              <div id="previewContent" class="preview-content">Hier erscheint der eigentliche Inhalt des Blogartikels.</div>
-            </div>
-          </div>
-
-          <div class="panel section-box">
-            <div class="section-head">
-              <h2>Beiträge</h2>
-              <p>Vorhandene Einträge laden, suchen, bearbeiten, veröffentlichen oder löschen.</p>
-            </div>
-            <div class="toolbar">
-              <input id="postSearch" class="input" type="search" placeholder="Beiträge filtern …">
-              <button id="reloadPostsBtn" class="button-outline" type="button">Neu laden</button>
-            </div>
-            <div id="postList" class="list"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="grid-2">
-        <div class="panel section-box">
-          <div class="section-head">
-            <h2>Automationen</h2>
-            <p>Nur bearbeiteter YAML-Code. Ohne Bilder, ohne Erklärungen, ohne Tokens oder Passwörter.</p>
-          </div>
-
-          <div id="automationStatus" class="status">Hier legst du die YAML-Versionen für die versteckte technische Seite an.</div>
-
-          <form id="automationForm" class="form-grid">
-            <input id="automationId" type="hidden">
-            <input id="automationTitle" class="input full" type="text" placeholder="Titel der Automation, z. B. Rasenmäher Start" required>
-            <textarea id="automationYaml" class="textarea code full" placeholder="YAML-Code hier einfügen" required></textarea>
-            <div class="action-row full">
-              <button class="button" type="submit">Automation speichern</button>
-              <button id="resetAutomationBtn" class="button-outline" type="button">Formular leeren</button>
-            </div>
-          </form>
-
-          <div class="section-head" style="margin-top:22px;">
-            <h2 style="font-size:22px;">Bereinigte Vorschau</h2>
-            <p>So wird der Code nach dem Entfernen sensibler Inhalte gespeichert.</p>
-          </div>
-          <pre id="automationPreview" class="code-preview">Hier erscheint die bereinigte YAML-Vorschau.</pre>
-        </div>
-
-        <div class="panel section-box">
-          <div class="section-head">
-            <h2>Gespeicherte Automationen</h2>
-            <p>Einträge laden, bearbeiten oder löschen.</p>
-          </div>
-          <div class="toolbar">
-            <input id="automationSearch" class="input" type="search" placeholder="Automationen filtern …">
-            <button id="reloadAutomationsBtn" class="button-outline" type="button">Neu laden</button>
-          </div>
-          <div id="automationList" class="list"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="grid-2">
-        <div class="panel section-box">
-          <div class="section-head">
-            <h2>Kommentar-Moderation</h2>
-            <p>Neue Kommentare freigeben, verbergen oder löschen.</p>
-          </div>
-          <div id="commentList" class="list"></div>
-        </div>
-
-        <div class="panel section-box">
-          <div class="section-head">
-            <h2>Hinweise</h2>
-            <p>Für deine gewählte Variante ohne Login wichtig.</p>
-          </div>
-          <div class="list">
-            <div class="note-item small">
-              <strong>1. Kein Service Role Key ins Frontend.</strong><br>
-              Verwende hier ausschließlich den Publishable/Anon-Key aus Supabase.
-            </div>
-            <div class="note-item small">
-              <strong>2. Ohne Login müssen die Policies passen.</strong><br>
-              Wenn Speichern oder Löschen scheitert, blockiert wahrscheinlich RLS die anon-Rolle.
-            </div>
-            <div class="note-item small">
-              <strong>3. Admin-Seite verstecken.</strong><br>
-              Nimm am besten einen unauffälligen Dateinamen wie <span class="mono">admin-hauski-intern-8472.html</span>.
-            </div>
-            <div class="note-item small">
-              <strong>4. Upload-Bucket.</strong><br>
-              Bild-Upload erwartet den Bucket <strong>blog-images</strong>.
-            </div>
-            <div class="note-item small">
-              <strong>5. Tabelle für Automationen.</strong><br>
-              Zusätzliche Tabelle: <span class="mono">automationen (id, title, yaml_code, created_at)</span>.
-            </div>
-            <div class="note-item small">
-              <strong>6. Blog-zu-Automation Link.</strong><br>
-              Für direkte Buttons im Blog braucht die Tabelle <span class="mono">posts</span> die Spalte <span class="mono">automation_id</span>.
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const ui = {
-      formStatus: document.getElementById('formStatus'),
-      automationStatus: document.getElementById('automationStatus'),
-      postForm: document.getElementById('postForm'),
-      automationForm: document.getElementById('automationForm'),
-      postSearch: document.getElementById('postSearch'),
-      automationSearch: document.getElementById('automationSearch'),
-      reloadPostsBtn: document.getElementById('reloadPostsBtn'),
-      reloadAutomationsBtn: document.getElementById('reloadAutomationsBtn'),
-      postList: document.getElementById('postList'),
-      automationList: document.getElementById('automationList'),
-      commentList: document.getElementById('commentList'),
-      statPosts: document.getElementById('statPosts'),
-      statPublished: document.getElementById('statPublished'),
-      statDrafts: document.getElementById('statDrafts'),
-      statPendingComments: document.getElementById('statPendingComments'),
-      uploadImageBtn: document.getElementById('uploadImageBtn'),
-      imageFile: document.getElementById('imageFile'),
-      preview: {
-        category: document.getElementById('previewCategory'),
-        title: document.getElementById('previewTitle'),
-        meta: document.getElementById('previewMeta'),
-        excerpt: document.getElementById('previewExcerpt'),
-        image: document.getElementById('previewImage'),
-        content: document.getElementById('previewContent')
-      },
-      automationPreview: document.getElementById('automationPreview'),
-      fields: {
-        postId: document.getElementById('postId'),
-        title: document.getElementById('title'),
-        date: document.getElementById('date'),
-        category: document.getElementById('category'),
-        source: document.getElementById('source'),
-        type: document.getElementById('type'),
-        excerpt: document.getElementById('excerpt'),
-        material: document.getElementById('material'),
-        automationId: document.getElementById('automationIdField'),
-        linkedinUrl: document.getElementById('linkedinUrl'),
-        image: document.getElementById('image'),
-        content: document.getElementById('content'),
-        published: document.getElementById('published')
-      },
-      automationFields: {
-        id: document.getElementById('automationId'),
-        title: document.getElementById('automationTitle'),
-        yaml: document.getElementById('automationYaml')
-      }
-    };
-
-    let posts = [];
-    let comments = [];
-    let automations = [];
-
-    document.getElementById('resetFormBtn').addEventListener('click', resetForm);
-    document.getElementById('resetAutomationBtn').addEventListener('click', resetAutomationForm);
-
-    ui.postForm.addEventListener('submit', savePost);
-    ui.automationForm.addEventListener('submit', saveAutomation);
-
-    ui.reloadPostsBtn.addEventListener('click', bootstrap);
-    ui.reloadAutomationsBtn.addEventListener('click', loadAutomations);
-
-    ui.postSearch.addEventListener('input', renderPosts);
-    ui.automationSearch.addEventListener('input', renderAutomations);
-
-    ui.uploadImageBtn.addEventListener('click', uploadImage);
-
-    [
-      ui.fields.title,
-      ui.fields.date,
-      ui.fields.category,
-      ui.fields.source,
-      ui.fields.type,
-      ui.fields.excerpt,
-      ui.fields.material,
-      ui.fields.automationId,
-      ui.fields.image,
-      ui.fields.content,
-      ui.fields.published
-    ].forEach(el => {
-      el.addEventListener('input', renderPreview);
-      el.addEventListener('change', renderPreview);
-    });
-
-    [
-      ui.automationFields.title,
-      ui.automationFields.yaml
-    ].forEach(el => {
-      el.addEventListener('input', renderAutomationPreview);
-      el.addEventListener('change', renderAutomationPreview);
-    });
-
-    bootstrap();
-
-    async function bootstrap(){
-      await Promise.all([loadPosts(), loadComments(), loadAutomations()]);
-      renderPreview();
-      renderAutomationPreview();
-    }
-
-    function setStatus(message, type='default'){
-      ui.formStatus.className = `status${type === 'default' ? '' : ' ' + type}`;
-      ui.formStatus.innerHTML = message;
-    }
-
-    function setAutomationStatus(message, type='default'){
-      ui.automationStatus.className = `status${type === 'default' ? '' : ' ' + type}`;
-      ui.automationStatus.innerHTML = message;
-    }
-
-    function slugify(input){
-      return String(input || '')
-        .toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '')
-        .slice(0, 120);
-    }
-
-    function today(){
-      return new Date().toISOString().slice(0,10);
-    }
-
-    function formatDate(value){
-      if(!value) return '';
-      try{
-        return new Date(value).toLocaleDateString('de-AT');
-      }catch{
-        return value;
-      }
-    }
-
-    function formatPreviewContent(value){
-      const cleaned = String(value || '').trim();
-      if(!cleaned) return 'Hier erscheint der eigentliche Inhalt des Blogartikels.';
-      return cleaned;
-    }
-
-    function renderPreview(){
-      ui.preview.category.textContent = ui.fields.category.value.trim() || 'Kategorie';
-      ui.preview.title.textContent = ui.fields.title.value.trim() || 'Titelvorschau';
-
-      const meta = [];
-      if(ui.fields.date.value) meta.push(formatDate(ui.fields.date.value));
-      if(ui.fields.source.value) meta.push(ui.fields.source.value);
-      if(ui.fields.type.value.trim()) meta.push(ui.fields.type.value.trim());
-      if(ui.fields.automationId.value.trim()) meta.push(`Automation: ${ui.fields.automationId.value.trim()}`);
-      ui.preview.meta.innerHTML = meta.map(item => `<span>${escapeHtml(item)}</span>`).join('');
-
-      ui.preview.excerpt.textContent = ui.fields.excerpt.value.trim() || 'Hier erscheint dein Kurztext oder Teaser.';
-      ui.preview.content.textContent = formatPreviewContent(ui.fields.content.value);
-
-      const imageUrl = ui.fields.image.value.trim();
-      if(imageUrl){
-        ui.preview.image.src = imageUrl;
-        ui.preview.image.style.display = 'block';
-      } else {
-        ui.preview.image.removeAttribute('src');
-        ui.preview.image.style.display = 'none';
-      }
-    }
-
-    function sanitizeYaml(input){
-      let yaml = String(input || '').replace(/\r\n/g, '\n');
-
-      yaml = yaml.replace(
-        /^(\s*)(password|passwd|token|api_key|apikey|secret|client_secret|authorization|bearer|access_token|refresh_token)\s*:\s*.*$/gim,
-        '$1$2: ***'
-      );
-      yaml = yaml.replace(/(bearer\s+)[a-z0-9\-_.=]+/gim, '$1***');
-      yaml = yaml.replace(/(authorization\s*:\s*)(.+)/gim, '$1***');
-
-      const entityMap = new Map();
-      const serviceMap = new Map();
-      let genericEntityCounter = 1;
-      let genericServiceCounter = 1;
-
-      function labelForEntity(entity){
-        const e = String(entity || '').toLowerCase().trim();
-        if (!e.includes('.')) return null;
-
-        if (/(regen|rain|niederschlag)/.test(e)) return 'Dein Regensensor';
-        if (/(maeher|mäher|mower|automower|lawn)/.test(e)) return 'Dein Mäher';
-        if (/(pv|solar|einspeis|grid_export)/.test(e)) return 'Deine PV-Leistung';
-        if (/(temp|temperature|temperatur)/.test(e)) return 'Dein Temperatursensor';
-        if (/(licht|light|lampe|beleuchtung)/.test(e)) return 'Dein Licht';
-        if (/(timer)/.test(e)) return 'Dein Timer';
-        if (/(heizung|climate|heiz|thermostat)/.test(e)) return 'Deine Heizung';
-        if (/(fenster|window)/.test(e)) return 'Dein Fensterkontakt';
-        if (/(tuere|tuer|door)/.test(e)) return 'Dein Türkontakt';
-        if (/(bewegung|motion|presence|praesenz)/.test(e)) return 'Dein Bewegungssensor';
-        if (/(rauch|smoke)/.test(e)) return 'Dein Rauchmelder';
-        if (/(wasser|water|leak)/.test(e)) return 'Dein Wassersensor';
-        if (/(kamera|camera)/.test(e)) return 'Deine Kamera';
-        if (/(lock|schloss)/.test(e)) return 'Dein Schloss';
-        if (/(person|device_tracker)/.test(e)) return 'Deine Person';
-        if (/(media_player|echo|alexa|speaker|lautsprecher)/.test(e)) return 'Dein Lautsprecher';
-        if (/(switch|schalter|relay)/.test(e)) return 'Dein Schalter';
-        if (/(cover|rollladen|jalousie)/.test(e)) return 'Dein Rollladen';
-        if (/(fan|luefter|lüfter)/.test(e)) return 'Dein Lüfter';
-
-        return `Deine Entität ${genericEntityCounter++}`;
-      }
-
-      function labelForService(service){
-        const s = String(service || '').toLowerCase().trim();
-        if (!s.includes('.')) return null;
-
-        if (s.startsWith('notify.')) return 'Dein Benachrichtigungsdienst';
-        if (s.startsWith('script.')) return 'Dein Script';
-        if (s.startsWith('scene.')) return 'Deine Szene';
-        if (s.startsWith('automation.')) return 'Deine Automation';
-        if (s.startsWith('timer.')) return 'Dein Timer';
-        if (s.startsWith('light.')) return 'Dein Licht';
-        if (s.startsWith('switch.')) return 'Dein Schalter';
-
-        return `Dein Dienst ${genericServiceCounter++}`;
-      }
-
-      function getEntityLabel(entity){
-        const key = String(entity || '').trim();
-        if (!key) return 'Deine Entität';
-        if (!entityMap.has(key)) {
-          entityMap.set(key, labelForEntity(key));
-        }
-        return entityMap.get(key);
-      }
-
-      function getServiceLabel(service){
-        const key = String(service || '').trim();
-        if (!key) return 'Dein Dienst';
-        if (!serviceMap.has(key)) {
-          serviceMap.set(key, labelForService(key));
-        }
-        return serviceMap.get(key);
-      }
-
-      yaml = yaml.replace(/^(\s*entity_id\s*:\s*)([^\n]+)$/gim, (_, prefix, entity) => {
-        return prefix + getEntityLabel(entity.trim());
-      });
-
-      yaml = yaml.replace(/^(\s*device_id\s*:\s*)([^\n]+)$/gim, '$1Dein Gerät');
-      yaml = yaml.replace(/^(\s*area_id\s*:\s*)([^\n]+)$/gim, '$1Dein Bereich');
-
-      yaml = yaml.replace(/^(\s*service\s*:\s*)([^\n]+)$/gim, (_, prefix, service) => {
-        return prefix + getServiceLabel(service.trim());
-      });
-
-      yaml = yaml.replace(/^(\s*service_template\s*:\s*)([^\n]+)$/gim, '$1Dein Dienst');
-
-      yaml = yaml.replace(/^(\s*alias\s*:\s*)(.+)$/gim, '$1Deine Automation');
-      yaml = yaml.replace(/^(\s*id\s*:\s*)(.+)$/gim, '$1deine_automation_id');
-      yaml = yaml.replace(/^(\s*unique_id\s*:\s*)(.+)$/gim, '$1deine_unique_id');
-      yaml = yaml.replace(/^(\s*name\s*:\s*)(.+)$/gim, '$1dein_name');
-
-      yaml = yaml.replace(
-        /^(\s*-\s*)((?:input_boolean|input_number|input_select|sensor|binary_sensor|switch|light|cover|climate|fan|media_player|camera|lock|person|device_tracker|script|scene|automation|timer|lawn_mower)\.[a-z0-9_]+)\s*$/gim,
-        (_, prefix, entity) => prefix + getEntityLabel(entity.trim())
-      );
-
-      yaml = yaml.replace(
-        /'((?:input_boolean|input_number|input_select|sensor|binary_sensor|switch|light|cover|climate|fan|media_player|camera|lock|person|device_tracker|script|scene|automation|timer|lawn_mower)\.[a-z0-9_]+)'/gim,
-        (_, entity) => `'${getEntityLabel(entity.trim())}'`
-      );
-
-      yaml = yaml.replace(
-        /\b((?:input_boolean|input_number|input_select|sensor|binary_sensor|switch|light|cover|climate|fan|media_player|camera|lock|person|device_tracker|script|scene|automation|timer|lawn_mower)\.[a-z0-9_]+)\b/gim,
-        (match) => getEntityLabel(match.trim())
-      );
-
-      yaml = yaml.replace(
-        /\b((?:notify|script|scene|automation|timer|light|switch)\.[a-z0-9_]+)\b/gim,
-        (match) => getServiceLabel(match.trim())
-      );
-
-      yaml = yaml.replace(/[ \t]+$/gm, '');
-
-      return yaml.trim();
-    }
-
-    function renderAutomationPreview(){
-      const sanitized = sanitizeYaml(ui.automationFields.yaml.value);
-      ui.automationPreview.textContent = sanitized || 'Hier erscheint die bereinigte YAML-Vorschau.';
-    }
-
-    async function loadPosts(){
-      const { data, error } = await supabaseClient
-        .from('posts')
-        .select('*')
-        .order('date', { ascending:false })
-        .order('created_at', { ascending:false });
-
-      if(error){
-        ui.postList.innerHTML = `<div class="post-item small">Beiträge konnten nicht geladen werden.<br>${escapeHtml(error.message)}</div>`;
-        setStatus(`Fehler beim Laden der Beiträge: ${escapeHtml(error.message)}`, 'warn');
-        return;
-      }
-
-      posts = data || [];
-      ui.statPosts.textContent = posts.length;
-      ui.statPublished.textContent = posts.filter(post => !!post.published).length;
-      ui.statDrafts.textContent = posts.filter(post => !post.published).length;
-      renderPosts();
-    }
-
-    function renderPosts(){
-      const term = ui.postSearch.value.trim().toLowerCase();
-      const filtered = posts.filter(post => {
-        if(!term) return true;
-        const hay = [post.title, post.excerpt, post.category, post.source, post.type, post.automation_id].join(' ').toLowerCase();
-        return hay.includes(term);
-      });
-
-      if(!filtered.length){
-        ui.postList.innerHTML = '<div class="post-item small">Keine passenden Beiträge gefunden.</div>';
-        return;
-      }
-
-      ui.postList.innerHTML = filtered.map(post => {
-        const likeCount = Number(post.like_count || 0);
-        const commentCount = comments.filter(c => c.post_id === post.id).length;
-        return `
-          <article class="post-item">
-            <div class="item-head">
-              <div>
-                <h3>${escapeHtml(post.title || 'Ohne Titel')}</h3>
-                <div class="meta">
-                  <span>${escapeHtml(post.date || '')}</span>
-                  ${post.category ? `<span>${escapeHtml(post.category)}</span>` : ''}
-                  ${post.source ? `<span>${escapeHtml(post.source)}</span>` : ''}
-                  ${post.automation_id ? `<span>Automation: ${escapeHtml(post.automation_id)}</span>` : ''}
-                  <span>${post.published ? 'Veröffentlicht' : 'Entwurf'}</span>
-                  <span>${likeCount} Likes</span>
-                  <span>${commentCount} Kommentare</span>
-                </div>
-              </div>
-              <div class="toolbar">
-                <span class="chip ${post.published ? '' : 'warn'}">${post.published ? 'Live' : 'Draft'}</span>
-              </div>
-            </div>
-            <div class="toolbar">
-              <button class="button-outline" type="button" onclick="editPost('${escapeJs(post.id)}')">Bearbeiten</button>
-              <button class="button-warning" type="button" onclick="togglePublished('${escapeJs(post.id)}')">${post.published ? 'Auf Entwurf setzen' : 'Veröffentlichen'}</button>
-              <button class="button-danger" type="button" onclick="deletePost('${escapeJs(post.id)}')">Löschen</button>
-            </div>
-          </article>
-        `;
-      }).join('');
-    }
-
-    function fillForm(post){
-      ui.fields.postId.value = post.id || '';
-      ui.fields.title.value = post.title || '';
-      ui.fields.date.value = post.date || today();
-      ui.fields.category.value = post.category || '';
-      ui.fields.source.value = post.source || 'Blog';
-      ui.fields.type.value = post.type || '';
-      ui.fields.excerpt.value = post.excerpt || '';
-      ui.fields.material.value = post.material || '';
-      ui.fields.automationId.value = post.automation_id || '';
-      ui.fields.linkedinUrl.value = post.linkedin_url || '';
-      ui.fields.image.value = post.image || '';
-      ui.fields.content.value = post.content || '';
-      ui.fields.published.checked = !!post.published;
-      renderPreview();
-      setStatus(`Beitrag <strong>${escapeHtml(post.title || post.id)}</strong> geladen.`, 'ok');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    window.editPost = function(id){
-      const post = posts.find(item => item.id === id);
-      if(post) fillForm(post);
-    };
-
-    function resetForm(){
-      ui.postForm.reset();
-      ui.fields.postId.value = '';
-      ui.fields.date.value = today();
-      ui.fields.source.value = 'Blog';
-      renderPreview();
-      setStatus('Bereit. Du kannst einen neuen Beitrag anlegen.', 'default');
-    }
-
-    async function savePost(event){
-      event.preventDefault();
-      const title = ui.fields.title.value.trim();
-      const manualId = ui.fields.postId.value.trim();
-      const payload = {
-        id: manualId || slugify(title),
-        title,
-        date: ui.fields.date.value || today(),
-        category: ui.fields.category.value.trim() || null,
-        source: ui.fields.source.value || 'Blog',
-        type: ui.fields.type.value.trim() || null,
-        excerpt: ui.fields.excerpt.value.trim() || null,
-        material: ui.fields.material.value.trim() || null,
-        automation_id: ui.fields.automationId.value.trim() || null,
-        linkedin_url: ui.fields.linkedinUrl.value.trim() || null,
-        image: ui.fields.image.value.trim() || null,
-        content: ui.fields.content.value.trim(),
-        published: ui.fields.published.checked
-      };
-
-      if(!payload.id){
-        setStatus('Bitte einen Titel eingeben, damit eine ID erzeugt werden kann.', 'warn');
-        return;
-      }
-
-      setStatus('Beitrag wird gespeichert …', 'default');
-
-      const isEdit = !!manualId;
-      let response;
-      if(isEdit){
-        response = await supabaseClient.from('posts').update(payload).eq('id', manualId).select().single();
-      } else {
-        response = await supabaseClient.from('posts').insert(payload).select().single();
-      }
-
-      if(response.error){
-        setStatus(`Speichern fehlgeschlagen: ${escapeHtml(response.error.message)}`, 'warn');
-        return;
-      }
-
-      setStatus(`Beitrag <strong>${escapeHtml(payload.title)}</strong> wurde gespeichert.`, 'ok');
-      resetForm();
-      await loadPosts();
-    }
-
-    window.togglePublished = async function(id){
-      const post = posts.find(item => item.id === id);
-      if(!post) return;
-      const { error } = await supabaseClient.from('posts').update({ published: !post.published }).eq('id', id);
-      if(error){
-        setStatus(`Status konnte nicht geändert werden: ${escapeHtml(error.message)}`, 'warn');
-        return;
-      }
-      await loadPosts();
-      setStatus('Veröffentlichungsstatus aktualisiert.', 'ok');
-    };
-
-    window.deletePost = async function(id){
-      const post = posts.find(item => item.id === id);
-      if(!post) return;
-      const confirmed = confirm(`Beitrag "${post.title}" wirklich löschen?`);
-      if(!confirmed) return;
-      const { error } = await supabaseClient.from('posts').delete().eq('id', id);
-      if(error){
-        setStatus(`Löschen fehlgeschlagen: ${escapeHtml(error.message)}`, 'warn');
-        return;
-      }
-      await loadPosts();
-      await loadComments();
-      setStatus('Beitrag wurde gelöscht.', 'ok');
-    };
-
-    async function loadAutomations(){
-      const { data, error } = await supabaseClient
-        .from('automationen')
-        .select('*')
-        .order('created_at', { ascending:false });
-
-      if(error){
-        ui.automationList.innerHTML = `<div class="automation-item small">Automationen konnten nicht geladen werden.<br>${escapeHtml(error.message)}</div>`;
-        setAutomationStatus(`Fehler beim Laden der Automationen: ${escapeHtml(error.message)}`, 'warn');
-        return;
-      }
-
-      automations = data || [];
-      renderAutomations();
-    }
-
-    function renderAutomations(){
-      const term = ui.automationSearch.value.trim().toLowerCase();
-      const filtered = automations.filter(item => {
-        if(!term) return true;
-        return [item.title, item.id, item.yaml_code].join(' ').toLowerCase().includes(term);
-      });
-
-      if(!filtered.length){
-        ui.automationList.innerHTML = '<div class="automation-item small">Keine passenden Automationen gefunden.</div>';
-        return;
-      }
-
-      ui.automationList.innerHTML = filtered.map(item => `
-        <article class="automation-item">
-          <div class="item-head">
-            <div>
-              <h3>${escapeHtml(item.title || 'Ohne Titel')}</h3>
-              <div class="meta">
-                <span>ID: ${escapeHtml(item.id || '')}</span>
-                ${item.created_at ? `<span>${new Date(item.created_at).toLocaleString('de-AT')}</span>` : ''}
-              </div>
-            </div>
-            <span class="chip">YAML</span>
-          </div>
-          <pre class="code-preview">${escapeHtml(item.yaml_code || '')}</pre>
-          <div class="toolbar" style="margin-top:12px;">
-            <button class="button-outline" type="button" onclick="editAutomation('${escapeJs(item.id)}')">Bearbeiten</button>
-            <button class="button-danger" type="button" onclick="deleteAutomation('${escapeJs(item.id)}')">Löschen</button>
-          </div>
-        </article>
-      `).join('');
-    }
-
-    function fillAutomationForm(item){
-      ui.automationFields.id.value = item.id || '';
-      ui.automationFields.title.value = item.title || '';
-      ui.automationFields.yaml.value = item.yaml_code || '';
-      renderAutomationPreview();
-      setAutomationStatus(`Automation <strong>${escapeHtml(item.title || item.id)}</strong> geladen.`, 'ok');
-      window.scrollTo({ top: document.body.scrollHeight * 0.35, behavior: 'smooth' });
-    }
-
-    window.editAutomation = function(id){
-      const item = automations.find(entry => entry.id === id);
-      if(item) fillAutomationForm(item);
-    };
-
-    function resetAutomationForm(){
-      ui.automationForm.reset();
-      ui.automationFields.id.value = '';
-      renderAutomationPreview();
-      setAutomationStatus('Bereit. Du kannst eine neue Automation anlegen.', 'default');
-    }
-
-    async function saveAutomation(event){
-      event.preventDefault();
-
-      const title = ui.automationFields.title.value.trim();
-      const manualId = ui.automationFields.id.value.trim();
-      const sanitizedYaml = sanitizeYaml(ui.automationFields.yaml.value);
-
-      if(!title){
-        setAutomationStatus('Bitte einen Titel eingeben.', 'warn');
-        return;
-      }
-
-      if(!sanitizedYaml){
-        setAutomationStatus('Bitte YAML-Code eingeben.', 'warn');
-        return;
-      }
-
-      const payload = {
-        id: manualId || slugify(title),
-        title,
-        yaml_code: sanitizedYaml
-      };
-
-      setAutomationStatus('Automation wird gespeichert …', 'default');
-
-      const isEdit = !!manualId;
-      let response;
-      if(isEdit){
-        response = await supabaseClient.from('automationen').update(payload).eq('id', manualId).select().single();
-      } else {
-        response = await supabaseClient.from('automationen').insert(payload).select().single();
-      }
-
-      if(response.error){
-        setAutomationStatus(`Speichern fehlgeschlagen: ${escapeHtml(response.error.message)}`, 'warn');
-        return;
-      }
-
-      setAutomationStatus(`Automation <strong>${escapeHtml(payload.title)}</strong> wurde gespeichert.`, 'ok');
-      resetAutomationForm();
-      await loadAutomations();
-    }
-
-    window.deleteAutomation = async function(id){
-      const item = automations.find(entry => entry.id === id);
-      if(!item) return;
-      const confirmed = confirm(`Automation "${item.title}" wirklich löschen?`);
-      if(!confirmed) return;
-
-      const { error } = await supabaseClient.from('automationen').delete().eq('id', id);
-      if(error){
-        setAutomationStatus(`Löschen fehlgeschlagen: ${escapeHtml(error.message)}`, 'warn');
-        return;
-      }
-
-      await loadAutomations();
-      setAutomationStatus('Automation wurde gelöscht.', 'ok');
-    };
-
-    async function loadComments(){
-      const { data, error } = await supabaseClient
-        .from('post_comments')
-        .select('*')
-        .order('created_at', { ascending:false });
-
-      if(error){
-        ui.commentList.innerHTML = `<div class="comment-item small">Kommentare konnten nicht geladen werden.<br>${escapeHtml(error.message)}</div>`;
-        ui.statPendingComments.textContent = '0';
-        return;
-      }
-
-      comments = data || [];
-      ui.statPendingComments.textContent = comments.filter(comment => comment.status !== 'approved').length;
-      renderComments();
-    }
-
-    function renderComments(){
-      if(!comments.length){
-        ui.commentList.innerHTML = '<div class="comment-item small">Noch keine Kommentare vorhanden.</div>';
-        return;
-      }
-
-      ui.commentList.innerHTML = comments.map(comment => `
-        <article class="comment-item">
-          <div class="item-head">
-            <div>
-              <h3>${escapeHtml(comment.author_name || 'Ohne Namen')}</h3>
-              <div class="meta">
-                <span>Post: ${escapeHtml(comment.post_id || '')}</span>
-                ${comment.author_email ? `<span>${escapeHtml(comment.author_email)}</span>` : ''}
-                ${comment.created_at ? `<span>${new Date(comment.created_at).toLocaleString('de-AT')}</span>` : ''}
-              </div>
-            </div>
-            <span class="chip ${comment.status === 'approved' ? '' : 'warn'}">${escapeHtml(comment.status || 'pending')}</span>
-          </div>
-          <div class="small" style="margin-bottom:12px; color:var(--text)">${escapeHtml(comment.content || '')}</div>
-          <div class="toolbar">
-            <button class="button" type="button" onclick="updateCommentStatus('${escapeJs(comment.id)}','approved')">Freigeben</button>
-            <button class="button-warning" type="button" onclick="updateCommentStatus('${escapeJs(comment.id)}','hidden')">Verbergen</button>
-            <button class="button-danger" type="button" onclick="deleteComment('${escapeJs(comment.id)}')">Löschen</button>
-          </div>
-        </article>
-      `).join('');
-    }
-
-    window.updateCommentStatus = async function(id, status){
-      const { error } = await supabaseClient.from('post_comments').update({ status }).eq('id', id);
-      if(error){
-        setStatus(`Kommentar konnte nicht aktualisiert werden: ${escapeHtml(error.message)}`, 'warn');
-        return;
-      }
-      await loadComments();
-      setStatus('Kommentarstatus aktualisiert.', 'ok');
-    };
-
-    window.deleteComment = async function(id){
-      const confirmed = confirm('Kommentar wirklich löschen?');
-      if(!confirmed) return;
-      const { error } = await supabaseClient.from('post_comments').delete().eq('id', id);
-      if(error){
-        setStatus(`Kommentar konnte nicht gelöscht werden: ${escapeHtml(error.message)}`, 'warn');
-        return;
-      }
-      await loadComments();
-      setStatus('Kommentar wurde gelöscht.', 'ok');
-    };
-
-    async function uploadImage(){
-      const file = ui.imageFile.files?.[0];
-      if(!file){
-        setStatus('Bitte zuerst eine Bilddatei auswählen.', 'warn');
-        return;
-      }
-      const safeName = `${Date.now()}-${file.name.toLowerCase().replace(/[^a-z0-9._-]/g,'-')}`;
-      const path = `blog/${safeName}`;
-      setStatus('Bild wird hochgeladen …', 'default');
-      const { error } = await supabaseClient.storage.from('blog-images').upload(path, file, { upsert:true });
-      if(error){
-        setStatus(`Bild-Upload fehlgeschlagen: ${escapeHtml(error.message)}`, 'warn');
-        return;
-      }
-      const { data } = supabaseClient.storage.from('blog-images').getPublicUrl(path);
-      ui.fields.image.value = data.publicUrl;
-      renderPreview();
-      setStatus('Bild erfolgreich hochgeladen und Feld befüllt.', 'ok');
-    }
-
-    function escapeHtml(value){
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function escapeJs(value){
-      return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    }
-
-    resetForm();
-    resetAutomationForm();
-  </script>
-</body>
-</html>
+  </div>
+</div>
+</section>
+</main>
+<footer>
+  <div class="container footer-line">
+    <span>© 2026 HausKI • Günther Hochreiter</span>
+    <span><a href="blog.html">Blog</a> · <a href="automationen.html">Automationen</a> · <a href="ueber.html">Über</a></span>
+  </div>
+</footer>
+</body></html>
