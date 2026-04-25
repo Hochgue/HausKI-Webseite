@@ -133,14 +133,20 @@ footer{margin-top:32px;padding:28px 0 44px;border-top:1px solid rgba(255,255,255
 @media(max-width:980px){.profile{grid-template-columns:1fr}}
 
 .logo-img{
-  height:100px;
+  height:72px;
   width:auto;
   display:block;
+  object-fit:contain;
   filter: drop-shadow(0 0 12px rgba(33,200,255,.35));
   transition:.2s;
 }
 .logo-img:hover{
   transform:scale(1.03);
+}
+@media(max-width:680px){
+  .logo-img{
+    height:52px;
+  }
 }
 
 </style>
@@ -148,8 +154,8 @@ footer{margin-top:32px;padding:28px 0 44px;border-top:1px solid rgba(255,255,255
 <body>
 <nav class="nav">
   <a class="logo" href="index.html">
-  <img src="bilder/logo-hauski.jpeg" alt="HausKI Logo" class="logo-img">
-</a>
+      <img src="bilder/logo-hauski.jpeg" alt="HausKI Logo" class="logo-img">
+    </a>
   <div class="nav-links">
     <a class="" href="index.html">Start</a><a class="" href="automationen.html">Automationen</a><a class="" href="blog.html">Blog</a><a class="" href="projekt.html">Projekt</a><a class="active" href="ueber.html">Über</a>
   </div>
@@ -169,8 +175,8 @@ footer{margin-top:32px;padding:28px 0 44px;border-top:1px solid rgba(255,255,255
     <div class="actions"><a class="btn primary" href="automationen.html">Automationen ansehen</a><a class="btn secondary" href="blog.html">Blog lesen</a></div>
   </div>
   <div class="card">
-    <div class="quote">„HausKI erklärt mein Haus – nicht meine beruflichen Entscheidungen.“</div>
-    <p style="margin-top:18px">Das Projekt bleibt bewusst privat. Es geht um Praxis, nicht um Verkauf.</p>
+    <div class="quote">Nicht alles funktioniert sofort.<br><br>Ich probiere Dinge aus.<br>Manches klappt.<br>Manches nicht.<br><br>Genau daraus lerne ich.</div>
+    <p style="margin-top:18px">HausKI zeigt den echten Weg eines Hauses – Schritt für Schritt.</p>
   </div>
 </div>
 </section>
