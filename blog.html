@@ -91,6 +91,25 @@
       color:var(--accent);
     }
 
+    .logo{
+      display:flex;
+      align-items:center;
+      text-decoration:none;
+    }
+
+    .logo-img{
+      height:48px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+      filter:drop-shadow(0 0 12px rgba(33,200,255,.35));
+      transition:.2s;
+    }
+
+    .logo-img:hover{
+      transform:scale(1.03);
+    }
+
     .container{
       width:min(1180px, calc(100% - 32px));
       margin:0 auto;
@@ -688,7 +707,7 @@
     }
 
     @media (max-width:640px){
-      .logo-img{ height:52px; }
+      .logo-img{ height:42px; }
 
       .nav{
         padding:14px 16px;
@@ -729,14 +748,6 @@
 
       .modal-card{
         max-height:calc(100vh - 20px);
-      }
-      .logo-img{
-        height:48px;
-        width:auto;
-        display:block;
-        object-fit:contain;
-        filter:drop-shadow(0 0 12px rgba(33,200,255,.35));
-        transition:.2s;
       }
     }
   </style>
