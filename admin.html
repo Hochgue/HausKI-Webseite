@@ -535,7 +535,9 @@ async function loadAll(){
 }
 
 function renderLists(){
-const blogs = allPosts.filter(isBlogPost).slice(0,20);
+const blogs = allPosts
+  .filter(post => String(post.excerpt || post.content || '').trim().length > 0)
+  .slice(0,20);
 const automations = allPosts.filter(isAutomationPost).slice(0,20);
 
   els.blogList.innerHTML = blogs.length
