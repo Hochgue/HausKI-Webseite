@@ -1,159 +1,623 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HausKI – Blog</title>
+  <meta name="description" content="HausKI Blog: Erfahrungen, Probleme und Lösungen aus dem Alltag eines intelligenten Zuhauses.">
+  <meta name="robots" content="index, follow">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-<title>HausKI – Blog</title>
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#040911;
+      --panel:rgba(9,20,36,.86);
+      --panel2:rgba(8,18,32,.96);
+      --line:rgba(33,200,255,.20);
+      --line-soft:rgba(255,255,255,.08);
+      --text:#ecf6ff;
+      --muted:#9db2c9;
+      --accent:#21c8ff;
+      --accent2:#6af0c7;
+      --shadow:0 22px 70px rgba(0,0,0,.38);
+      --radius:24px;
+    }
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 18% 10%, rgba(33,200,255,.18), transparent 26%),
+        radial-gradient(circle at 86% 0%, rgba(106,240,199,.10), transparent 24%),
+        linear-gradient(180deg,#040911 0%,#081426 50%,#040911 100%);
+      min-height:100vh;
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size:28px 28px;
+      pointer-events:none;
+      opacity:.75;
+      z-index:0;
+    }
 
-<style>
+    a{color:inherit}
+    .container{width:min(1180px, calc(100% - 32px)); margin:0 auto; position:relative; z-index:1}
 
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#040911;
-  color:white;
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+      padding:16px 28px;
+      background:rgba(4,9,17,.82);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line-soft);
+      box-shadow:0 5px 22px rgba(0,0,0,.24);
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      font-weight:900;
+      color:var(--accent);
+      letter-spacing:.4px;
+      white-space:nowrap;
+    }
+    .logo-mark{
+      width:36px;
+      height:36px;
+      border-radius:13px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg, var(--accent), #206cff);
+      color:#03101b;
+      box-shadow:0 0 28px rgba(33,200,255,.32);
+    }
+    .nav-links{
+      display:flex;
+      gap:18px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .nav-links a{
+      color:#dcefff;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:700;
+      opacity:.9;
+      transition:.2s;
+      white-space:nowrap;
+    }
+    .nav-links a:hover,
+    .nav-links a.active{color:var(--accent); opacity:1}
+
+    .hero{padding:70px 0 30px}
+    .panel{
+      background:linear-gradient(180deg, rgba(12,24,42,.88), rgba(6,15,28,.94));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .hero-box{
+      padding:44px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-box:after{
+      content:"";
+      position:absolute;
+      right:-120px;
+      top:-120px;
+      width:340px;
+      height:340px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(33,200,255,.18), transparent 66%);
+      pointer-events:none;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:rgba(33,200,255,.08);
+      border:1px solid rgba(33,200,255,.18);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:1px;
+      text-transform:uppercase;
+    }
+    h1{
+      margin:18px 0 16px;
+      font-size:clamp(38px,5vw,62px);
+      line-height:1.02;
+      letter-spacing:-2.2px;
+      max-width:13ch;
+    }
+    .lead{
+      margin:0;
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.72;
+      max-width:72ch;
+    }
+
+    .section{padding:28px 0}
+    .section-head{margin-bottom:18px}
+    .section-head h2{
+      margin:12px 0 8px;
+      font-size:clamp(28px,4vw,42px);
+      letter-spacing:-1.2px;
+    }
+    .section-head p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:780px;
+    }
+
+    .blog-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:18px;
+    }
+    .blog-card{
+      min-height:330px;
+      border-radius:24px;
+      overflow:hidden;
+      background:var(--panel);
+      border:1px solid var(--line);
+      box-shadow:0 14px 42px rgba(0,0,0,.28);
+      display:grid;
+      grid-template-columns:1fr 1.15fr;
+      text-decoration:none;
+      transition:.22s;
+    }
+    .blog-card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(33,200,255,.44);
+    }
+    .blog-image{
+      min-height:260px;
+      background:#081424 center/cover no-repeat;
+      border-right:1px solid rgba(255,255,255,.08);
+      position:relative;
+    }
+    .blog-image:after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(33,200,255,.13), rgba(0,0,0,.20));
+    }
+
+    .img-dishwasher{background-image:url("bilder/geschirrspueler-pv.jpg")}
+    .img-mower{background-image:url("bilder/rasenmaeher.jpg")}
+    .img-doorbell{background-image:url("bilder/klingel.jpg")}
+    .img-energy{background-image:url("bilder/energie.jpg")}
+
+    .blog-body{
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .blog-body h3{
+      margin:12px 0 10px;
+      font-size:28px;
+      line-height:1.13;
+      letter-spacing:-.8px;
+    }
+    .blog-body p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.68;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:14px;
+    }
+    .chip{
+      min-height:30px;
+      display:inline-flex;
+      align-items:center;
+      padding:0 11px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.09);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+    }
+    .linkline{
+      color:var(--accent);
+      font-weight:900;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .wide{
+      grid-column:1 / -1;
+      grid-template-columns:.85fr 1.15fr;
+    }
+
+    .note-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+    .note{
+      padding:18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .note strong{
+      display:block;
+      color:var(--accent);
+      margin-bottom:8px;
+    }
+    .note span{
+      display:block;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    footer{
+      margin-top:32px;
+      padding:28px 0 44px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+    }
+    .footer-line{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .footer-line a{
+      color:var(--accent);
+      text-decoration:none;
+      font-weight:800;
+    }
+
+    @media(max-width:1050px){
+      .blog-grid{grid-template-columns:1fr}
+      .blog-card,.wide{grid-template-columns:1fr}
+      .blog-image{border-right:none; border-bottom:1px solid rgba(255,255,255,.08)}
+      .note-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:680px){
+      .nav{flex-direction:column; align-items:flex-start; padding:14px 16px}
+      .nav-links{gap:12px}
+      .hero{padding-top:38px}
+      .hero-box,.blog-body{padding:24px}
+      h1{letter-spacing:-1.4px}
+    }
+  
+.logo-img{
+  height:48px;
+  width:auto;
+  display:block;
+  filter: drop-shadow(0 0 12px rgba(33,200,255,.35));
+  transition:.2s;
+}
+.logo-img:hover{
+  transform:scale(1.03);
 }
 
-h1{
-  padding:20px;
-}
 
-.posts-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-  padding:20px;
-}
-
-.card{
-  background:#0a1320;
-  padding:20px;
-  border-radius:12px;
-}
-
-.card h3{
-  margin-top:0;
-}
-
-.button{
-  display:inline-block;
-  padding:10px 14px;
-  background:#21c8ff;
-  color:black;
-  text-decoration:none;
-  border-radius:8px;
-  margin-top:12px;
-}
-
-.empty{
-  padding:20px;
-}
-
-@media(max-width:900px){
-
-  .posts-grid{
-    grid-template-columns:1fr;
-  }
-
-}
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(2,7,14,.82);
+      backdrop-filter:blur(10px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      z-index:300;
+    }
+    .modal.open{display:flex}
+    .modal-card{
+      width:min(980px,100%);
+      max-height:calc(100vh - 44px);
+      overflow:auto;
+      background:linear-gradient(180deg, rgba(12,24,42,.98), rgba(6,15,28,.98));
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:0 20px 80px rgba(0,0,0,.48);
+    }
+    .modal-cover{
+      width:100%;
+      max-height:420px;
+      object-fit:contain;
+      background:#081424;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:block;
+    }
+    .modal-body{padding:28px}
+    .modal-body h2{
+      margin:12px 0 12px;
+      font-size:clamp(28px,4vw,42px);
+      line-height:1.12;
+      letter-spacing:-1px;
+    }
+    .modal-content{
+      color:var(--muted);
+      line-height:1.75;
+      white-space:pre-wrap;
+    }
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:22px;
+    }
+    .modal-button{
+      min-height:44px;
+      padding:0 16px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.035);
+      color:var(--text);
+      font-weight:900;
+      cursor:pointer;
+    }
 
 </style>
-
 </head>
 
 <body>
-
-<h1>HausKI Blog</h1>
-
-<div
-  id="postsGrid"
-  class="posts-grid">
-</div>
-
-<script>
-
-const SUPABASE_URL =
-'https://wuizcshgkdolkngqoutj.supabase.co';
-
-const SUPABASE_ANON_KEY =
-'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
-
-const supabaseClient =
-supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-async function loadPosts(){
-
-  const { data, error } =
-  await supabaseClient
-    .from("posts")
-    .select("*")
-    .eq("published", true)
-    .neq("type", "Automation")
-    .order("date", { ascending:false });
-
-  if(error){
-
-    console.error(error);
-
-    alert(error.message);
-
-    return;
-
-  }
-
-  renderPosts(data || []);
-
-}
-
-function renderPosts(posts){
-
-  const grid =
-  document.getElementById("postsGrid");
-
-  if(!posts.length){
-
-    grid.innerHTML =
-    "<div class='empty'>Keine Blogbeiträge gefunden</div>";
-
-    return;
-
-  }
-
-  grid.innerHTML =
-  posts.map(post => `
-
-    <div class="card">
-
-      <h3>
-        ${post.title}
-      </h3>
-
-      <p>
-        ${post.excerpt || ""}
-      </p>
-
-      <a
-        class="button"
-        href="blog.html#post-${post.id}">
-        Beitrag öffnen
-      </a>
-
+  <nav class="nav">
+    <a class="logo" href="index.html">
+      <img src="bilder/logo-hauski.jpeg" alt="HausKI Logo" class="logo-img">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Start</a>
+      <a href="automationen.html">Automationen</a>
+      <a class="active" href="blog.html">Blog</a>
+      <a href="roadmap.html">Projekt</a>
+      <a href="ueber.html">Über</a>
     </div>
+  </nav>
 
-  `).join("");
+  <header class="hero container">
+    <div class="panel hero-box">
+      <span class="badge">Erfahrungen aus HausKI</span>
+      <h1>Blog aus dem echten Alltag.</h1>
+      <p class="lead">
+        Hier dokumentiere ich, was im Haus wirklich passiert: Probleme, Lösungen,
+        Umwege und Learnings. Keine Theorie – sondern Praxis.
+      </p>
+    </div>
+  </header>
 
-}
+  <main>
+    <section class="section container">
+      <div class="section-head">
+        <span class="badge">Aktuelle Beiträge</span>
+        <h2>HausKI-Blog</h2>
+        <p>Jeder Beitrag erzählt eine konkrete Erfahrung: Was war das Problem, wie wurde es gelöst und was bleibt als Erkenntnis?</p>
+      </div>
 
-loadPosts();
+      <div id="blogGrid" class="blog-grid">
+        <div class="note">
+          <strong>Beiträge werden geladen ...</strong>
+          <span>Die Blogbeiträge werden aus Supabase geladen.</span>
+        </div>
+      </div>
+    </section>
 
-</script>
+    <section class="section container">
+      <div class="section-head">
+        <span class="badge">Blog-Prinzip</span>
+        <h2>Warum diese Beiträge entstehen</h2>
+      </div>
+
+      <div class="note-grid">
+        <div class="note">
+          <strong>Aus Problemen lernen</strong>
+          <span>Nicht alles funktioniert sofort. Genau daraus entstehen gute Beiträge.</span>
+        </div>
+        <div class="note">
+          <strong>Praxis statt Theorie</strong>
+          <span>Ich schreibe über Dinge, die im eigenen Haus wirklich passiert sind.</span>
+        </div>
+        <div class="note">
+          <strong>Einfach erklären</strong>
+          <span>Technik soll verständlich werden – nicht komplizierter wirken.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-line">
+      <span>© 2026 HausKI • Günther Hochreiter</span>
+      <span><a href="index.html">Start</a> · <a href="automationen.html">Automationen</a> · <a href="ueber.html">Über</a></span>
+    </div>
+  </footer>
+
+  <div id="postModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+
+  <script>
+    const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let posts = [];
+
+    const blogGrid = document.getElementById('blogGrid');
+    const postModal = document.getElementById('postModal');
+    const modalContent = document.getElementById('modalContent');
+
+    function escapeHtml(value = '') {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function isBlogPost(post) {
+      const type = String(post.type || '').trim().toLowerCase();
+      return type !== 'automation';
+    }
+
+    function getImage(post) {
+      return String(post.image || '').trim() || 'bilder/energie.jpg';
+    }
+
+    function getPostById(postId) {
+      return posts.find(post => String(post.id) === String(postId)) || null;
+    }
+
+    function renderPosts(items) {
+      if (!items.length) {
+        blogGrid.innerHTML = `
+          <div class="note">
+            <strong>Keine Blogbeiträge gefunden</strong>
+            <span>Bitte prüfe, ob Beiträge veröffentlicht sind.</span>
+          </div>
+        `;
+        return;
+      }
+
+      blogGrid.innerHTML = items.map((post, index) => {
+        const image = getImage(post);
+        const title = escapeHtml(post.title || 'Ohne Titel');
+        const excerpt = escapeHtml(post.excerpt || '');
+        const category = escapeHtml(post.category || 'Blog');
+        const wide = index === 0 ? ' wide' : '';
+
+        return `
+          <a class="blog-card${wide}" href="#post-${encodeURIComponent(post.id)}" onclick="event.preventDefault(); openPost('${escapeHtml(post.id)}')">
+            <div class="blog-image" style="background-image:url('${escapeHtml(image)}')" role="img" aria-label="${title}"></div>
+            <div class="blog-body">
+              <div>
+                <span class="badge">${category}</span>
+                <h3>${title}</h3>
+                <p>${excerpt}</p>
+              </div>
+              <div class="linkline">Beitrag lesen →</div>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    async function loadPosts() {
+      const { data, error } = await supabaseClient
+        .from('posts')
+        .select('*')
+        .eq('published', true)
+        .order('date', { ascending:false });
+
+      if (error) {
+        console.error(error);
+        blogGrid.innerHTML = `
+          <div class="note">
+            <strong>Fehler beim Laden</strong>
+            <span>${escapeHtml(error.message)}</span>
+          </div>
+        `;
+        return;
+      }
+
+      posts = (data || []).filter(isBlogPost);
+      renderPosts(posts);
+      openPostFromHash();
+    }
+
+    window.openPost = function(postId, updateUrl = true) {
+      const post = getPostById(postId);
+      if (!post) return;
+
+      if (updateUrl) {
+        history.pushState(null, '', `#post-${encodeURIComponent(String(postId))}`);
+      }
+
+      const image = getImage(post);
+      const title = escapeHtml(post.title || 'Ohne Titel');
+      const category = escapeHtml(post.category || 'Blog');
+      const content = escapeHtml(post.content || post.excerpt || '');
+
+      modalContent.innerHTML = `
+        <img class="modal-cover" src="${escapeHtml(image)}" alt="${title}">
+        <div class="modal-body">
+          <span class="badge">${category}</span>
+          <h2>${title}</h2>
+          <div class="modal-content">${content}</div>
+          <div class="modal-actions">
+            <button class="modal-button" type="button" onclick="closePost()">Schließen</button>
+          </div>
+        </div>
+      `;
+
+      postModal.classList.add('open');
+      postModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closePost = function() {
+      postModal.classList.remove('open');
+      postModal.setAttribute('aria-hidden', 'true');
+      modalContent.innerHTML = '';
+      document.body.style.overflow = '';
+
+      if (window.location.hash.startsWith('#post-')) {
+        history.pushState(null, '', window.location.pathname);
+      }
+    };
+
+    function openPostFromHash() {
+      const hash = window.location.hash.replace('#', '');
+      if (!hash.startsWith('post-')) return;
+
+      const postId = decodeURIComponent(hash.replace('post-', ''));
+      openPost(postId, false);
+    }
+
+    postModal.addEventListener('click', event => {
+      if (event.target === postModal) closePost();
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && postModal.classList.contains('open')) {
+        closePost();
+      }
+    });
+
+    window.addEventListener('hashchange', openPostFromHash);
+
+    loadPosts();
+  </script>
 
 </body>
 </html>
