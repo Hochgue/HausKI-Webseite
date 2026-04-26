@@ -226,12 +226,6 @@ h1{
   color:var(--text);
 }
 
-.btn.danger{
-  background:rgba(255,107,129,.12);
-  border:1px solid rgba(255,107,129,.28);
-  color:#ffdce2;
-}
-
 .note{
   padding:14px 16px;
   border-radius:16px;
@@ -373,6 +367,7 @@ footer{
 <section class="section container">
   <div class="note">
     Blogtext steht in <strong>content</strong>. Automation/YAML steht in <strong>material</strong>.
+    Ein Datensatz kann beides haben.
   </div>
   <div id="message" class="message"></div>
 </section>
@@ -388,7 +383,7 @@ footer{
         <input type="hidden" id="blogId">
 
         <input id="blogTitle" class="input" placeholder="Titel">
-        <input id="blogSlug" class="input" placeholder="Slug / Direktlink optional">
+        <input id="blogSlug" class="input" placeholder="Automation-ID / Direktlink optional">
         <input id="blogImage" class="input" placeholder="Bild-URL">
 
         <div class="row">
@@ -494,11 +489,6 @@ const els = {
 function showMessage(text, type='ok'){
   els.msg.textContent = text;
   els.msg.className = `message show ${type}`;
-
-  setTimeout(() => {
-    els.msg.className = 'message';
-    els.msg.textContent = '';
-  }, 4500);
 }
 
 function escapeHtml(value=''){
@@ -510,8 +500,7 @@ function escapeHtml(value=''){
     .replace(/'/g,'&#039;');
 }
 
-
-  function isAutomationPost(post){
+function isAutomationPost(post){
   const category = String(post.category || '').trim().toLowerCase();
   const type = String(post.type || '').trim().toLowerCase();
   const material = String(post.material || '').trim();
@@ -526,7 +515,9 @@ function escapeHtml(value=''){
 }
 
 function isBlogPost(post){
-  return String(post.content || '').trim().length > 0;
+  const content = String(post.content || '').trim();
+  const excerpt = String(post.excerpt || '').trim();
+  return content.length > 0 || excerpt.length > 0;
 }
 
 async function loadAll(){
@@ -538,6 +529,8 @@ async function loadAll(){
   if(error){
     console.error(error);
     showMessage('Fehler beim Laden: ' + error.message, 'err');
+    els.blogList.innerHTML = `<div class="item"><span>Fehler beim Laden.</span></div>`;
+    els.automationList.innerHTML = `<div class="item"><span>Fehler beim Laden.</span></div>`;
     return;
   }
 
@@ -546,10 +539,8 @@ async function loadAll(){
 }
 
 function renderLists(){
-const blogs = allPosts
-  .filter(post => String(post.excerpt || post.content || '').trim().length > 0)
-  .slice(0,20);
-const automations = allPosts.filter(isAutomationPost).slice(0,20);
+  const blogs = allPosts.filter(isBlogPost).slice(0,50);
+  const automations = allPosts.filter(isAutomationPost).slice(0,50);
 
   els.blogList.innerHTML = blogs.length
     ? blogs.map(post => `
@@ -596,7 +587,7 @@ window.editAutomation = function(id){
   if(!post) return;
 
   document.getElementById('automationFormTitle').textContent = 'Automation bearbeiten';
-  document.getElementById('automationDbId').value = post.id || '';
+  document.getElementById('automationDbId').value = String(post.id || '');
   document.getElementById('automationTitle').value = post.title || '';
   document.getElementById('automationSlug').value = post.automation_id || '';
   document.getElementById('automationImage').value = post.image || '';
@@ -633,7 +624,6 @@ async function saveBlog(){
     type: document.getElementById('blogType').value.trim() || 'Blog',
     excerpt: document.getElementById('blogExcerpt').value.trim(),
     content: document.getElementById('blogContent').value.trim(),
-    material: null,
     published: true,
     date: new Date().toISOString()
   };
@@ -644,10 +634,17 @@ async function saveBlog(){
   }
 
   const request = id
-    ? supabaseClient.from('posts').update(payload).eq('id', id)
-    : supabaseClient.from('posts').insert([payload]);
+    ? supabaseClient
+        .from('posts')
+        .update(payload)
+        .eq('id', id)
+        .select()
+    : supabaseClient
+        .from('posts')
+        .insert([{ id: crypto.randomUUID(), ...payload }])
+        .select();
 
-  const { error } = await request;
+  const { data, error } = await request;
 
   if(error){
     console.error(error);
@@ -655,14 +652,15 @@ async function saveBlog(){
     return;
   }
 
+  console.log('Blog gespeichert:', data);
+
   showMessage('Beitrag gespeichert.');
   resetBlogForm();
-  loadAll();
+  await loadAll();
 }
 
 async function saveAutomation(){
   const id = document.getElementById('automationDbId').value.trim();
-
   const yaml = document.getElementById('automationYaml').value.trim();
 
   if(!yaml){
@@ -687,70 +685,38 @@ async function saveAutomation(){
     return;
   }
 
-  console.log('Speichere Automation ID:', id);
-  console.log('Payload:', payload);
+  const existingPost = !id && payload.automation_id
+    ? allPosts.find(post =>
+        String(post.automation_id || '').trim() === String(payload.automation_id || '').trim()
+      )
+    : null;
 
-  const existingPost = !id
-  ? allPosts.find(post =>
-      String(post.automation_id || '').trim() === String(payload.automation_id || '').trim()
-    )
-  : null;
+  const finalId = id || (existingPost ? existingPost.id : '');
 
-const finalId = id || (existingPost ? existingPost.id : '');
-
-const request = finalId
-  ? supabaseClient
-      .from('posts')
-      .update(payload)
-      .eq('id', finalId)
-      .select()
-  : supabaseClient
-      .from('posts')
-      .insert([{ id: payload.automation_id || crypto.randomUUID(), ...payload }])
-      .select();
+  const request = finalId
+    ? supabaseClient
+        .from('posts')
+        .update(payload)
+        .eq('id', finalId)
+        .select()
+    : supabaseClient
+        .from('posts')
+        .insert([{ id: crypto.randomUUID(), ...payload }])
+        .select();
 
   const { data, error } = await request;
 
   if(error){
-    console.error('Supabase Fehler:', error);
+    console.error(error);
     showMessage('Fehler beim Speichern: ' + error.message, 'err');
     return;
   }
 
-  console.log('Gespeichert:', data);
+  console.log('Automation gespeichert:', data);
 
   showMessage('Automation gespeichert.');
   resetAutomationForm();
   await loadAll();
-}
-
- const request = id
-  ? supabaseClient
-      .from('posts')
-      .update(payload)
-      .eq('id', id)
-      .select()
-  : supabaseClient
-      .from('posts')
-      .insert([payload])
-      .select();
-
-const { data, error } = await request;
-
-if(error){
-  console.error("Supabase Fehler:", error);
-  showMessage('Fehler beim Speichern: ' + error.message, 'err');
-  return;
-}
-
-console.log("Gespeichert:", data);
-showMessage('Automation gespeichert.');
-resetAutomationForm();
-loadAll();
-
-  showMessage('Automation gespeichert.');
-  resetAutomationForm();
-  loadAll();
 }
 
 loadAll();
