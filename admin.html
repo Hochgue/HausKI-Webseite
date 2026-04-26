@@ -511,18 +511,15 @@ function escapeHtml(value=''){
 }
 
 function isAutomationPost(post){
-  const values = [
-    post.type,
-    post.category,
-    post.source,
-    post.material,
-    post.title
-  ]
-  .filter(Boolean)
-  .join(' ')
-  .toLowerCase();
+  const category = String(post.category || '').trim().toLowerCase();
+  const type = String(post.type || '').trim().toLowerCase();
+  const material = String(post.material || '').trim();
 
-  return values.includes('automation') || values.includes('yaml');
+  return (
+    category === 'automation' ||
+    type === 'automation' ||
+    material.length > 0
+  );
 }
 
 async function loadAll(){
