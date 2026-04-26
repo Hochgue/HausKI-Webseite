@@ -652,6 +652,13 @@ async function saveBlog(){
 async function saveAutomation(){
   const id = document.getElementById('automationDbId').value.trim();
 
+  const yaml = document.getElementById('automationYaml').value.trim();
+
+  if(!yaml){
+    showMessage('Bitte YAML / Erklärung eingeben.', 'err');
+    return;
+  }
+
   const payload = {
     title: document.getElementById('automationTitle').value.trim(),
     automation_id: document.getElementById('automationSlug').value.trim() || null,
@@ -659,7 +666,7 @@ async function saveAutomation(){
     category: document.getElementById('automationCategory').value || 'Automation',
     type: document.getElementById('automationType').value.trim() || 'Automation,YAML',
     excerpt: document.getElementById('automationExcerpt').value.trim(),
-    material: document.getElementById('automationYaml').value.trim(),
+    material: yaml,
     published: true,
     date: new Date().toISOString()
   };
@@ -668,6 +675,35 @@ async function saveAutomation(){
     showMessage('Bitte einen Namen für die Automation eingeben.', 'err');
     return;
   }
+
+  console.log('Speichere Automation ID:', id);
+  console.log('Payload:', payload);
+
+  const request = id
+    ? supabaseClient
+        .from('posts')
+        .update(payload)
+        .eq('id', id)
+        .select()
+    : supabaseClient
+        .from('posts')
+        .insert([payload])
+        .select();
+
+  const { data, error } = await request;
+
+  if(error){
+    console.error('Supabase Fehler:', error);
+    showMessage('Fehler beim Speichern: ' + error.message, 'err');
+    return;
+  }
+
+  console.log('Gespeichert:', data);
+
+  showMessage('Automation gespeichert.');
+  resetAutomationForm();
+  await loadAll();
+}
 
  const request = id
   ? supabaseClient
