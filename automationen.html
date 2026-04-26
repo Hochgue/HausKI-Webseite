@@ -1,89 +1,116 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HausKI – Automationen</title>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+  font-family:Arial;
+  background:#040911;
+  color:white;
+}
+
+.auto-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+  padding:20px;
+}
+
+.card{
+  background:#0a1320;
+  padding:20px;
+  border-radius:12px;
+}
+
+.button{
+  display:inline-block;
+  padding:10px 14px;
+  background:#21c8ff;
+  color:black;
+  text-decoration:none;
+  border-radius:8px;
+}
+</style>
+
+</head>
+<body>
+
+<h1 style="padding:20px;">HausKI Automationen</h1>
+
+<div id="autoGrid" class="auto-grid"></div>
 
 <script>
 
 const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
 
-const supabaseClient = window.supabase.createClient(
+const supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
-async function loadAutomationen() {
+async function loadAutomationen(){
 
   const { data, error } = await supabaseClient
-    .from('posts')
-    .select('*')
-    .eq('published', true)
-    .eq('type', 'Automation')
-    .order('date', { ascending: false });
+    .from("posts")
+    .select("*")
+    .eq("published", true)
+    .eq("type", "Automation")
+    .order("date", { ascending:false });
 
-  if (error) {
+  if(error){
+
     console.error(error);
     alert(error.message);
     return;
+
   }
 
   renderAutomationen(data || []);
+
 }
 
-function renderAutomationen(posts) {
+function renderAutomationen(posts){
 
   const grid = document.getElementById("autoGrid");
 
-  if (!posts.length) {
+  if(!posts.length){
 
-    grid.innerHTML = `
-      <div class="empty-text">
-        Noch keine Automationen vorhanden.
-      </div>
-    `;
-
+    grid.innerHTML = "Keine Automationen gefunden";
     return;
+
   }
 
-  grid.innerHTML = posts.map(post => {
+  grid.innerHTML = posts.map(post => `
 
-    return `
-      <a class="automation-card"
+    <div class="card">
+
+      <h3>${post.title}</h3>
+
+      <p>
+        ${post.excerpt || ""}
+      </p>
+
+      <a class="button"
          href="blog.html#post-${post.id}">
-
-        <div class="auto-image"
-             style="background-image:url('${post.image}')">
-        </div>
-
-        <div class="auto-body">
-
-          <div>
-
-            <span class="badge">
-              ${post.category || "Automation"}
-            </span>
-
-            <h3>
-              ${post.title}
-            </h3>
-
-            <p>
-              ${post.excerpt || ""}
-            </p>
-
-          </div>
-
-          <div class="linkline">
-            Automation ansehen →
-          </div>
-
-        </div>
-
+         Automation ansehen
       </a>
-    `;
 
-  }).join("");
+    </div>
+
+  `).join("");
 
 }
 
 loadAutomationen();
 
 </script>
+
+</body>
+</html>

@@ -1,84 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HausKI – Blog</title>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+  font-family:Arial;
+  background:#040911;
+  color:white;
+}
+
+.posts-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  padding:20px;
+}
+
+.card{
+  background:#0a1320;
+  padding:20px;
+  border-radius:12px;
+}
+
+.button{
+  display:inline-block;
+  padding:10px 14px;
+  background:#21c8ff;
+  color:black;
+  text-decoration:none;
+  border-radius:8px;
+}
+</style>
+
+</head>
+<body>
+
+<h1 style="padding:20px;">HausKI Blog</h1>
+
+<div id="postsGrid" class="posts-grid"></div>
+
 <script>
+
 const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
 
-const supabaseClient = window.supabase.createClient(
+const supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
-async function loadPosts() {
+async function loadPosts(){
 
   const { data, error } = await supabaseClient
-    .from('posts')
-    .select('*')
-    .eq('published', true)
-    .neq('type', 'Automation')
-    .order('date', { ascending: false });
+    .from("posts")
+    .select("*")
+    .eq("published", true)
+    .neq("type", "Automation")
+    .order("date", { ascending:false });
 
-  if (error) {
+  if(error){
+
     console.error(error);
     alert(error.message);
     return;
+
   }
 
   renderPosts(data || []);
+
 }
 
-function renderPosts(posts) {
+function renderPosts(posts){
 
   const grid = document.getElementById("postsGrid");
 
-  if (!posts.length) {
-    grid.innerHTML = `
-      <div class="empty-text">
-        Noch keine Blogbeiträge vorhanden.
-      </div>
-    `;
+  if(!posts.length){
+
+    grid.innerHTML = "Keine Blogbeiträge gefunden";
     return;
+
   }
 
-  grid.innerHTML = posts.map(post => {
+  grid.innerHTML = posts.map(post => `
 
-    return `
-      <article class="card">
+    <div class="card">
 
-        <div class="card-image-wrap">
-          ${post.image
-            ? `<img class="card-image" src="${post.image}">`
-            : `<div class="card-image placeholder">HausKI</div>`
-          }
-        </div>
+      <h3>${post.title}</h3>
 
-        <div class="card-body">
+      <p>
+        ${post.excerpt || ""}
+      </p>
 
-          <div class="meta-row">
-            <span>${post.category || "Allgemein"}</span>
-            <span>${post.date || ""}</span>
-          </div>
+      <a class="button"
+         href="blog.html#post-${post.id}">
+         Beitrag öffnen
+      </a>
 
-          <h3>${post.title}</h3>
+    </div>
 
-          <p class="excerpt">
-            ${post.excerpt || ""}
-          </p>
-
-          <div class="card-actions">
-            <a class="button-outline"
-               href="#post-${post.id}"
-               onclick="event.preventDefault(); openPost('${post.id}')">
-               Beitrag lesen
-            </a>
-          </div>
-
-        </div>
-
-      </article>
-    `;
-
-  }).join("");
+  `).join("");
 
 }
 
 loadPosts();
+
 </script>
+
+</body>
+</html>
