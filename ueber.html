@@ -215,4 +215,88 @@ footer{margin-top:32px;padding:28px 0 44px;border-top:1px solid rgba(255,255,255
   </a>
 
 </footer>
+<div id="cookieBanner" style="
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#081426;
+  color:#ecf6ff;
+  padding:18px;
+  border-top:1px solid rgba(255,255,255,.08);
+  box-shadow:0 -6px 24px rgba(0,0,0,.45);
+  display:none;
+  z-index:9999;
+  font-family:Arial;
+">
+  Diese Website verwendet Google Analytics, um die Nutzung der Website anonymisiert auszuwerten.
+
+  <a href="datenschutz.html" style="color:#21c8ff;text-decoration:none;margin-left:8px;">
+    Datenschutz
+  </a>
+
+  <button onclick="acceptAnalytics()" style="
+    margin-left:16px;
+    padding:8px 14px;
+    border-radius:10px;
+    border:none;
+    background:#21c8ff;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+    Akzeptieren
+  </button>
+
+  <button onclick="declineAnalytics()" style="
+    margin-left:8px;
+    padding:8px 14px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.2);
+    background:transparent;
+    color:#ecf6ff;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+    Ablehnen
+  </button>
+</div>
+
+<script>
+function loadAnalytics(){
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = "https://www.googletagmanager.com/gtag/js?id=G-FDR62RTX1J";
+  document.head.appendChild(script);
+
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  window.gtag = gtag;
+
+  gtag("js", new Date());
+  gtag("config", "G-FDR62RTX1J", {
+    anonymize_ip: true
+  });
+}
+
+function acceptAnalytics(){
+  localStorage.setItem("analyticsConsent","accepted");
+  document.getElementById("cookieBanner").style.display="none";
+  loadAnalytics();
+}
+
+function declineAnalytics(){
+  localStorage.setItem("analyticsConsent","declined");
+  document.getElementById("cookieBanner").style.display="none";
+}
+
+window.addEventListener("load", function(){
+  const consent = localStorage.getItem("analyticsConsent");
+
+  if(consent === "accepted"){
+    loadAnalytics();
+  } else if(consent !== "declined"){
+    document.getElementById("cookieBanner").style.display="block";
+  }
+});
+</script>
 </body></html>
