@@ -1063,7 +1063,7 @@
 
               <div class="card-actions">
                 <div class="hero-actions" style="margin-top:0;">
-                  <button class="button-outline" type="button" onclick="openPost('${escapeHtml(post.id)}')">Beitrag lesen</button>
+                  <a class="button-outline" href="#post-${escapeHtml(post.id)}" onclick="event.preventDefault(); openPost('${escapeHtml(post.id)}')">Beitrag lesen</a>
                   ${automationUrl ? `<a class="button-outline" href="${escapeHtml(automationUrl)}">Zur YAML Automation</a>` : ''}
                 </div>
                 <div class="metric-row">
@@ -1132,6 +1132,7 @@
         populateFilters();
         updateStats();
         renderPosts();
+        openPostFromHash();
       } catch (error) {
         console.error(error);
         els.loadingState.hidden = true;
@@ -1140,7 +1141,7 @@
     }
 
     function getPostById(postId) {
-      return state.posts.find(post => post.id === postId) || null;
+      return state.posts.find(post => String(post.id) === String(postId)) || null;
     }
 
     function buildCommentMarkup(comments) {
@@ -1163,9 +1164,31 @@
       `).join('');
     }
 
-    window.openPost = function(postId) {
+
+    function getPostHash(postId) {
+      return `post-${encodeURIComponent(String(postId))}`;
+    }
+
+    function getPostIdFromHash() {
+      const hash = window.location.hash.replace('#', '');
+      if (!hash.startsWith('post-')) return '';
+      return decodeURIComponent(hash.replace('post-', ''));
+    }
+
+    function openPostFromHash() {
+      const postId = getPostIdFromHash();
+      if (!postId) return;
+      const post = getPostById(postId);
+      if (post) openPost(postId, false);
+    }
+
+    window.openPost = function(postId, updateUrl = true) {
       const post = getPostById(postId);
       if (!post) return;
+
+      if (updateUrl) {
+        history.pushState(null, '', `#${getPostHash(postId)}`);
+      }
 
       state.activePostId = postId;
       const comments = state.commentsByPost[postId] || [];
@@ -1256,6 +1279,9 @@
       els.modalBody.innerHTML = '';
       state.activePostId = null;
       document.body.style.overflow = '';
+      if (window.location.hash.startsWith('#post-')) {
+        history.pushState(null, '', window.location.pathname);
+      }
     }
 
     async function likePost(postId) {
@@ -1282,6 +1308,7 @@
 
         updateStats();
         renderPosts();
+        openPostFromHash();
       } catch (error) {
         console.error(error);
         showMessage('Der Like konnte nicht gespeichert werden. Prüfe bitte die Tabelle post_likes und die Insert-Policy.');
@@ -1352,6 +1379,12 @@
       document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && els.postModal.classList.contains('open')) {
           closeModal();
+        }
+      });
+
+      window.addEventListener('hashchange', () => {
+        if (window.location.hash.startsWith('#post-')) {
+          openPostFromHash();
         }
       });
     }
