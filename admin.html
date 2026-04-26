@@ -510,8 +510,19 @@ function escapeHtml(value=''){
     .replace(/'/g,'&#039;');
 }
 
-function isAutomationPost(post){
-  return String(post.material || '').trim().length > 0;
+
+  function isAutomationPost(post){
+  const category = String(post.category || '').trim().toLowerCase();
+  const type = String(post.type || '').trim().toLowerCase();
+  const material = String(post.material || '').trim();
+  const automationId = String(post.automation_id || '').trim();
+
+  return (
+    category === 'automation' ||
+    type.split(',').map(v => v.trim()).includes('automation') ||
+    material.length > 0 ||
+    automationId.length > 0
+  );
 }
 
 function isBlogPost(post){
@@ -679,16 +690,24 @@ async function saveAutomation(){
   console.log('Speichere Automation ID:', id);
   console.log('Payload:', payload);
 
-  const request = id
-    ? supabaseClient
-        .from('posts')
-        .update(payload)
-        .eq('id', id)
-        .select()
-    : supabaseClient
-        .from('posts')
-        .insert([payload])
-        .select();
+  const existingPost = !id
+  ? allPosts.find(post =>
+      String(post.automation_id || '').trim() === String(payload.automation_id || '').trim()
+    )
+  : null;
+
+const finalId = id || (existingPost ? existingPost.id : '');
+
+const request = finalId
+  ? supabaseClient
+      .from('posts')
+      .update(payload)
+      .eq('id', finalId)
+      .select()
+  : supabaseClient
+      .from('posts')
+      .insert([{ id: payload.automation_id || crypto.randomUUID(), ...payload }])
+      .select();
 
   const { data, error } = await request;
 
