@@ -669,17 +669,29 @@ async function saveAutomation(){
     return;
   }
 
-  const request = id
-    ? supabaseClient.from('posts').update(payload).eq('id', id)
-    : supabaseClient.from('posts').insert([payload]);
+ const request = id
+  ? supabaseClient
+      .from('posts')
+      .update(payload)
+      .eq('id', id)
+      .select()
+  : supabaseClient
+      .from('posts')
+      .insert([payload])
+      .select();
 
-  const { error } = await request;
+const { data, error } = await request;
 
-  if(error){
-    console.error(error);
-    showMessage('Fehler beim Speichern: ' + error.message, 'err');
-    return;
-  }
+if(error){
+  console.error("Supabase Fehler:", error);
+  showMessage('Fehler beim Speichern: ' + error.message, 'err');
+  return;
+}
+
+console.log("Gespeichert:", data);
+showMessage('Automation gespeichert.');
+resetAutomationForm();
+loadAll();
 
   showMessage('Automation gespeichert.');
   resetAutomationForm();
