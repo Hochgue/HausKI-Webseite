@@ -1,502 +1,89 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <title>HausKI – Automationen</title>
-  <meta name="description" content="HausKI Automationen: Rasenroboter, Geschirrspüler, Heizung, Klingel und PV-Überschuss – echte Praxislösungen aus einem intelligenten Zuhause.">
-  <meta name="robots" content="index, follow">
+<script>
 
-  <style>
-    *{box-sizing:border-box}
-    :root{
-      --bg:#040911;
-      --panel:rgba(9,20,36,.86);
-      --panel2:rgba(8,18,32,.96);
-      --line:rgba(33,200,255,.20);
-      --line-soft:rgba(255,255,255,.08);
-      --text:#ecf6ff;
-      --muted:#9db2c9;
-      --accent:#21c8ff;
-      --accent2:#6af0c7;
-      --warning:#ffd76a;
-      --red:#ff6b81;
-      --shadow:0 22px 70px rgba(0,0,0,.38);
-      --radius:24px;
-    }
+const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
 
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at 18% 10%, rgba(33,200,255,.18), transparent 26%),
-        radial-gradient(circle at 86% 0%, rgba(106,240,199,.10), transparent 24%),
-        linear-gradient(180deg,#040911 0%,#081426 50%,#040911 100%);
-      min-height:100vh;
-    }
-    body:before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size:28px 28px;
-      pointer-events:none;
-      opacity:.75;
-      z-index:0;
-    }
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 
-    a{color:inherit}
-    .container{width:min(1180px, calc(100% - 32px)); margin:0 auto; position:relative; z-index:1}
+async function loadAutomationen() {
 
-    .nav{
-      position:sticky;
-      top:0;
-      z-index:20;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:18px;
-      padding:16px 28px;
-      background:rgba(4,9,17,.82);
-      backdrop-filter:blur(14px);
-      border-bottom:1px solid var(--line-soft);
-      box-shadow:0 5px 22px rgba(0,0,0,.24);
-    }
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      text-decoration:none;
-      font-weight:900;
-      color:var(--accent);
-      letter-spacing:.4px;
-      white-space:nowrap;
-    }
-    .logo-mark{
-      width:36px;
-      height:36px;
-      border-radius:13px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(135deg, var(--accent), #206cff);
-      color:#03101b;
-      box-shadow:0 0 28px rgba(33,200,255,.32);
-    }
-    .nav-links{
-      display:flex;
-      gap:18px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .nav-links a{
-      color:#dcefff;
-      text-decoration:none;
-      font-size:14px;
-      font-weight:700;
-      opacity:.9;
-      transition:.2s;
-      white-space:nowrap;
-    }
-    .nav-links a:hover,
-    .nav-links a.active{color:var(--accent); opacity:1}
+  const { data, error } = await supabaseClient
+    .from('posts')
+    .select('*')
+    .eq('published', true)
+    .eq('type', 'Automation')
+    .order('date', { ascending: false });
 
-    .hero{padding:70px 0 30px}
-    .panel{
-      background:linear-gradient(180deg, rgba(12,24,42,.88), rgba(6,15,28,.94));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-    .hero-box{
-      padding:44px;
-      position:relative;
-      overflow:hidden;
-    }
-    .hero-box:after{
-      content:"";
-      position:absolute;
-      right:-120px;
-      top:-120px;
-      width:340px;
-      height:340px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(33,200,255,.18), transparent 66%);
-      pointer-events:none;
-    }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:9px 14px;
-      border-radius:999px;
-      background:rgba(33,200,255,.08);
-      border:1px solid rgba(33,200,255,.18);
-      color:var(--accent);
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:1px;
-      text-transform:uppercase;
-    }
-    h1{
-      margin:18px 0 16px;
-      font-size:clamp(38px,5vw,62px);
-      line-height:1.02;
-      letter-spacing:-2.2px;
-      max-width:13ch;
-    }
-    .lead{
-      margin:0;
-      color:var(--muted);
-      font-size:18px;
-      line-height:1.72;
-      max-width:72ch;
-    }
+  if (error) {
+    console.error(error);
+    alert(error.message);
+    return;
+  }
 
-    .section{padding:28px 0}
-    .section-head{margin-bottom:18px}
-    .section-head h2{
-      margin:12px 0 8px;
-      font-size:clamp(28px,4vw,42px);
-      letter-spacing:-1.2px;
-    }
-    .section-head p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.7;
-      max-width:780px;
-    }
-
-    .auto-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:18px;
-    }
-    .automation-card{
-      min-height:330px;
-      border-radius:24px;
-      overflow:hidden;
-      background:var(--panel);
-      border:1px solid var(--line);
-      box-shadow:0 14px 42px rgba(0,0,0,.28);
-      display:grid;
-      grid-template-columns:1fr 1.2fr;
-      text-decoration:none;
-      transition:.22s;
-    }
-    .automation-card:hover{
-      transform:translateY(-4px);
-      border-color:rgba(33,200,255,.44);
-    }
-    .auto-image{
-      min-height:260px;
-      background:#081424 center/cover no-repeat;
-      border-right:1px solid rgba(255,255,255,.08);
-      position:relative;
-    }
-    .auto-image:after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:linear-gradient(135deg, rgba(33,200,255,.13), rgba(0,0,0,.20));
-    }
-    .img-dishwasher{background-image:url("bilder/geschirrspueler-pv.jpg")}
-    .img-mower{background-image:url("bilder/rasenmaeher.jpg")}
-    .img-heating{background-image:url("bilder/heizung.jpg")}
-    .img-doorbell{background-image:url("bilder/klingel.jpg")}
-    .img-energy{background-image:url("bilder/energie.jpg")}
-
-    .auto-body{
-      padding:24px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap:18px;
-    }
-    .auto-body h3{
-      margin:12px 0 10px;
-      font-size:28px;
-      line-height:1.13;
-      letter-spacing:-.8px;
-    }
-    .auto-body p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.68;
-    }
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:14px;
-    }
-    .chip{
-      min-height:30px;
-      display:inline-flex;
-      align-items:center;
-      padding:0 11px;
-      border-radius:999px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.09);
-      color:var(--muted);
-      font-size:12px;
-      font-weight:800;
-    }
-    .linkline{
-      color:var(--accent);
-      font-weight:900;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .wide{
-      grid-column:1 / -1;
-      grid-template-columns:.85fr 1.15fr;
-    }
-
-    .logic-box{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-    }
-    .logic{
-      padding:18px;
-      border-radius:20px;
-      background:rgba(255,255,255,.035);
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .logic strong{
-      display:block;
-      color:var(--accent);
-      margin-bottom:8px;
-    }
-    .logic span{
-      display:block;
-      color:var(--muted);
-      line-height:1.55;
-      font-size:14px;
-    }
-
-    footer{
-      margin-top:32px;
-      padding:28px 0 44px;
-      border-top:1px solid rgba(255,255,255,.08);
-      color:var(--muted);
-    }
-    .footer-line{
-      display:flex;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .footer-line a{
-      color:var(--accent);
-      text-decoration:none;
-      font-weight:800;
-    }
-
-    @media(max-width:1050px){
-      .auto-grid{grid-template-columns:1fr}
-      .automation-card,.wide{grid-template-columns:1fr}
-      .auto-image{border-right:none; border-bottom:1px solid rgba(255,255,255,.08)}
-      .logic-box{grid-template-columns:1fr 1fr}
-    }
-    @media(max-width:680px){
-      .nav{flex-direction:column; align-items:flex-start; padding:14px 16px}
-      .nav-links{gap:12px}
-      .hero{padding-top:38px}
-      .hero-box,.auto-body{padding:24px}
-      .logic-box{grid-template-columns:1fr}
-      h1{letter-spacing:-1.4px}
-    }
-  
-.logo-img{
-  height:100px;
-  width:auto;
-  display:block;
-  filter: drop-shadow(0 0 12px rgba(33,200,255,.35));
-  transition:.2s;
-}
-.logo-img:hover{
-  transform:scale(1.03);
+  renderAutomationen(data || []);
 }
 
-</style>
-</head>
+function renderAutomationen(posts) {
 
-<body>
-  <nav class="nav">
-    <a class="logo" href="index.html">
-  <img src="bilder/logo-hauski.jpeg" alt="HausKI Logo" class="logo-img">
-</a>
-    <<div class="nav-links">
-  <a href="index.html">Start</a>
-  <a href="automationen.html">Automationen</a>
-  <a href="blog.html">Blog</a>
-  <a class="active" href="roadmap.html">Projekt</a>
-  <a href="ueber.html">Über</a>
-</div>
-  </nav>
+  const grid = document.getElementById("autoGrid");
 
-  <header class="hero container">
-    <div class="panel hero-box">
-      <span class="badge">Praxislösungen aus HausKI</span>
-      <h1>Automationen, die im Alltag wirklich helfen.</h1>
-      <p class="lead">
-        Hier sammle ich die wichtigsten HausKI-Automationen: nicht als Technikshow,
-        sondern als nachvollziehbare Lösungen für Energie, Komfort und Kontrolle.
-      </p>
-    </div>
-  </header>
+  if (!posts.length) {
 
-  <main>
-    <section class="section container">
-      <div class="section-head">
-        <span class="badge">Aktuelle Lösungen</span>
-        <h2>HausKI-Automationen</h2>
-        <p>Kurze Übersicht statt Textwüste. Jede Kachel zeigt: Was macht die Automation und welchen Nutzen hat sie?</p>
+    grid.innerHTML = `
+      <div class="empty-text">
+        Noch keine Automationen vorhanden.
       </div>
+    `;
 
-      <div class="auto-grid">
+    return;
+  }
 
-        <a class="automation-card wide" href="blog.html">
-          <div class="auto-image img-dishwasher" role="img" aria-label="Geschirrspüler bei PV-Überschuss"></div>
-          <div class="auto-body">
-            <div>
-              <span class="badge">PV-Überschuss</span>
-              <h3>Geschirrspüler startet automatisch</h3>
-              <p>
-                Programm wählen, per Taster stromlos schalten – bei PV-Überschuss bekommt die Steckdose wieder Strom
-                und der Geschirrspüler läuft los.
-              </p>
-              <div class="chips">
-                <span class="chip">PV</span>
-                <span class="chip">Taster</span>
-                <span class="chip">Steckdose</span>
-                <span class="chip">Alltag</span>
-              </div>
-            </div>
-            <div class="linkline">Details ansehen →</div>
-          </div>
-        </a>
+  grid.innerHTML = posts.map(post => {
 
-        <a class="automation-card" href="blog.html">
-          <div class="auto-image img-mower" role="img" aria-label="Rasenroboter Automation"></div>
-          <div class="auto-body">
-            <div>
-              <span class="badge">Lokal + Wetter</span>
-              <h3>Rasenroboter mäht nur wenn es passt</h3>
-              <p>
-                Start nur bei passender Temperatur, keinem Regen, aktivem Zeitfenster und sinnvoller Energie-Situation.
-              </p>
-              <div class="chips">
-                <span class="chip">Bluetooth</span>
-                <span class="chip">Regen</span>
-                <span class="chip">Temperatur</span>
-              </div>
-            </div>
-            <div class="linkline">Automation ansehen →</div>
-          </div>
-        </a>
+    return `
+      <a class="automation-card"
+         href="blog.html#post-${post.id}">
 
-        <a class="automation-card" href="blog.html">
-          <div class="auto-image img-heating" role="img" aria-label="Heizungslogik"></div>
-          <div class="auto-body">
-            <div>
-              <span class="badge">Heizung</span>
-              <h3>Heizung reagiert auf Alltag</h3>
-              <p>
-                Präsenz, Fenster, Licht und Außentemperatur bestimmen, ob Komfortbetrieb oder Absenkung sinnvoll ist.
-              </p>
-              <div class="chips">
-                <span class="chip">Präsenz</span>
-                <span class="chip">Fenster</span>
-                <span class="chip">Temperatur</span>
-              </div>
-            </div>
-            <div class="linkline">Logik ansehen →</div>
-          </div>
-        </a>
-
-        <a class="automation-card" href="blog.html">
-          <div class="auto-image img-doorbell" role="img" aria-label="Klingel Automation"></div>
-          <div class="auto-body">
-            <div>
-              <span class="badge">Klingel</span>
-              <h3>Eine Klingel, zwei Gongs, klare Lösung</h3>
-              <p>
-                Aus Chaos wurde eine saubere Logik: Klingelereignis erkennen, Bild anzeigen und Verhalten nachvollziehbar machen.
-              </p>
-              <div class="chips">
-                <span class="chip">Shelly</span>
-                <span class="chip">Kamera</span>
-                <span class="chip">Benachrichtigung</span>
-              </div>
-            </div>
-            <div class="linkline">Beitrag ansehen →</div>
-          </div>
-        </a>
-
-        <a class="automation-card" href="blog.html">
-          <div class="auto-image img-energy" role="img" aria-label="PV und Energie Logik"></div>
-          <div class="auto-body">
-            <div>
-              <span class="badge">Energie</span>
-              <h3>PV-Überschuss als Freigabe</h3>
-              <p>
-                Nicht jedes Gerät muss smart sein. Oft reicht eine saubere Freigabe: Überschuss vorhanden – Aktion erlaubt.
-              </p>
-              <div class="chips">
-                <span class="chip">PV</span>
-                <span class="chip">Boolean</span>
-                <span class="chip">Freigabe</span>
-              </div>
-            </div>
-            <div class="linkline">Mehr erfahren →</div>
-          </div>
-        </a>
-
-      </div>
-    </section>
-
-    <section class="section container">
-      <div class="section-head">
-        <span class="badge">Prinzip</span>
-        <h2>Wie HausKI-Automationen gedacht sind</h2>
-      </div>
-
-      <div class="logic-box">
-        <div class="logic">
-          <strong>1. Beobachten</strong>
-          <span>Was passiert im Haus wirklich?</span>
+        <div class="auto-image"
+             style="background-image:url('${post.image}')">
         </div>
-        <div class="logic">
-          <strong>2. Entscheiden</strong>
-          <span>Welche Bedingung macht Sinn?</span>
-        </div>
-        <div class="logic">
-          <strong>3. Automatisieren</strong>
-          <span>Nur so viel Technik wie nötig.</span>
-        </div>
-        <div class="logic">
-          <strong>4. Kontrolle behalten</strong>
-          <span>Manuell übersteuerbar bleibt wichtig.</span>
-        </div>
-      </div>
-    </section>
-  </main>
 
-  <footer>
-    <div class="container footer-line">
-      <span>© 2026 HausKI • Günther Hochreiter</span>
-      <span><a href="index.html">Start</a> · <a href="blog.html">Blog</a> · <a href="ueber.html">Über</a></span>
-    </div>
-  </footer>
-</body>
-</html>
+        <div class="auto-body">
+
+          <div>
+
+            <span class="badge">
+              ${post.category || "Automation"}
+            </span>
+
+            <h3>
+              ${post.title}
+            </h3>
+
+            <p>
+              ${post.excerpt || ""}
+            </p>
+
+          </div>
+
+          <div class="linkline">
+            Automation ansehen →
+          </div>
+
+        </div>
+
+      </a>
+    `;
+
+  }).join("");
+
+}
+
+loadAutomationen();
+
+</script>
