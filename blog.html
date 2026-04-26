@@ -9,10 +9,16 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <style>
+
 body{
   font-family:Arial;
   background:#040911;
   color:white;
+  margin:0;
+}
+
+h1{
+  padding:20px;
 }
 
 .posts-grid{
@@ -35,29 +41,93 @@ body{
   color:black;
   text-decoration:none;
   border-radius:8px;
+  margin-top:12px;
 }
-</style>
 
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal.open{
+  display:flex;
+}
+
+.modal-card{
+  background:#0a1320;
+  padding:30px;
+  border-radius:12px;
+  max-width:900px;
+  width:90%;
+}
+
+.close{
+  cursor:pointer;
+  margin-top:20px;
+  display:inline-block;
+}
+
+@media(max-width:900px){
+  .posts-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+</style>
 </head>
+
 <body>
 
-<h1 style="padding:20px;">HausKI Blog</h1>
+<h1>HausKI Blog</h1>
 
 <div id="postsGrid" class="posts-grid"></div>
 
+<div id="modal" class="modal">
+  <div class="modal-card">
+
+    <h2 id="modalTitle"></h2>
+
+    <p id="modalContent"></p>
+
+    <span class="button close" onclick="closeModal()">
+      Schließen
+    </span>
+
+  </div>
+</div>
+
 <script>
 
-const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
+const SUPABASE_URL =
+'https://wuizcshgkdolkngqoutj.supabase.co';
 
-const supabaseClient = supabase.createClient(
+const SUPABASE_ANON_KEY =
+'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
+
+const supabaseClient =
+supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
+let posts = [];
+
+function escapeHtml(text){
+
+  return String(text || "")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+
+}
+
 async function loadPosts(){
 
-  const { data, error } = await supabaseClient
+  const { data, error } =
+  await supabaseClient
     .from("posts")
     .select("*")
     .eq("published", true)
@@ -72,34 +142,50 @@ async function loadPosts(){
 
   }
 
-  renderPosts(data || []);
+  posts = data || [];
+
+  renderPosts(posts);
+
+  openPostFromUrl();
 
 }
 
 function renderPosts(posts){
 
-  const grid = document.getElementById("postsGrid");
+  const grid =
+  document.getElementById("postsGrid");
 
   if(!posts.length){
 
-    grid.innerHTML = "Keine Blogbeiträge gefunden";
+    grid.innerHTML =
+    "Keine Blogbeiträge gefunden";
+
     return;
 
   }
 
-  grid.innerHTML = posts.map(post => `
+  grid.innerHTML =
+  posts.map(post => `
 
     <div class="card">
 
-      <h3>${post.title}</h3>
+      <h3>
+        ${escapeHtml(post.title)}
+      </h3>
 
       <p>
-        ${post.excerpt || ""}
+        ${escapeHtml(post.excerpt || "")}
       </p>
 
-      <a class="button"
-         href="blog.html#post-${post.id}">
-         Beitrag öffnen
+      <a
+        class="button"
+        href="#post-${post.id}"
+        onclick="
+          event.preventDefault();
+          openPost('${post.id}')
+        "
+      >
+        Beitrag öffnen
       </a>
 
     </div>
@@ -107,6 +193,77 @@ function renderPosts(posts){
   `).join("");
 
 }
+
+function openPost(postId){
+
+  const post =
+  posts.find(
+    p => String(p.id)
+    === String(postId)
+  );
+
+  if(!post) return;
+
+  document
+    .getElementById("modalTitle")
+    .innerHTML =
+    escapeHtml(post.title);
+
+  document
+    .getElementById("modalContent")
+    .innerHTML =
+    escapeHtml(
+      post.content
+      || post.excerpt
+    );
+
+  document
+    .getElementById("modal")
+    .classList
+    .add("open");
+
+  history.pushState(
+    null,
+    "",
+    "#post-" + postId
+  );
+
+}
+
+function closeModal(){
+
+  document
+    .getElementById("modal")
+    .classList
+    .remove("open");
+
+  history.pushState(
+    null,
+    "",
+    window.location.pathname
+  );
+
+}
+
+function openPostFromUrl(){
+
+  const hash =
+  window.location.hash;
+
+  if(!hash.startsWith("#post-"))
+    return;
+
+  const postId =
+  hash.replace("#post-","");
+
+  openPost(postId);
+
+}
+
+window.addEventListener(
+  "hashchange",
+  openPostFromUrl
+);
 
 loadPosts();
 
