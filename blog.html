@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,10 +12,10 @@
 <style>
 
 body{
-  font-family:Arial;
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
   background:#040911;
   color:white;
-  margin:0;
 }
 
 h1{
@@ -34,6 +35,10 @@ h1{
   border-radius:12px;
 }
 
+.card h3{
+  margin-top:0;
+}
+
 .button{
   display:inline-block;
   padding:10px 14px;
@@ -44,60 +49,29 @@ h1{
   margin-top:12px;
 }
 
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.8);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-
-.modal.open{
-  display:flex;
-}
-
-.modal-card{
-  background:#0a1320;
-  padding:30px;
-  border-radius:12px;
-  max-width:900px;
-  width:90%;
-}
-
-.close{
-  cursor:pointer;
-  margin-top:20px;
-  display:inline-block;
+.empty{
+  padding:20px;
 }
 
 @media(max-width:900px){
+
   .posts-grid{
     grid-template-columns:1fr;
   }
+
 }
 
 </style>
+
 </head>
 
 <body>
 
 <h1>HausKI Blog</h1>
 
-<div id="postsGrid" class="posts-grid"></div>
-
-<div id="modal" class="modal">
-  <div class="modal-card">
-
-    <h2 id="modalTitle"></h2>
-
-    <p id="modalContent"></p>
-
-    <span class="button close" onclick="closeModal()">
-      Schließen
-    </span>
-
-  </div>
+<div
+  id="postsGrid"
+  class="posts-grid">
 </div>
 
 <script>
@@ -114,16 +88,6 @@ supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
-let posts = [];
-
-function escapeHtml(text){
-
-  return String(text || "")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
-
-}
-
 async function loadPosts(){
 
   const { data, error } =
@@ -137,16 +101,14 @@ async function loadPosts(){
   if(error){
 
     console.error(error);
+
     alert(error.message);
+
     return;
 
   }
 
-  posts = data || [];
-
-  renderPosts(posts);
-
-  openPostFromUrl();
+  renderPosts(data || []);
 
 }
 
@@ -158,7 +120,7 @@ function renderPosts(posts){
   if(!posts.length){
 
     grid.innerHTML =
-    "Keine Blogbeiträge gefunden";
+    "<div class='empty'>Keine Blogbeiträge gefunden</div>";
 
     return;
 
@@ -170,21 +132,16 @@ function renderPosts(posts){
     <div class="card">
 
       <h3>
-        ${escapeHtml(post.title)}
+        ${post.title}
       </h3>
 
       <p>
-        ${escapeHtml(post.excerpt || "")}
+        ${post.excerpt || ""}
       </p>
 
       <a
         class="button"
-        href="#post-${post.id}"
-        onclick="
-          event.preventDefault();
-          openPost('${post.id}')
-        "
-      >
+        href="blog.html#post-${post.id}">
         Beitrag öffnen
       </a>
 
@@ -193,77 +150,6 @@ function renderPosts(posts){
   `).join("");
 
 }
-
-function openPost(postId){
-
-  const post =
-  posts.find(
-    p => String(p.id)
-    === String(postId)
-  );
-
-  if(!post) return;
-
-  document
-    .getElementById("modalTitle")
-    .innerHTML =
-    escapeHtml(post.title);
-
-  document
-    .getElementById("modalContent")
-    .innerHTML =
-    escapeHtml(
-      post.content
-      || post.excerpt
-    );
-
-  document
-    .getElementById("modal")
-    .classList
-    .add("open");
-
-  history.pushState(
-    null,
-    "",
-    "#post-" + postId
-  );
-
-}
-
-function closeModal(){
-
-  document
-    .getElementById("modal")
-    .classList
-    .remove("open");
-
-  history.pushState(
-    null,
-    "",
-    window.location.pathname
-  );
-
-}
-
-function openPostFromUrl(){
-
-  const hash =
-  window.location.hash;
-
-  if(!hash.startsWith("#post-"))
-    return;
-
-  const postId =
-  hash.replace("#post-","");
-
-  openPost(postId);
-
-}
-
-window.addEventListener(
-  "hashchange",
-  openPostFromUrl
-);
 
 loadPosts();
 
