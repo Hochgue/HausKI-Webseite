@@ -5,111 +5,413 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>HausKI – Automationen</title>
+<meta name="description" content="HausKI Automationen: echte Praxislösungen aus meinem intelligenten Zuhause.">
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+*{box-sizing:border-box}
+
+:root{
+  --bg:#040911;
+  --panel:rgba(9,20,36,.86);
+  --line:rgba(33,200,255,.20);
+  --line-soft:rgba(255,255,255,.08);
+  --text:#ecf6ff;
+  --muted:#9db2c9;
+  --accent:#21c8ff;
+  --shadow:0 22px 70px rgba(0,0,0,.38);
+  --radius:24px;
+}
+
 body{
-  font-family:Arial;
-  background:#040911;
-  color:white;
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(33,200,255,.18), transparent 26%),
+    linear-gradient(180deg,#040911 0%,#081426 50%,#040911 100%);
+  color:var(--text);
+}
+
+a{color:inherit}
+
+.container{
+  width:min(1180px, calc(100% - 32px));
+  margin:0 auto;
+}
+
+.nav{
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  padding:16px 28px;
+  background:rgba(4,9,17,.82);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-soft);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  text-decoration:none;
+}
+
+.logo-img{
+  height:48px;
+  width:auto;
+  display:block;
+  object-fit:contain;
+  filter:drop-shadow(0 0 12px rgba(33,200,255,.35));
+}
+
+.nav-links{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.nav-links a{
+  color:#dcefff;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:700;
+}
+
+.nav-links a.active,
+.nav-links a:hover{
+  color:var(--accent);
+}
+
+.hero{
+  padding:70px 0 30px;
+}
+
+.panel{
+  background:linear-gradient(180deg, rgba(12,24,42,.88), rgba(6,15,28,.94));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+.hero-box{
+  padding:44px;
+}
+
+.badge{
+  display:inline-flex;
+  padding:9px 14px;
+  border-radius:999px;
+  background:rgba(33,200,255,.08);
+  border:1px solid rgba(33,200,255,.18);
+  color:var(--accent);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+h1{
+  margin:18px 0 16px;
+  font-size:clamp(38px,5vw,62px);
+  line-height:1.02;
+  letter-spacing:-2px;
+}
+
+.lead{
+  color:var(--muted);
+  font-size:18px;
+  line-height:1.7;
+  max-width:760px;
+}
+
+.section{
+  padding:28px 0;
+}
+
+.section-head{
+  margin-bottom:18px;
+}
+
+.section-head h2{
+  margin:12px 0 8px;
+  font-size:clamp(28px,4vw,42px);
+}
+
+.section-head p{
+  color:var(--muted);
+  line-height:1.7;
 }
 
 .auto-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:20px;
-  padding:20px;
+  gap:18px;
 }
 
 .card{
-  background:#0a1320;
-  padding:20px;
-  border-radius:12px;
+  min-height:260px;
+  padding:24px;
+  border-radius:24px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:0 14px 42px rgba(0,0,0,.28);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.card h3{
+  margin:0 0 12px;
+  font-size:26px;
+  line-height:1.15;
+}
+
+.card p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.65;
+}
+
+.meta{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+.chip{
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.09);
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
 }
 
 .button{
-  display:inline-block;
-  padding:10px 14px;
-  background:#21c8ff;
-  color:black;
+  margin-top:20px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:max-content;
+  min-height:44px;
+  padding:0 16px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),#1d8cff);
+  color:#03111d;
+  font-weight:900;
   text-decoration:none;
-  border-radius:8px;
+}
+
+.loading,
+.empty{
+  padding:28px;
+  border-radius:20px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--muted);
+}
+
+footer{
+  margin-top:32px;
+  padding:28px 0 44px;
+  border-top:1px solid rgba(255,255,255,.08);
+  color:var(--muted);
+}
+
+.footer-line{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.footer-line a{
+  color:var(--accent);
+  text-decoration:none;
+  font-weight:800;
+}
+
+@media(max-width:900px){
+  .auto-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:640px){
+  .nav{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .logo-img{
+    height:42px;
+  }
+
+  .hero-box,
+  .card{
+    padding:24px;
+  }
 }
 </style>
-
 </head>
+
 <body>
 
-<h1 style="padding:20px;">HausKI Automationen</h1>
+<nav class="nav">
+  <a class="logo" href="index.html">
+    <img src="bilder/logo-hauski.jpeg" alt="HausKI Logo" class="logo-img">
+  </a>
 
-<div id="autoGrid" class="auto-grid"></div>
+  <div class="nav-links">
+    <a href="index.html">Start</a>
+    <a href="automationen.html" class="active">Automationen</a>
+    <a href="blog.html">Blog</a>
+    <a href="roadmap.html">Projekt</a>
+    <a href="ueber.html">Über</a>
+  </div>
+</nav>
+
+<header class="hero container">
+  <div class="panel hero-box">
+    <span class="badge">Praxislösungen aus HausKI</span>
+    <h1>Automationen, die im Alltag wirklich helfen.</h1>
+    <p class="lead">
+      Hier sammle ich die wichtigsten HausKI-Automationen aus meinem echten Zuhause.
+      Nicht als Technikshow, sondern als nachvollziehbare Lösungen für Alltag, Energie und Kontrolle.
+    </p>
+  </div>
+</header>
+
+<main class="container">
+
+<section class="section">
+  <div class="section-head">
+    <span class="badge">Aus dem Blog geladen</span>
+    <h2>HausKI-Automationen</h2>
+    <p>
+      Diese Übersicht lädt automatisch alle veröffentlichten Beiträge aus Supabase,
+      die als Automation markiert sind.
+    </p>
+  </div>
+
+  <div id="loading" class="loading">Automationen werden geladen ...</div>
+  <div id="autoGrid" class="auto-grid" hidden></div>
+  <div id="empty" class="empty" hidden>Keine Automationen gefunden.</div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container footer-line">
+    <span>© 2026 HausKI • Günther Hochreiter</span>
+    <span><a href="blog.html">Blog</a> · <a href="roadmap.html">Projekt</a> · <a href="ueber.html">Über</a></span>
+  </div>
+</footer>
 
 <script>
-
 const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
 
-const supabaseClient = supabase.createClient(
+const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
-async function loadAutomationen(){
+const els = {
+  loading: document.getElementById("loading"),
+  grid: document.getElementById("autoGrid"),
+  empty: document.getElementById("empty")
+};
 
+function escapeHtml(value = ""){
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function isAutomationPost(post){
+  const values = [
+    post.type,
+    post.category,
+    post.source,
+    post.material,
+    post.title
+  ]
+  .filter(Boolean)
+  .join(" ")
+  .toLowerCase();
+
+  return values.includes("automation") || values.includes("yaml");
+}
+
+function splitTags(value){
+  if(!value) return [];
+  return String(value)
+    .split(",")
+    .map(v => v.trim())
+    .filter(Boolean);
+}
+
+async function loadAutomationen(){
   const { data, error } = await supabaseClient
     .from("posts")
     .select("*")
     .eq("published", true)
-    .eq("type", "Automation")
     .order("date", { ascending:false });
 
   if(error){
-
     console.error(error);
-    alert(error.message);
+    els.loading.textContent = "Fehler beim Laden der Automationen.";
     return;
-
   }
 
-  renderAutomationen(data || []);
+  const automations = (data || []).filter(isAutomationPost);
 
+  renderAutomationen(automations);
 }
 
 function renderAutomationen(posts){
-
-  const grid = document.getElementById("autoGrid");
+  els.loading.hidden = true;
 
   if(!posts.length){
-
-    grid.innerHTML = "Keine Automationen gefunden";
+    els.empty.hidden = false;
+    els.grid.hidden = true;
     return;
-
   }
 
-  grid.innerHTML = posts.map(post => `
+  els.empty.hidden = true;
+  els.grid.hidden = false;
 
-    <div class="card">
+  els.grid.innerHTML = posts.map(post => {
+    const tags = splitTags(post.type || post.category);
+    const url = `blog.html#post-${encodeURIComponent(post.id)}`;
 
-      <h3>${post.title}</h3>
+    return `
+      <article class="card" id="${escapeHtml(post.automation_id || post.id)}">
+        <div>
+          <span class="badge">${escapeHtml(post.category || "Automation")}</span>
+          <h3>${escapeHtml(post.title || "Ohne Titel")}</h3>
+          <p>${escapeHtml(post.excerpt || "Keine Kurzbeschreibung vorhanden.")}</p>
 
-      <p>
-        ${post.excerpt || ""}
-      </p>
+          <div class="meta">
+            ${tags.slice(0,4).map(tag => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}
+          </div>
+        </div>
 
-      <a class="button"
-         href="blog.html#post-${post.id}">
-         Automation ansehen
-      </a>
-
-    </div>
-
-  `).join("");
-
+        <a class="button" href="${url}">Automation ansehen →</a>
+      </article>
+    `;
+  }).join("");
 }
 
 loadAutomationen();
-
 </script>
 
 </body>
