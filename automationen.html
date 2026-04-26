@@ -514,7 +514,10 @@ window.openAutomation = function(automationId, updateUrl = true){
 
   const tags = splitTags(post.type || post.category);
   const content =
-  post.automation_yaml
+  post.material
+  || post.automation_yaml
+  || post.yaml
+  || post.content
   || "Keine Automation vorhanden.";
 
   const description =
