@@ -305,14 +305,12 @@
       grid-template-columns:1.05fr .95fr;
       overflow:hidden;
     }
-    .highlight-img{
-      min-height:340px;
-      background:
-        linear-gradient(135deg, rgba(33,200,255,.13), rgba(0,0,0,.2)),
-        url("bilder/geschirrspueler-pv.jpg") center/cover no-repeat,
-        #081424;
-      border-right:1px solid rgba(255,255,255,.08);
+    ..highlight-img{
+      min-height:360px;
+      background:#081424 center center / contain no-repeat;
+      border-right:1px solid rgba(33,200,255,.20);
     }
+    
     .highlight-body{
       padding:34px;
       display:flex;
@@ -486,7 +484,7 @@
       </div>
 
       <article class="panel highlight">
-        <div class="highlight-img" role="img" aria-label="Geschirrspüler startet bei PV-Überschuss"></div>
+        <div class="highlight-img" style="background-image:url('bilder/geschirrspueler-pv.jpg');" role="img" aria-label="Geschirrspüler startet bei PV-Überschuss"></div>
         <div class="highlight-body">
           <span class="badge">PV-Überschuss</span>
           <h3>Geschirrspüler startet automatisch</h3>
