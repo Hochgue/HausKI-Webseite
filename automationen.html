@@ -206,6 +206,8 @@ h1{
   color:#03111d;
   font-weight:900;
   text-decoration:none;
+  border:none;
+  cursor:pointer;
 }
 
 .loading,
@@ -215,6 +217,71 @@ h1{
   background:rgba(255,255,255,.035);
   border:1px solid rgba(255,255,255,.08);
   color:var(--muted);
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(2,7,14,.82);
+  backdrop-filter:blur(10px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  z-index:300;
+}
+
+.modal.open{
+  display:flex;
+}
+
+.modal-card{
+  width:min(980px,100%);
+  max-height:calc(100vh - 44px);
+  overflow:auto;
+  background:linear-gradient(180deg, rgba(12,24,42,.98), rgba(6,15,28,.98));
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:0 20px 80px rgba(0,0,0,.48);
+}
+
+.modal-body{
+  padding:30px;
+}
+
+.modal-body h2{
+  margin:12px 0 12px;
+  font-size:clamp(28px,4vw,42px);
+  line-height:1.12;
+}
+
+.modal-content{
+  margin-top:20px;
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--muted);
+  line-height:1.75;
+  white-space:pre-wrap;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:22px;
+}
+
+.modal-button{
+  min-height:44px;
+  padding:0 16px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.035);
+  color:var(--text);
+  font-weight:900;
+  cursor:pointer;
 }
 
 footer{
@@ -252,7 +319,8 @@ footer{
   }
 
   .hero-box,
-  .card{
+  .card,
+  .modal-body{
     padding:24px;
   }
 }
@@ -290,11 +358,11 @@ footer{
 
 <section class="section">
   <div class="section-head">
-    <span class="badge">Aus dem Blog geladen</span>
+    <span class="badge">Automationen</span>
     <h2>HausKI-Automationen</h2>
     <p>
-      Diese Übersicht lädt automatisch alle veröffentlichten Beiträge aus Supabase,
-      die als Automation markiert sind.
+      Diese Übersicht lädt automatisch alle veröffentlichten Automationen aus Supabase.
+      Beim Öffnen bleibst du auf der Automationen-Seite.
     </p>
   </div>
 
@@ -312,6 +380,12 @@ footer{
   </div>
 </footer>
 
+<div id="automationModal" class="modal" aria-hidden="true">
+  <div class="modal-card">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://wuizcshgkdolkngqoutj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_hHr-ZsPbx8vFZfOJ-mGARg_Atr7yIdI';
@@ -321,10 +395,14 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
+let automations = [];
+
 const els = {
   loading: document.getElementById("loading"),
   grid: document.getElementById("autoGrid"),
-  empty: document.getElementById("empty")
+  empty: document.getElementById("empty"),
+  modal: document.getElementById("automationModal"),
+  modalContent: document.getElementById("modalContent")
 };
 
 function escapeHtml(value = ""){
@@ -353,10 +431,19 @@ function isAutomationPost(post){
 
 function splitTags(value){
   if(!value) return [];
+
   return String(value)
     .split(",")
     .map(v => v.trim())
     .filter(Boolean);
+}
+
+function getAutomationId(post){
+  return String(post.automation_id || post.id);
+}
+
+function getAutomationById(id){
+  return automations.find(post => String(getAutomationId(post)) === String(id)) || null;
 }
 
 async function loadAutomationen(){
@@ -372,9 +459,10 @@ async function loadAutomationen(){
     return;
   }
 
-  const automations = (data || []).filter(isAutomationPost);
+  automations = (data || []).filter(isAutomationPost);
 
   renderAutomationen(automations);
+  openAutomationFromHash();
 }
 
 function renderAutomationen(posts){
@@ -391,10 +479,10 @@ function renderAutomationen(posts){
 
   els.grid.innerHTML = posts.map(post => {
     const tags = splitTags(post.type || post.category);
-    const url = `blog.html#post-${encodeURIComponent(post.id)}`;
+    const automationId = getAutomationId(post);
 
     return `
-      <article class="card" id="${escapeHtml(post.automation_id || post.id)}">
+      <article class="card" id="automation-${escapeHtml(automationId)}">
         <div>
           <span class="badge">${escapeHtml(post.category || "Automation")}</span>
           <h3>${escapeHtml(post.title || "Ohne Titel")}</h3>
@@ -405,11 +493,86 @@ function renderAutomationen(posts){
           </div>
         </div>
 
-        <a class="button" href="${url}">Automation ansehen →</a>
+        <a
+          class="button"
+          href="#automation-${encodeURIComponent(automationId)}"
+          onclick="event.preventDefault(); openAutomation('${escapeHtml(automationId)}')">
+          Automation öffnen →
+        </a>
       </article>
     `;
   }).join("");
 }
+
+window.openAutomation = function(automationId, updateUrl = true){
+  const post = getAutomationById(automationId);
+  if(!post) return;
+
+  if(updateUrl){
+    history.pushState(null, "", `#automation-${encodeURIComponent(automationId)}`);
+  }
+
+  const tags = splitTags(post.type || post.category);
+  const content = post.content || post.material || post.excerpt || "Kein Inhalt vorhanden.";
+
+  els.modalContent.innerHTML = `
+    <div class="modal-body">
+      <span class="badge">${escapeHtml(post.category || "Automation")}</span>
+      <h2>${escapeHtml(post.title || "Ohne Titel")}</h2>
+      <p style="color:var(--muted);line-height:1.7;">
+        ${escapeHtml(post.excerpt || "")}
+      </p>
+
+      <div class="meta">
+        ${tags.slice(0,6).map(tag => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}
+      </div>
+
+      <div class="modal-content">${escapeHtml(content)}</div>
+
+      <div class="modal-actions">
+        <button class="modal-button" type="button" onclick="closeAutomation()">Schließen</button>
+      </div>
+    </div>
+  `;
+
+  els.modal.classList.add("open");
+  els.modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+};
+
+window.closeAutomation = function(){
+  els.modal.classList.remove("open");
+  els.modal.setAttribute("aria-hidden", "true");
+  els.modalContent.innerHTML = "";
+  document.body.style.overflow = "";
+
+  if(window.location.hash.startsWith("#automation-")){
+    history.pushState(null, "", window.location.pathname);
+  }
+};
+
+function openAutomationFromHash(){
+  const hash = window.location.hash.replace("#", "");
+
+  if(!hash.startsWith("automation-")) return;
+
+  const automationId = decodeURIComponent(hash.replace("automation-", ""));
+  openAutomation(automationId, false);
+}
+
+els.modal.addEventListener("click", event => {
+  if(event.target === els.modal){
+    closeAutomation();
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if(event.key === "Escape" && els.modal.classList.contains("open")){
+    closeAutomation();
+  }
+});
+
+window.addEventListener("hashchange", openAutomationFromHash);
 
 loadAutomationen();
 </script>
