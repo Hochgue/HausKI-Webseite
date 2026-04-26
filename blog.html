@@ -236,7 +236,7 @@
      position:relative;
      width:100%;
      aspect-ratio:16 / 9;
-     background:#081424 center center / cover no-repeat;
+     background:#081424 center center / contain no-repeat;
      border-bottom:1px solid rgba(255,255,255,.08);
      overflow:hidden;
     }
@@ -413,11 +413,12 @@
       }
 
       .blog-card.wide .blog-image{
-        height:260px;
-        min-height:260px;
+        height:auto;
+        min-height:0;
+        aspect-ratio:16 / 9;
         border-right:none;
         border-bottom:1px solid rgba(255,255,255,.08);
-      }
+  }
 
       .note-grid{
         grid-template-columns:1fr;
