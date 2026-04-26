@@ -513,7 +513,14 @@ window.openAutomation = function(automationId, updateUrl = true){
   }
 
   const tags = splitTags(post.type || post.category);
-  const content = post.content || post.material || post.excerpt || "Kein Inhalt vorhanden.";
+  const content =
+  post.automation_yaml
+  || "Keine Automation vorhanden.";
+
+  const description =
+  post.automation_description
+  || post.excerpt
+  || "";
 
   els.modalContent.innerHTML = `
     <div class="modal-body">
@@ -527,7 +534,15 @@ window.openAutomation = function(automationId, updateUrl = true){
         ${tags.slice(0,6).map(tag => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}
       </div>
 
-      <div class="modal-content">${escapeHtml(content)}</div>
+      ${description
+  ? `<p style="color:var(--muted);line-height:1.7;">
+       ${escapeHtml(description)}
+     </p>`
+  : ""}
+
+<div class="modal-content">
+${escapeHtml(content)}
+</div>
 
       <div class="modal-actions">
         <button class="modal-button" type="button" onclick="closeAutomation()">Schließen</button>
