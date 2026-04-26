@@ -511,15 +511,11 @@ function escapeHtml(value=''){
 }
 
 function isAutomationPost(post){
-  const category = String(post.category || '').trim().toLowerCase();
-  const type = String(post.type || '').trim().toLowerCase();
-  const material = String(post.material || '').trim();
+  return String(post.material || '').trim().length > 0;
+}
 
-  return (
-    category === 'automation' ||
-    type === 'automation' ||
-    material.length > 0
-  );
+function isBlogPost(post){
+  return String(post.content || '').trim().length > 0;
 }
 
 async function loadAll(){
@@ -539,8 +535,8 @@ async function loadAll(){
 }
 
 function renderLists(){
-  const blogs = allPosts.filter(post => !isAutomationPost(post)).slice(0,20);
-  const automations = allPosts.filter(isAutomationPost).slice(0,20);
+const blogs = allPosts.filter(isBlogPost).slice(0,20);
+const automations = allPosts.filter(isAutomationPost).slice(0,20);
 
   els.blogList.innerHTML = blogs.length
     ? blogs.map(post => `
@@ -661,7 +657,6 @@ async function saveAutomation(){
     category: document.getElementById('automationCategory').value || 'Automation',
     type: document.getElementById('automationType').value.trim() || 'Automation,YAML',
     excerpt: document.getElementById('automationExcerpt').value.trim(),
-    content: '',
     material: document.getElementById('automationYaml').value.trim(),
     published: true,
     date: new Date().toISOString()
