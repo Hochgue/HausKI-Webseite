@@ -131,6 +131,8 @@
           <div><label>Bundesland</label><select id="bundesland"><option>Burgenland</option><option>Kärnten</option><option>Niederösterreich</option><option>Oberösterreich</option><option>Salzburg</option><option>Steiermark</option><option>Tirol</option><option>Vorarlberg</option><option>Wien</option></select></div>
           <div><label>Kundentyp</label><select id="kundentyp"><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option></select></div>
           <div><label>Kundenstatus</label><select id="kundenstatus"><option>Kunde</option><option>Interessent</option><option>Sonstiges</option></select></div>
+          <div><label>In weclapp übernommen</label><select id="weclapp"><option>Nein</option><option>Ja</option></select></div>
+          <div><label>Potenzial</label><select id="potenzial"><option>klein</option><option>mittel</option><option>groß</option></select></div>
         </div>
       </div>
 
@@ -151,19 +153,16 @@
       </div>
 
       <div class="section">
-        <div class="section-title">Aktivität erfassen</div>
-        <div class="grid-4">
-          <div><label>Status</label><select id="status"><option>Termin vereinbart</option><option>Unterlagen versendet</option><option>Telefonat ausgemacht</option><option>Sonstiges</option></select></div>
-          <div><label>Erstkontakt</label><input id="erstkontakt" type="date"></div>
-          <div><label>Nächster Termin / Kontakt</label><input id="naechsterkontakt" type="date"></div>
-          <div><label>Uhrzeit</label><input id="naechsterkontakt_zeit" type="time"></div>
-          <div><label>Art nächster Kontakt</label><select id="kontaktart"><option>Persönlicher Termin</option><option>Rückruf</option><option>Telefonat</option><option>Mail</option><option>Unterlagen</option><option>Sonstiges</option></select></div>
-          <div><label>In weclapp übernommen</label><select id="weclapp"><option>Nein</option><option>Ja</option></select></div>
-          <div><label>Potenzial</label><select id="potenzial"><option>klein</option><option>mittel</option><option>groß</option></select></div>
-        </div>
+        <div class="section-title">Neue Aktivität</div>
 
-        <div style="margin-top:18px">
-          <div class="sub-title">Neue Aktivität</div>
+        <input id="status" type="hidden" value="Sonstiges">
+        <input id="erstkontakt" type="hidden">
+        <input id="naechsterkontakt" type="hidden">
+        <input id="naechsterkontakt_zeit" type="hidden">
+        <input id="kontaktart" type="hidden">
+
+        <div style="margin-top:0">
+          <div class="hint" style="margin-bottom:12px">Hier dokumentierst du Telefonate, E-Mails, Termine, Besuche und Unterlagen. Zukünftige Termine/Rückrufe erscheinen automatisch rechts als nächster Schritt. Vergangene Einträge bleiben in der Timeline.</div>
           <div class="note-grid">
             <div><label>Datum</label><input id="noteDate" type="date"></div>
             <div><label>Uhrzeit</label><input id="noteTime" type="time"></div>
@@ -197,7 +196,6 @@
       <div class="section"><div class="sub-title">Kundenakte</div><div class="mini-box" id="customerSummary">Kein Kontakt ausgewählt.</div></div>
       <div class="section"><div class="sub-title">Anhänge / Unterlagen</div><div class="mini-box" id="customerAttachmentsSummary">Keine Anhänge vorhanden.</div></div>
       <div class="section"><div class="sub-title">Letzte Aktivitäten</div><div class="mini-box" id="customerActivitySummary">Keine Aktivitäten vorhanden.</div></div>
-      <div class="section"><div class="sub-title">Kennzahlen</div><div class="stats"><div class="stat"><div class="label">Gesamt</div><div class="value" id="s_gesamt">0</div></div><div class="stat"><div class="label long">Heute fällig</div><div class="value" id="s_faellig">0</div></div><div class="stat"><div class="label long">Sonstiges</div><div class="value" id="s_rot">0</div></div><div class="stat"><div class="label long">Telefonat ausgemacht</div><div class="value" id="s_orange">0</div></div><div class="stat"><div class="label long">Unterlagen versendet</div><div class="value" id="s_violett">0</div></div><div class="stat"><div class="label long">Termin vereinbart</div><div class="value" id="s_gelb">0</div></div><div class="stat"><div class="label long">B2B</div><div class="value" id="s_gruen">0</div></div></div></div>
     </div>
   </div>
 </div>
@@ -264,9 +262,67 @@ function updateSubContact(index,field,value){ contacts=contacts.map(x=>{ if(x.id
 function removeSubContact(index){ contacts=contacts.map(x=>{ if(x.id!==selectedId) return x; const weitere=[...(x.weitere_kontakte||[])]; weitere.splice(index,1); return {...x,weitere_kontakte:weitere}; }); persistData(true); fillForm(); renderList(); }
 
 function renderAttachments(){ const c=getSelected(); const list=document.getElementById("attachmentList"); if(!c||!(c.attachments||[]).length){ list.innerHTML='<div class="empty">Noch keine Anhänge für diesen Kunden.</div>'; return; } list.innerHTML=c.attachments.map((a,i)=>`<div class="attachment-item"><div class="attachment-meta"><div class="attachment-name">${esc(a.name||"Datei")}</div><div class="attachment-sub">${esc(a.type||"Datei")} • ${esc(humanSize(a.size||0))}</div></div><div class="attachment-actions"><button onclick="openAttachment(${i}); event.stopPropagation();">Öffnen</button><button class="delete" onclick="removeAttachment(${i}); event.stopPropagation();">Löschen</button></div></div>`).join(""); }
-function updateCustomerSummary(){ const c=getSelected(); const box=document.getElementById("customerSummary"); const attBox=document.getElementById("customerAttachmentsSummary"); const actBox=document.getElementById("customerActivitySummary"); if(!box) return; if(!c){ box.innerHTML="Kein Kontakt ausgewählt."; if(attBox) attBox.innerHTML="Keine Anhänge vorhanden."; if(actBox) actBox.innerHTML="Keine Aktivitäten vorhanden."; return; } const contactsList=[]; if([c.vorname,c.nachname,c.rolle,c.telefon,c.mobil,c.email].some(v=>String(v||"").trim()!=="")){ contactsList.push(`<div class="summary-card"><strong>Hauptkontakt</strong><div class="hint">${esc([c.vorname,c.nachname].filter(Boolean).join(" "))}</div><div class="hint">${esc(c.rolle||"")}</div><div class="hint">${esc(c.telefon||"")}</div><div class="hint">${esc(c.mobil||"")}</div><div class="hint">${esc(c.email||"")}</div></div>`); } (c.weitere_kontakte||[]).forEach((p,i)=>{ contactsList.push(`<div class="summary-card"><strong>Kontakt ${i+2}</strong><div class="hint">${esc([p.vorname,p.nachname].filter(Boolean).join(" "))}</div><div class="hint">${esc(p.position||"")}</div><div class="hint">${esc(p.telefon||"")}</div><div class="hint">${esc(p.mobil||"")}</div><div class="hint">${esc(p.email||"")}</div></div>`); }); box.innerHTML=`<div><strong style="font-size:18px">${esc(c.firma||"-")}</strong></div><div class="hint">${esc(c.strasse||"")}<br>${esc([c.plz,c.ort].filter(Boolean).join(" "))}<br>${esc([c.bezirk,c.bundesland].filter(Boolean).join(" / "))}</div><hr><div class="summary-grid"><div class="summary-card"><strong>Kundendaten</strong><div class="hint">Kundentyp: ${esc(c.kundentyp||"-")}</div><div class="hint">Kundenstatus: ${esc(c.kundenstatus||"-")}</div><div class="hint">Potenzial: ${esc(c.potenzial||"-")}</div><div class="hint">In weclapp: ${esc(c.weclapp||"Nein")}</div></div><div class="summary-card"><strong>Nächster Termin / Kontakt</strong><div class="hint">${esc(formatDateDisplay(c.naechsterkontakt||""))}</div><div class="hint">${esc(c.naechsterkontakt_zeit||"")}</div><div class="hint">${esc(c.kontaktart||"-")}</div><div class="hint">Status: ${esc(c.status||"-")}</div></div></div><hr><strong>Kontakte</strong><div class="summary-grid">${contactsList.length?contactsList.join(""):'<div class="hint">Keine Kontakte hinterlegt.</div>'}</div>`; const attachments=c.attachments||[]; if(attBox){ attBox.innerHTML=attachments.length?attachments.map(a=>`<div class="hint"><strong>${esc(a.name||"Datei")}</strong><br>${esc(a.type||"Datei")} · ${esc(humanSize(a.size||0))}</div>`).join("<hr>"):"Keine Anhänge vorhanden."; } const notes=[...(c.notes_history||[])].reverse().slice(0,5); if(actBox){ actBox.innerHTML=notes.length?notes.map(n=>`<div class="hint"><strong>${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""} · ${esc(n.type||"Aktivität")}</strong><br>${esc(n.text||"")}</div>`).join("<hr>"):"Keine Aktivitäten vorhanden."; } }
+function updateCustomerSummary(){ const c=getSelected(); const box=document.getElementById("customerSummary"); const attBox=document.getElementById("customerAttachmentsSummary"); const actBox=document.getElementById("customerActivitySummary"); if(!box) return; if(!c){ box.innerHTML="Kein Kontakt ausgewählt."; if(attBox) attBox.innerHTML="Keine Anhänge vorhanden."; if(actBox) actBox.innerHTML="Keine Aktivitäten vorhanden."; return; } const contactsList=[]; if([c.vorname,c.nachname,c.rolle,c.telefon,c.mobil,c.email].some(v=>String(v||"").trim()!=="")){ contactsList.push(`<div class="summary-card"><strong>Hauptkontakt</strong><div class="hint">${esc([c.vorname,c.nachname].filter(Boolean).join(" "))}</div><div class="hint">${esc(c.rolle||"")}</div><div class="hint">${esc(c.telefon||"")}</div><div class="hint">${esc(c.mobil||"")}</div><div class="hint">${esc(c.email||"")}</div></div>`); } (c.weitere_kontakte||[]).forEach((p,i)=>{ contactsList.push(`<div class="summary-card"><strong>Kontakt ${i+2}</strong><div class="hint">${esc([p.vorname,p.nachname].filter(Boolean).join(" "))}</div><div class="hint">${esc(p.position||"")}</div><div class="hint">${esc(p.telefon||"")}</div><div class="hint">${esc(p.mobil||"")}</div><div class="hint">${esc(p.email||"")}</div></div>`); }); box.innerHTML=`<div><strong style="font-size:18px">${esc(c.firma||"-")}</strong></div><div class="hint">${esc(c.strasse||"")}<br>${esc([c.plz,c.ort].filter(Boolean).join(" "))}<br>${esc([c.bezirk,c.bundesland].filter(Boolean).join(" / "))}</div><hr><div class="summary-grid"><div class="summary-card"><strong>Kundendaten</strong><div class="hint">Kundentyp: ${esc(c.kundentyp||"-")}</div><div class="hint">Kundenstatus: ${esc(c.kundenstatus||"-")}</div><div class="hint">Potenzial: ${esc(c.potenzial||"-")}</div><div class="hint">In weclapp übernommen: ${esc(c.weclapp||"Nein")}</div></div><div class="summary-card"><strong>Nächster Schritt</strong><div class="hint">${esc(formatDateDisplay(c.naechsterkontakt||""))}</div><div class="hint">${esc(c.naechsterkontakt_zeit||"")}</div><div class="hint">${esc(c.kontaktart||"-")}</div><div class="hint">Status: ${esc(c.status||"-")}</div></div></div><hr><strong>Kontakte</strong><div class="summary-grid">${contactsList.length?contactsList.join(""):'<div class="hint">Keine Kontakte hinterlegt.</div>'}</div>`; const attachments=c.attachments||[]; if(attBox){ attBox.innerHTML=attachments.length?attachments.map(a=>`<div class="hint"><strong>${esc(a.name||"Datei")}</strong><br>${esc(a.type||"Datei")} · ${esc(humanSize(a.size||0))}</div>`).join("<hr>"):"Keine Anhänge vorhanden."; } const notes=[...(c.notes_history||[])].reverse().slice(0,5); if(actBox){ actBox.innerHTML=notes.length?notes.map(n=>`<div class="hint"><strong>${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""} · ${esc(n.type||"Aktivität")}</strong><br>${esc(n.text||"")}</div>`).join("<hr>"):"Keine Aktivitäten vorhanden."; } }
 
-function applyTimelineLogic(noteType,noteDate,noteTime){ const type=String(noteType||"").toLowerCase(); const statusEl=document.getElementById("status"); const nextDateEl=document.getElementById("naechsterkontakt"); const nextTimeEl=document.getElementById("naechsterkontakt_zeit"); const kontaktartEl=document.getElementById("kontaktart"); if(type.includes("termin vereinbart")||type.includes("persönlicher besuch")){ statusEl.value="Termin vereinbart"; if(noteDate) nextDateEl.value=noteDate; if(noteTime) nextTimeEl.value=noteTime; kontaktartEl.value=type.includes("besuch")?"Persönlicher Termin":"Persönlicher Termin"; }else if(type.includes("rückruf")){ statusEl.value="Telefonat ausgemacht"; if(noteDate) nextDateEl.value=noteDate; if(noteTime) nextTimeEl.value=noteTime; kontaktartEl.value="Rückruf"; }else if(type.includes("mail")){ statusEl.value="Unterlagen versendet"; kontaktartEl.value="Mail"; }else if(type.includes("unterlagen")||type.includes("angebot")){ statusEl.value="Unterlagen versendet"; kontaktartEl.value="Unterlagen"; }else if(type.includes("telefonat")){ statusEl.value="Telefonat ausgemacht"; kontaktartEl.value="Telefonat"; }else if(type.includes("erstkontakt")){ if(!document.getElementById("erstkontakt").value) document.getElementById("erstkontakt").value=noteDate||todayStr(); }else{ if(!statusEl.value) statusEl.value="Sonstiges"; } }
+function isFutureOrToday(dateStr){
+  if(!dateStr) return false;
+  return String(dateStr) >= todayStr();
+}
+
+function applyTimelineLogic(noteType,noteDate,noteTime){
+  const type=String(noteType||"").toLowerCase();
+  const statusEl=document.getElementById("status");
+  const nextDateEl=document.getElementById("naechsterkontakt");
+  const nextTimeEl=document.getElementById("naechsterkontakt_zeit");
+  const kontaktartEl=document.getElementById("kontaktart");
+  const erstkontaktEl=document.getElementById("erstkontakt");
+  const future = isFutureOrToday(noteDate);
+
+  if(type.includes("erstkontakt")){
+    if(erstkontaktEl && !erstkontaktEl.value) erstkontaktEl.value = noteDate || todayStr();
+  }
+
+  if(type.includes("termin vereinbart") || type.includes("persönlicher besuch")){
+    statusEl.value = "Termin vereinbart";
+    kontaktartEl.value = "Persönlicher Termin";
+    if(future){
+      nextDateEl.value = noteDate || "";
+      nextTimeEl.value = noteTime || "";
+    }
+    return;
+  }
+
+  if(type.includes("rückruf")){
+    statusEl.value = "Telefonat ausgemacht";
+    kontaktartEl.value = "Rückruf";
+    if(future){
+      nextDateEl.value = noteDate || "";
+      nextTimeEl.value = noteTime || "";
+    }
+    return;
+  }
+
+  if(type.includes("mail")){
+    statusEl.value = "Unterlagen versendet";
+    kontaktartEl.value = "Mail";
+    return;
+  }
+
+  if(type.includes("unterlagen") || type.includes("angebot")){
+    statusEl.value = "Unterlagen versendet";
+    kontaktartEl.value = "Unterlagen";
+    return;
+  }
+
+  if(type.includes("telefonat")){
+    statusEl.value = "Telefonat ausgemacht";
+    kontaktartEl.value = "Telefonat";
+    return;
+  }
+
+  statusEl.value = "Sonstiges";
+  kontaktartEl.value = "Sonstiges";
+}
 function renderNoteHistory(){ const c=getSelected(); const box=document.getElementById("noteHistory"); if(!box) return; if(!c||!(c.notes_history||[]).length){ box.innerHTML='<div class="empty">Noch keine Aktivitäten vorhanden.</div>'; return; } box.innerHTML=[...(c.notes_history||[])].map((n,i)=>{ const autoInfo=[n.auto_status?"Status: "+n.auto_status:"",n.auto_naechsterkontakt?"Nächster Kontakt: "+formatDateDisplay(n.auto_naechsterkontakt):"",n.auto_kontaktart?"Art: "+n.auto_kontaktart:""].filter(Boolean).join(" • "); return `<div class="note-entry"><div class="note-entry-head"><div><div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div><div class="note-entry-meta">${esc(n.type||"Aktivität")}</div>${autoInfo?`<div class="note-entry-meta">${esc(autoInfo)}</div>`:""}</div><button class="icon-btn danger" type="button" onclick="removeNoteEntry(${i})">Löschen</button></div><div class="note-entry-text">${esc(n.text||"")}</div></div>`; }).reverse().join(""); }
 function addNoteEntry(){ const c=getSelected(); if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; } const date=document.getElementById("noteDate").value||todayStr(); const time=document.getElementById("noteTime").value||""; const type=document.getElementById("noteType").value||"Sonstiges"; const text=document.getElementById("noteText").value.trim(); if(!text){ alert("Bitte eine Notiz eingeben."); return; } applyTimelineLogic(type,date,time); const currentStatus=document.getElementById("status").value; const currentNextDate=document.getElementById("naechsterkontakt").value; const currentNextTime=document.getElementById("naechsterkontakt_zeit").value; const currentKontaktart=document.getElementById("kontaktart").value; const currentErstkontakt=document.getElementById("erstkontakt").value; contacts=contacts.map(x=>{ if(x.id!==selectedId) return x; const notes_history=Array.isArray(x.notes_history)?[...x.notes_history]:[]; notes_history.push({date,time,type,text,auto_status:currentStatus,auto_naechsterkontakt:currentNextDate,auto_naechsterkontakt_zeit:currentNextTime,auto_kontaktart:currentKontaktart}); return {...x,status:currentStatus,erstkontakt:currentErstkontakt,naechsterkontakt:currentNextDate,naechsterkontakt_zeit:currentNextTime,kontaktart:currentKontaktart,notes_history}; }); document.getElementById("noteDate").value=todayStr(); document.getElementById("noteTime").value=""; document.getElementById("noteType").value="Telefonat geführt"; document.getElementById("noteText").value=""; persistData(true); fillForm(); renderList(); }
 function removeNoteEntry(index){ const c=getSelected(); if(!c) return; contacts=contacts.map(x=>{ if(x.id!==selectedId) return x; const notes_history=[...(x.notes_history||[])]; notes_history.splice(index,1); return {...x,notes_history}; }); persistData(true); fillForm(); renderList(); }
