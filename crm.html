@@ -1332,19 +1332,35 @@ window.addEventListener("beforeunload", () => {
   try{ persistData(true); }catch(e){}
 });
 
-const hasLoadedData = loadPersistedData();
-if(!hasLoadedData){
-  contacts = [
-    {id:"1",firma:"Elektro Muster GmbH",nachname:"Huber",vorname:"Max",rolle:"Geschäftsführer",kundentyp:"Fachpartner",bundesland:"Oberösterreich",bezirk:"Linz-Land",telefon:"+43 732 123456",mobil:"+43 660 1234567",email:"max@elektro-muster.at",strasse:"Musterstraße 1",plz:"4020",ort:"Linz",status:"Telefonat ausgemacht",erstkontakt:"",naechsterkontakt:"",kontaktart:"Persönlicher Termin",weclapp:"Nein",potenzial:"mittel",notes_history:[{date:"",type:"Import",text:"PV und Speicher interessant"}],attachments:[],weitere_kontakte:[],archived:false,kundenstatus:"Interessent"},
-    {id:"2",firma:"Bauhof Beispiel GmbH",nachname:"Mayer",vorname:"Thomas",rolle:"Einkauf",kundentyp:"B2B",kundenstatus:"Kunde",bundesland:"Steiermark",bezirk:"Graz-Umgebung",telefon:"",mobil:"+43 664 222333",email:"office@bauhof-beispiel.at",strasse:"Industriestraße 8",plz:"8054",ort:"Seiersberg",status:"Unterlagen versendet",erstkontakt:"2026-04-15",naechsterkontakt:"2026-04-22",kontaktart:"Rückruf",weclapp:"Ja",potenzial:"groß",notes_history:[{date:"2026-04-16",type:"Import",text:"Gespräch zu Gewerbespeicher"}],attachments:[],weitere_kontakte:[{vorname:"Sabine",nachname:"Mayer",telefon:"",mobil:"+43 664 555666",email:"s.mayer@bauhof-beispiel.at",position:"Assistenz",notiz:"Zusätzliche Ansprechpartnerin"}],archived:false}
-  ];
-  selectedId = "1";
-  persistData(true);
+async function initApp(){
+
+  try{
+    setSaveState("Lade Daten aus Supabase ...");
+
+    await loadAllFromSupabase();
+
+    setSaveState("Daten aus Supabase geladen");
+
+  }catch(e){
+    console.warn("Supabase nicht erreichbar – lade lokale Daten", e);
+
+    const hasLoadedData = loadPersistedData();
+
+    if(!hasLoadedData){
+      contacts = [];
+      selectedId = null;
+      setSaveState("Keine Daten vorhanden");
+    }else{
+      setSaveState("Lokale Daten geladen");
+    }
+  }
+
+  fillForm();
+  renderList();
+  showDueTodayBanner();
 }
-fillForm();
-renderList();
-showDueTodayBanner();
-setSaveState(hasLoadedData ? "Gespeicherte Daten geladen" : "Beispieldaten geladen");
+
+initApp();
 
 function downloadJSON(filename, payload){
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8;" });
