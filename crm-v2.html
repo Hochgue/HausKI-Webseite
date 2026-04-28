@@ -450,32 +450,39 @@
       </div>
     </div>
 
-    <div class="side-card">
-      <div class="section">
-        <div class="sub-title">Status</div>
-        <div class="mini-box">
-          <div class="badge orange" id="sideStatus">Momentan kein Interesse</div>
-          <div class="hint" style="margin-top:8px">Kundentyp und Status sind jetzt getrennt. Status: Termin vereinbart, Unterlagen versendet, Telefonat ausgemacht, Sonstiges.</div>
-        </div>
+    
+      <d<div class="side-card">
 
-        <div class="sub-title">Kennzahlen</div>
-        <div class="stats">
-          <div class="stat"><div class="label">Gesamt</div><div class="value" id="s_gesamt">0</div></div>
-          <div class="stat"><div class="label long">Heute fällig</div><div class="value" id="s_faellig">0</div></div>
-          <div class="stat"><div class="label long">Sonstiges</div><div class="value" id="s_rot">0</div></div>
-          <div class="stat"><div class="label long">Telefonat ausgemacht</div><div class="value" id="s_orange">0</div></div>
-          <div class="stat"><div class="label long">Unterlagen versendet</div><div class="value" id="s_violett">0</div></div>
-          <div class="stat"><div class="label long">Termin vereinbart</div><div class="value" id="s_gelb">0</div></div>
-          <div class="stat"><div class="label long">B2B</div><div class="value" id="s_gruen">0</div></div>
-        </div>
-      </div>
+  <div class="section">
+    <div class="sub-title">Kundenzusammenfassung</div>
+    <div class="mini-box" id="customerSummary">
+      Kein Kontakt ausgewählt.
+    </div>
+  </div>
 
-      <div class="section">
-        <div class="sub-title">Ausgewählter Kontakt</div>
-        <div class="mini-box" id="selectedInfo">Kein Kontakt ausgewählt.</div>
+  <div class="section">
+    <div class="sub-title">Status</div>
+    <div class="mini-box">
+      <div class="badge orange" id="sideStatus">Momentan kein Interesse</div>
+      <div class="hint" style="margin-top:8px">
+        Kundentyp und Status sind jetzt getrennt.
       </div>
     </div>
   </div>
+
+  <div class="section">
+    <div class="sub-title">Kennzahlen</div>
+    <div class="stats">
+      <div class="stat"><div class="label">Gesamt</div><div class="value" id="s_gesamt">0</div></div>
+      <div class="stat"><div class="label long">Heute fällig</div><div class="value" id="s_faellig">0</div></div>
+      <div class="stat"><div class="label long">Sonstiges</div><div class="value" id="s_rot">0</div></div>
+      <div class="stat"><div class="label long">Telefonat ausgemacht</div><div class="value" id="s_orange">0</div></div>
+      <div class="stat"><div class="label long">Unterlagen versendet</div><div class="value" id="s_violett">0</div></div>
+      <div class="stat"><div class="label long">Termin vereinbart</div><div class="value" id="s_gelb">0</div></div>
+      <div class="stat"><div class="label long">B2B</div><div class="value" id="s_gruen">0</div></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -933,6 +940,101 @@ function renderAttachments(){
       </div>
     </div>
   `).join("");
+}
+
+function updateCustomerSummary(){
+
+  const c = getSelected();
+
+  const box =
+    document.getElementById("customerSummary");
+
+  if(!box){
+    return;
+  }
+
+  if(!c){
+
+    box.innerHTML =
+      "Kein Kontakt ausgewählt.";
+
+    return;
+
+  }
+
+  const letzteNotiz =
+    (c.notes_history || [])
+    .slice(-1)[0];
+
+  box.innerHTML = `
+
+    <div>
+      <strong>${c.firma || ""}</strong>
+    </div>
+
+    <div class="hint">
+      ${c.strasse || ""}
+      ${c.plz || ""}
+      ${c.ort || ""}
+    </div>
+
+    <hr>
+
+    <div>
+      <strong>Kontakt</strong>
+    </div>
+
+    <div class="hint">
+      ${c.vorname || ""}
+      ${c.nachname || ""}
+    </div>
+
+    <div class="hint">
+      ${c.mobil || c.telefon || ""}
+    </div>
+
+    <div class="hint">
+      ${c.email || ""}
+    </div>
+
+    <hr>
+
+    <div>
+      <strong>Nächster Termin</strong>
+    </div>
+
+    <div class="hint">
+      ${c.naechsterkontakt || "-"}
+      ${c.kontaktart
+        ? " · " + c.kontaktart
+        : ""}
+    </div>
+
+    <hr>
+
+    <div>
+      <strong>Letzte Notiz</strong>
+    </div>
+
+    <div class="hint">
+      ${letzteNotiz
+        ? letzteNotiz.text
+        : "Keine Notiz vorhanden"}
+    </div>
+
+    <hr>
+
+    <div>
+      <strong>Anhänge</strong>
+    </div>
+
+    <div class="hint">
+      ${(c.attachments || []).length}
+      Datei(en)
+    </div>
+
+  `;
+
 }
 
 function applyTimelineLogic(noteType, noteDate){
