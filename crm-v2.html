@@ -246,7 +246,24 @@ function syncFormToSelected(){ const c=getSelected(); if(!c) return; const getVa
 }:x); }
 function scheduleAutosave(){ syncFormToSelected(); updateCustomerSummary(); setSaveState("Änderungen lokal vorgemerkt ..."); clearTimeout(autosaveTimer); autosaveTimer=setTimeout(()=>persistData(true),300); }
 
-function updateStats(){ document.getElementById("s_gesamt").textContent=contacts.length; document.getElementById("s_rot").textContent=contacts.filter(c=>c.kundentyp==="Sonstiges").length; document.getElementById("s_orange").textContent=contacts.filter(c=>c.status==="Telefonat ausgemacht").length; document.getElementById("s_violett").textContent=contacts.filter(c=>c.status==="Unterlagen versendet").length; document.getElementById("s_gelb").textContent=contacts.filter(c=>c.status==="Termin vereinbart").length; document.getElementById("s_gruen").textContent=contacts.filter(c=>c.kundentyp==="B2B").length; const today=todayStr(); document.getElementById("s_faellig").textContent=contacts.filter(c=>c.naechsterkontakt===today).length; }
+function setTextIfExists(id, value){
+  const el = document.getElementById(id);
+  if(el){
+    el.textContent = value;
+  }
+}
+
+function updateStats(){
+  setTextIfExists("s_gesamt", contacts.length);
+  setTextIfExists("s_rot", contacts.filter(c => c.kundentyp === "Sonstiges").length);
+  setTextIfExists("s_orange", contacts.filter(c => c.status === "Telefonat ausgemacht").length);
+  setTextIfExists("s_violett", contacts.filter(c => c.status === "Unterlagen versendet").length);
+  setTextIfExists("s_gelb", contacts.filter(c => c.status === "Termin vereinbart").length);
+  setTextIfExists("s_gruen", contacts.filter(c => c.kundentyp === "B2B").length);
+
+  const today = todayStr();
+  setTextIfExists("s_faellig", contacts.filter(c => c.naechsterkontakt === today).length);
+}
 function sortBy(field){ currentSort=field; renderList(); }
 function clearSearch(){ document.getElementById("search").value=""; document.getElementById("statusFilter").value="Alle"; document.getElementById("kundentypFilter").value="Alle"; document.getElementById("regionFilter").value=""; dueFilterActive=false; renderList(); }
 function filteredContacts(){ const search=document.getElementById("search").value.toLowerCase().trim(); const statusFilter=document.getElementById("statusFilter").value; const kundentypFilter=document.getElementById("kundentypFilter").value; const region=document.getElementById("regionFilter").value.toLowerCase().trim(); const today=todayStr(); let arr=contacts.filter(c=>{ if(dueFilterActive&&c.naechsterkontakt!==today) return false; const noteTexts=(c.notes_history||[]).map(n=>`${n.type||""} ${n.text||""}`).join(" "); const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,noteTexts].join(" ").toLowerCase(); const sOk=search===""||hay.includes(search); const stOk=statusFilter==="Alle"?!c.archived:(statusFilter==="Archiviert"?!!c.archived:c.status===statusFilter&&!c.archived); const ktOk=kundentypFilter==="Alle"||c.kundentyp===kundentypFilter; const rOk=region===""||[c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region); return sOk&&stOk&&ktOk&&rOk; }); if(currentSort) arr.sort((a,b)=>String(a[currentSort]||"").localeCompare(String(b[currentSort]||""),'de')); return arr; }
