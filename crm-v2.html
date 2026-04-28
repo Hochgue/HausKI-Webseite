@@ -373,7 +373,7 @@ async function initApp(){ try{ setSaveState("Lade Daten aus Supabase ..."); awai
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 function isUuid(value){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||"")); }
 function baseCompanyPayload(contact){ return {firma:contact.firma||"",strasse:contact.strasse||"",plz:contact.plz||"",ort:contact.ort||"",bezirk:contact.bezirk||"",bundesland:contact.bundesland||"",kundentyp:contact.kundentyp||"",kundenstatus:contact.kundenstatus||"",status:contact.status||"",erstkontakt:normalizeDate(contact.erstkontakt),naechsterkontakt:normalizeDate(contact.naechsterkontakt),kontaktart:contact.kontaktart||"",weclapp:contact.weclapp||"",potenzial:contact.potenzial||"",updated_at:new Date().toISOString()}; }
