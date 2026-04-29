@@ -43,12 +43,11 @@
   .contact-list{display:flex;flex-direction:column;gap:10px}
   .contact-item{border:1px solid var(--line);border-radius:6px;padding:12px;background:#fbfcfd;cursor:pointer}
   .contact-item:hover{background:#f5f8fb}.contact-item.active{border-color:#9fb2c8;background:#eef4fa}
-  .contact-item-top{display:grid;grid-template-columns:34px minmax(0,1fr) 92px;align-items:center;gap:12px;width:100%}
+  .contact-item-top{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:12px;width:100%}
   .contact-select{margin:0;justify-self:center;align-self:center}
   .contact-row{display:grid;grid-template-columns:minmax(220px,2fr) minmax(110px,.9fr) minmax(110px,.9fr) minmax(180px,1.2fr) minmax(130px,.9fr);gap:10px;align-items:center;width:100%}
   .contact-row>div,.meta-small{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .meta-small{font-size:12px;color:var(--muted);margin-top:3px}
-  .contact-actions{display:flex;gap:6px;justify-self:end;justify-content:flex-end;align-items:center;min-width:92px;white-space:nowrap}
   .icon-btn{background:#e2e8f0;color:#111827;border:none;border-radius:6px;padding:8px 10px;cursor:pointer;font-weight:700}
   .icon-btn.danger{background:#fee2e2!important;color:#991b1b!important}
   .icon-btn.archive{background:#ede9fe!important;color:#5b21b6!important}
@@ -64,7 +63,7 @@
   #noteHistory{max-height:260px;overflow:auto}#subContactList{max-height:220px;overflow:auto}
   .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px}.summary-card strong{display:block;margin-bottom:4px}
   @media (max-width:1550px){.layout{grid-template-columns:1fr}.side-card{position:static;max-height:none}}
-  @media (max-width:900px){.toolbar,.group-grid-4,.group-grid-3,.subcontact-grid,.note-grid,.contact-row,.summary-grid{grid-template-columns:1fr}.contact-item-top{grid-template-columns:1fr}.contact-actions,.contact-select{justify-self:start}}
+  @media (max-width:900px){.toolbar,.group-grid-4,.group-grid-3,.subcontact-grid,.note-grid,.contact-row,.summary-grid{grid-template-columns:1fr}.contact-item-top{grid-template-columns:1fr}.contact-select{justify-self:start}}
 </style>
 </head>
 <body>
@@ -157,7 +156,7 @@
         <input id="naechsterkontakt_zeit" type="hidden">
         <input id="kontaktart" type="hidden">
 
-        <div class="hint" style="margin-bottom:12px">Telefonate, E-Mails, Termine, Besuche und Unterlagen werden automatisch in Supabase gespeichert.</div>
+        <div class="hint" style="margin-bottom:12px">Telefonate, E-Mails, Termine, Besuche und Unterlagen werden automatisch in Supabase gespeichert. Erinnerungen und gelbe Statusanzeigen erscheinen nur für zukünftige Wiedervorlagen.</div>
         <div class="note-grid">
           <div><label>Datum</label><input id="noteDate" type="date"></div>
           <div><label>Uhrzeit</label><input id="noteTime" type="time"></div>
@@ -219,6 +218,22 @@ function getSelected(){ return contacts.find(c => c.id === selectedId) || null; 
 function setSaveState(message,isError=false){ const el=document.getElementById("saveState"); if(!el) return; el.textContent=message; el.style.color=isError?"#b91c1c":"#475569"; }
 function statusBadgeClass(status){ if(status==="Termin vereinbart") return "gelb"; if(status==="Unterlagen versendet") return "violett"; if(status==="Telefonat ausgemacht") return "orange"; if(status==="Sonstiges") return "gruen"; return "orange"; }
 
+function getContactDateTime(c){
+  if(!c || !c.naechsterkontakt) return null;
+  const time = c.naechsterkontakt_zeit || "00:00";
+  return new Date(c.naechsterkontakt + "T" + time);
+}
+function hasFutureNextContact(c){
+  const dt = getContactDateTime(c);
+  if(!dt) return false;
+  return dt >= new Date();
+}
+function getVisibleStatus(c){
+  if(c.archived) return "Archiviert";
+  if(hasFutureNextContact(c)) return c.status || "";
+  return "";
+}
+
 function parseCsvLine(line){
   const result=[]; let cur=""; let inQuotes=false;
   for(let i=0;i<line.length;i++){
@@ -247,9 +262,7 @@ function sanitizeContacts(list){
 }
 
 function persistLocalBackup(){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({saved_at:new Date().toISOString(), contacts}));
-  }catch(e){}
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({saved_at:new Date().toISOString(), contacts})); }catch(e){}
 }
 
 function syncFormToSelected(){
@@ -318,6 +331,7 @@ function baseCompanyPayload(contact){
     status:contact.status||"",
     erstkontakt:normalizeDate(contact.erstkontakt),
     naechsterkontakt:normalizeDate(contact.naechsterkontakt),
+    naechsterkontakt_zeit:contact.naechsterkontakt_zeit || "",
     kontaktart:contact.kontaktart||"",
     weclapp:contact.weclapp||"",
     potenzial:contact.potenzial||"",
@@ -336,7 +350,7 @@ function mapDbToContact(firma,ansprechpartnerRows,historieRows,anhaengeRows){
     id:firma.id,
     firma:firma.firma||"", strasse:firma.strasse||"", plz:firma.plz||"", ort:firma.ort||"", bezirk:firma.bezirk||"", bundesland:firma.bundesland||"Oberösterreich",
     kundentyp:firma.kundentyp||"Fachpartner", kundenstatus:firma.kundenstatus||"Interessent", status:firma.status||"Telefonat ausgemacht",
-    erstkontakt:firma.erstkontakt||"", naechsterkontakt:firma.naechsterkontakt||"", naechsterkontakt_zeit:"", kontaktart:firma.kontaktart||"Persönlicher Termin",
+    erstkontakt:firma.erstkontakt||"", naechsterkontakt:firma.naechsterkontakt||"", naechsterkontakt_zeit:firma.naechsterkontakt_zeit || "", kontaktart:firma.kontaktart||"Persönlicher Termin",
     weclapp:firma.weclapp||"Nein", potenzial:firma.potenzial||"mittel",
     nachname:haupt.nachname||"", vorname:haupt.vorname||"", rolle:haupt.rolle||"", telefon:haupt.telefon||"", mobil:haupt.mobil||"", email:haupt.email||"",
     notes_history:historie.map(h=>({id:h.id,date:h.datum||"",time:"",type:h.art||"",text:h.notiz||"",auto_status:h.auto_status||"",auto_naechsterkontakt:h.auto_naechsterkontakt||"",auto_naechsterkontakt_zeit:"",auto_kontaktart:h.auto_kontaktart||""})),
@@ -468,13 +482,16 @@ function filteredContacts(){
   const statusFilter=document.getElementById("statusFilter").value;
   const kundentypFilter=document.getElementById("kundentypFilter").value;
   const region=document.getElementById("regionFilter").value.toLowerCase().trim();
-  const today=todayStr();
+
   let arr=contacts.filter(c=>{
-    if(dueFilterActive&&c.naechsterkontakt!==today) return false;
+    if(dueFilterActive){
+      if(!hasFutureNextContact(c) || c.naechsterkontakt !== todayStr()) return false;
+    }
     const noteTexts=(c.notes_history||[]).map(n=>`${n.type||""} ${n.text||""}`).join(" ");
     const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,noteTexts].join(" ").toLowerCase();
     const sOk=search===""||hay.includes(search);
-    const stOk=statusFilter==="Alle"?!c.archived:(statusFilter==="Archiviert"?!!c.archived:c.status===statusFilter&&!c.archived);
+    const visibleStatus=getVisibleStatus(c);
+    const stOk=statusFilter==="Alle"?!c.archived:(statusFilter==="Archiviert"?!!c.archived:visibleStatus===statusFilter&&!c.archived);
     const ktOk=kundentypFilter==="Alle"||c.kundentyp===kundentypFilter;
     const rOk=region===""||[c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region);
     return sOk&&stOk&&ktOk&&rOk;
@@ -482,6 +499,7 @@ function filteredContacts(){
   if(currentSort) arr.sort((a,b)=>String(a[currentSort]||"").localeCompare(String(b[currentSort]||""),'de'));
   return arr;
 }
+
 function renderList(){
   showDueTodayBanner();
   const list=document.getElementById("contactList");
@@ -498,21 +516,29 @@ function renderList(){
   let visible=arr;
   if(!hasFilter&&showRecent) visible=[...arr].slice(0,8);
   if(!visible.length){ list.innerHTML='<div class="empty">Keine Kontakte gefunden.</div>'; return; }
-  list.innerHTML=visible.map(c=>`
-    <div class="contact-item ${selectedId===c.id?'active':''}" onclick="selectContact('${c.id}')">
-      <div class="contact-item-top">
-        <input class="contact-select" type="checkbox" ${selectedIds.has(c.id)?'checked':''} onclick="event.stopPropagation();" onchange="toggleSelectContact('${c.id}')">
-        <div>
-          <div class="contact-row">
-            <div><div style="font-weight:700">${esc(c.firma||"(ohne Firma)")}</div><div class="meta-small">${esc([c.vorname,c.nachname].filter(Boolean).join(" "))}</div></div>
-            <div><div>${esc(c.kundentyp||"")}</div><div class="meta-small">${esc(c.bundesland||"")}</div></div>
-            <div><div>${esc(c.bezirk||"")}</div><div class="meta-small">${esc(c.ort||"")}</div></div>
-            <div><div>${esc(c.mobil||c.telefon||"")}</div><div class="meta-small">${esc(c.email||"")}</div></div>
-            <div><span class="badge ${c.archived?'violett':statusBadgeClass(c.status)}">${esc(c.archived?'Archiviert':c.status)}</span></div>
+
+  list.innerHTML=visible.map(c=>{
+    const name = [c.vorname,c.nachname].filter(Boolean).join(" ");
+    const visibleStatus = getVisibleStatus(c);
+    return `
+      <div class="contact-item ${selectedId===c.id?'active':''}" onclick="selectContact('${c.id}')">
+        <div class="contact-item-top">
+          <input class="contact-select" type="checkbox" ${selectedIds.has(c.id)?'checked':''} onclick="event.stopPropagation();" onchange="toggleSelectContact('${c.id}')">
+          <div>
+            <div class="contact-row">
+              <div>
+                <div style="font-weight:700">${esc(c.firma||"(ohne Firma)")}</div>
+                ${name ? `<div class="meta-small">${esc(name)}</div>` : ""}
+              </div>
+              <div><div>${esc(c.kundentyp||"")}</div><div class="meta-small">${esc(c.bundesland||"")}</div></div>
+              <div><div>${esc(c.bezirk||"")}</div><div class="meta-small">${esc(c.ort||"")}</div></div>
+              <div><div>${esc(c.mobil||c.telefon||"")}</div><div class="meta-small">${esc(c.email||"")}</div></div>
+              <div>${visibleStatus ? `<span class="badge ${c.archived?'violett':statusBadgeClass(c.status)}">${esc(visibleStatus)}</span>` : ""}</div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>`).join("");
+      </div>`;
+  }).join("");
 }
 function selectContact(id){ syncFormToSelected(); selectedId=id; fillForm(); renderList(); }
 function sortBy(field){ currentSort=field; renderList(); }
@@ -534,9 +560,13 @@ function fillForm(){
     renderNoteHistory(); renderSubContacts(); updateCustomerSummary();
     isLoading=false; return;
   }
+
+  const visibleStatus = getVisibleStatus(c);
   document.getElementById("pageTitle").textContent=c.firma||"Mini CRM Vertrieb";
-  document.getElementById("pageStatus").textContent=c.archived?"Archiviert":(c.status||"");
-  document.getElementById("pageStatus").className="badge "+(c.archived?"violett":statusBadgeClass(c.status));
+  document.getElementById("pageStatus").textContent=visibleStatus || "";
+  document.getElementById("pageStatus").className="badge "+(c.archived?"violett":(visibleStatus?statusBadgeClass(c.status):"orange"));
+  document.getElementById("pageStatus").style.display = visibleStatus ? "inline-block" : "none";
+
   ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=c[id]||""; });
   document.getElementById("noteDate").value=todayStr();
   document.getElementById("noteTime").value="";
@@ -686,6 +716,8 @@ function updateCustomerSummary(){
     contactsList.push(`<div class="summary-card"><strong>Kontakt ${i+2}</strong><div class="hint">${esc([p.vorname,p.nachname].filter(Boolean).join(" "))}</div><div class="hint">${esc(p.position||"")}</div><div class="hint">${esc(p.telefon||"")}</div><div class="hint">${esc(p.mobil||"")}</div><div class="hint">${esc(p.email||"")}</div></div>`);
   });
 
+  const futureStep = hasFutureNextContact(c);
+
   box.innerHTML=`
     <div><strong style="font-size:18px">${esc(c.firma||"-")}</strong></div>
     <div class="hint">
@@ -704,10 +736,12 @@ function updateCustomerSummary(){
       </div>
       <div class="summary-card">
         <strong>Nächster Schritt</strong>
-        <div class="hint">${esc(formatDateDisplay(c.naechsterkontakt||""))}</div>
-        <div class="hint">${esc(c.naechsterkontakt_zeit||"")}</div>
-        <div class="hint">${esc(c.kontaktart||"-")}</div>
-        <div class="hint">Status: ${esc(c.status||"-")}</div>
+        ${futureStep ? `
+          <div class="hint">${esc(formatDateDisplay(c.naechsterkontakt||""))}</div>
+          <div class="hint">${esc(c.naechsterkontakt_zeit||"")}</div>
+          <div class="hint">${esc(c.kontaktart||"-")}</div>
+          <div class="hint">Status: ${esc(c.status||"-")}</div>
+        ` : `<div class="hint">Keine zukünftige Wiedervorlage.</div>`}
       </div>
     </div>
     <hr>
@@ -746,10 +780,6 @@ function updateCustomerSummary(){
   }
 }
 
-function isFutureOrToday(dateStr){
-  if(!dateStr) return false;
-  return String(dateStr) >= todayStr();
-}
 function isFutureDateTime(noteDate,noteTime){
   if(!noteDate) return false;
   const time = noteTime || "23:59";
@@ -772,40 +802,20 @@ function applyTimelineLogic(noteType,noteDate,noteTime){
   if(type.includes("termin vereinbart") || type.includes("persönlicher besuch")){
     statusEl.value = "Termin vereinbart";
     kontaktartEl.value = "Persönlicher Termin";
-    if(future){
-      nextDateEl.value = noteDate || "";
-      nextTimeEl.value = noteTime || "";
-    }
+    if(future){ nextDateEl.value = noteDate || ""; nextTimeEl.value = noteTime || ""; }
     return;
   }
 
   if(type.includes("rückruf")){
     statusEl.value = "Telefonat ausgemacht";
     kontaktartEl.value = "Rückruf";
-    if(future){
-      nextDateEl.value = noteDate || "";
-      nextTimeEl.value = noteTime || "";
-    }
+    if(future){ nextDateEl.value = noteDate || ""; nextTimeEl.value = noteTime || ""; }
     return;
   }
 
-  if(type.includes("mail")){
-    statusEl.value = "Unterlagen versendet";
-    kontaktartEl.value = "Mail";
-    return;
-  }
-
-  if(type.includes("unterlagen") || type.includes("angebot")){
-    statusEl.value = "Unterlagen versendet";
-    kontaktartEl.value = "Unterlagen";
-    return;
-  }
-
-  if(type.includes("telefonat")){
-    statusEl.value = "Telefonat ausgemacht";
-    kontaktartEl.value = "Telefonat";
-    return;
-  }
+  if(type.includes("mail")){ statusEl.value = "Unterlagen versendet"; kontaktartEl.value = "Mail"; return; }
+  if(type.includes("unterlagen") || type.includes("angebot")){ statusEl.value = "Unterlagen versendet"; kontaktartEl.value = "Unterlagen"; return; }
+  if(type.includes("telefonat")){ statusEl.value = "Telefonat ausgemacht"; kontaktartEl.value = "Telefonat"; return; }
 
   statusEl.value = "Sonstiges";
   kontaktartEl.value = "Sonstiges";
@@ -865,7 +875,7 @@ function duplicateContact(){
   contacts.unshift(copy); selectedId=copy.id; fillForm(); renderList(); scheduleAutosave();
 }
 
-function buildBackupPayload(){ syncFormToSelected(); return {app:"Mini CRM Vertrieb",version:27,exportedAt:new Date().toISOString(),contactCount:contacts.length,selectedId,contacts}; }
+function buildBackupPayload(){ syncFormToSelected(); return {app:"Mini CRM Vertrieb",version:28,exportedAt:new Date().toISOString(),contactCount:contacts.length,selectedId,contacts}; }
 function exportJSONBackup(){ const payload=buildBackupPayload(); const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8;"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`mini_crm_backup_${new Date().toISOString().replace(/[:.]/g,"-")}.json`; a.click(); URL.revokeObjectURL(url); setSaveState("JSON Backup exportiert"); }
 function importJSONBackupFile(file){
   if(!file) return;
@@ -926,7 +936,7 @@ dropzone.addEventListener("dragleave",()=>dropzone.classList.remove("dragover"))
 dropzone.addEventListener("drop",e=>{ e.preventDefault(); dropzone.classList.remove("dragover"); if(e.dataTransfer?.files?.length) addAttachmentsToCurrent(e.dataTransfer.files); });
 
 function downloadJSON(filename,payload){ const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8;"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
-function createDeletionBackup(scopeLabel,ids){ const idSet=new Set(ids||[]); const backupContacts=contacts.filter(c=>idSet.has(c.id)); downloadJSON(`mini_crm_loeschbackup_${scopeLabel}_${new Date().toISOString().replace(/[:.]/g,"-")}.json`,{app:"Mini CRM Vertrieb",version:27,type:"deletion-backup",scope:scopeLabel,exportedAt:new Date().toISOString(),contactCount:backupContacts.length,contacts:backupContacts}); }
+function createDeletionBackup(scopeLabel,ids){ const idSet=new Set(ids||[]); const backupContacts=contacts.filter(c=>idSet.has(c.id)); downloadJSON(`mini_crm_loeschbackup_${scopeLabel}_${new Date().toISOString().replace(/[:.]/g,"-")}.json`,{app:"Mini CRM Vertrieb",version:28,type:"deletion-backup",scope:scopeLabel,exportedAt:new Date().toISOString(),contactCount:backupContacts.length,contacts:backupContacts}); }
 function toggleSelectContact(id){ selectedIds.has(id)?selectedIds.delete(id):selectedIds.add(id); renderList(); }
 function toggleSelectAllVisible(){ const visibleIds=filteredContacts().map(c=>c.id); const allSelected=visibleIds.length&&visibleIds.every(id=>selectedIds.has(id)); visibleIds.forEach(id=>allSelected?selectedIds.delete(id):selectedIds.add(id)); renderList(); }
 
@@ -972,15 +982,17 @@ function showArchivedOnly(){ document.getElementById("statusFilter").value="Arch
 function hideArchivedFilter(){ document.getElementById("statusFilter").value="Alle"; dueFilterActive=false; renderList(); }
 
 function getLatestNoteText(contact){ const notes=Array.isArray(contact.notes_history)?contact.notes_history:[]; if(!notes.length) return ""; const latest=[...notes].sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0]||{}; return [latest.type||"",latest.text||""].filter(Boolean).join(": "); }
-function buildDailyReportContacts(){ const today=todayStr(); return contacts.filter(c=>c.naechsterkontakt===today||(c.notes_history||[]).some(n=>(n.date||"")===today)); }
+function buildDailyReportContacts(){ const today=todayStr(); return contacts.filter(c=>(hasFutureNextContact(c) && c.naechsterkontakt===today)||(c.notes_history||[]).some(n=>(n.date||"")===today)); }
 function generateDailyReport(){
   const today=todayStr(); const reportContacts=buildDailyReportContacts();
   if(!reportContacts.length){ alert("Für heute wurden keine Kontakte gefunden."); return; }
-  const rows=reportContacts.map(c=>`<tr><td>${esc(c.firma||"-")}</td><td>${esc(safeJoin([c.plz,c.ort]," "))}</td><td>${esc(safeJoin([c.vorname,c.nachname]," "))}</td><td>${esc(c.status||"-")}</td><td>${esc(c.kontaktart||"-")}</td><td>${esc(formatDateDisplay(c.naechsterkontakt||""))} ${esc(c.naechsterkontakt_zeit||"")}</td><td>${esc(getLatestNoteText(c)||"-")}</td></tr>`).join("");
+  const rows=reportContacts.map(c=>`<tr><td>${esc(c.firma||"-")}</td><td>${esc(safeJoin([c.plz,c.ort]," "))}</td><td>${esc(safeJoin([c.vorname,c.nachname]," "))}</td><td>${esc(getVisibleStatus(c)||"-")}</td><td>${esc(hasFutureNextContact(c)?(c.kontaktart||"-"):"-")}</td><td>${hasFutureNextContact(c)?esc(formatDateDisplay(c.naechsterkontakt||""))+" "+esc(c.naechsterkontakt_zeit||""):"-"}</td><td>${esc(getLatestNoteText(c)||"-")}</td></tr>`).join("");
   const html=`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Tagesbericht Vertrieb ${esc(today)}</title><style>body{font-family:Arial;margin:28px;color:#111827}table{width:100%;border-collapse:collapse}th,td{border:1px solid #cfd8e3;padding:8px;text-align:left;font-size:12px}th{background:#eef2f6}@media print{button{display:none}}</style></head><body><h1>Tagesbericht Vertrieb</h1><p><strong>Datum:</strong> ${esc(today)} · <strong>Anzahl Kontakte:</strong> ${reportContacts.length}</p><button onclick="window.print()">Drucken / als PDF speichern</button><table><thead><tr><th>Kunde</th><th>Ort</th><th>Ansprechpartner</th><th>Status</th><th>Nächster Schritt</th><th>Nächster Kontakt</th><th>Letzte Notiz</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
   const win=window.open("","_blank"); if(!win){alert("Popup wurde blockiert."); return;} win.document.open(); win.document.write(html); win.document.close();
 }
-function getTodayDueContacts(){ const today=todayStr(); return contacts.filter(c=>c.naechsterkontakt===today); }
+function getTodayDueContacts(){
+  return contacts.filter(c => hasFutureNextContact(c) && c.naechsterkontakt === todayStr());
+}
 function showDueTodayBanner(){
   const banner=document.getElementById("dueBanner"); if(!banner) return;
   const dueContacts=getTodayDueContacts();
