@@ -267,6 +267,17 @@ let dueFilterActive = false;
 let isLoading = false;
 
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0'); }
+function addDays(dateStr, days){
+  if(!dateStr) return "";
+  const d = new Date(dateStr + "T12:00:00");
+  d.setDate(d.getDate() + days);
+
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+
+  return `${yyyy}-${mm}-${dd}`;
+}
 function esc(v){ return String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function normalizeDate(value){ const v=String(value||"").trim(); return v==="" ? null : v; }
 function normalizeTime(value){ const v=String(value||"").trim(); return v==="" ? null : v; }
@@ -1017,40 +1028,51 @@ async function markDocumentsSent(){
 
   const date=document.getElementById("noteDate").value||todayStr();
   const time=document.getElementById("noteTime").value||"";
-  const appointmentDate=document.getElementById("appointmentDate").value||"";
-  const appointmentTime=document.getElementById("appointmentTime").value||"";
-  const appointmentType=document.getElementById("appointmentType").value||"";
+
+  let appointmentDate=document.getElementById("appointmentDate").value||"";
+  let appointmentTime=document.getElementById("appointmentTime").value||"";
+  let appointmentType=document.getElementById("appointmentType").value||"";
+
   const activityText=document.getElementById("activityText").value.trim();
   const appointmentText=document.getElementById("appointmentText").value.trim();
 
+  // Automatische Wiedervorlage: Unterlagen versendet -> 14 Tage später nachfassen
+  if(!appointmentDate){
+    appointmentDate = addDays(date, 14);
+    appointmentTime = "";
+    appointmentType = "📞 Anruf";
+  }
+
   document.getElementById("noteType").value="📄 Unterlagen gesendet";
+  document.getElementById("status").value="Unterlagen versendet";
+  document.getElementById("naechsterkontakt").value=appointmentDate;
+  document.getElementById("naechsterkontakt_zeit").value=appointmentTime;
+  document.getElementById("kontaktart").value="Nachfassen Unterlagen";
 
   const textParts=[];
   textParts.push("Aktivität: "+(activityText || "Unterlagen wurden versendet."));
 
-  if(appointmentDate || appointmentTime || appointmentType || appointmentText){
-    const terminInfo=[
-      appointmentType ? "Art: "+appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,"") : "",
-      appointmentDate ? "Datum: "+formatDateDisplay(appointmentDate) : "",
-      appointmentTime ? "Zeit: "+appointmentTime : "",
-      appointmentText ? "Notiz: "+appointmentText : ""
-    ].filter(Boolean).join(" • ");
-    textParts.push("Termin/Rückruf: "+terminInfo);
-  }
+  const terminInfo=[
+    "Art: Nachfassen Unterlagen",
+    appointmentDate ? "Datum: "+formatDateDisplay(appointmentDate) : "",
+    appointmentTime ? "Zeit: "+appointmentTime : "",
+    appointmentText ? "Notiz: "+appointmentText : "Automatische Wiedervorlage 14 Tage nach Versand der Unterlagen."
+  ].filter(Boolean).join(" • ");
+
+  textParts.push("Termin/Rückruf: "+terminInfo);
 
   const text=textParts.join("\n");
 
-  applyTimelineLogic("📄 Unterlagen gesendet",date,time,appointmentDate,appointmentTime,appointmentType);
-
-  const currentStatus=document.getElementById("status").value || "Unterlagen versendet";
-  const currentNextDate=document.getElementById("naechsterkontakt").value;
-  const currentNextTime=document.getElementById("naechsterkontakt_zeit").value;
-  const currentKontaktart=document.getElementById("kontaktart").value || "Unterlagen";
+  const currentStatus="Unterlagen versendet";
+  const currentNextDate=appointmentDate;
+  const currentNextTime=appointmentTime;
+  const currentKontaktart="Nachfassen Unterlagen";
   const currentErstkontakt=document.getElementById("erstkontakt").value;
 
   contacts=contacts.map(x=>{
     if(x.id!==selectedId) return x;
     const notes_history=Array.isArray(x.notes_history)?[...x.notes_history]:[];
+
     notes_history.push({
       date,
       time,
@@ -1058,15 +1080,24 @@ async function markDocumentsSent(){
       text,
       appointment_date:appointmentDate,
       appointment_time:appointmentTime,
-      appointment_type:appointmentType,
+      appointment_type:"Nachfassen Unterlagen",
       activity_text:activityText || "Unterlagen wurden versendet.",
-      appointment_text:appointmentText,
+      appointment_text:appointmentText || "Automatische Wiedervorlage 14 Tage nach Versand der Unterlagen.",
       auto_status:currentStatus,
       auto_naechsterkontakt:currentNextDate,
       auto_naechsterkontakt_zeit:currentNextTime,
       auto_kontaktart:currentKontaktart
     });
-    return {...x,status:currentStatus,erstkontakt:currentErstkontakt,naechsterkontakt:currentNextDate,naechsterkontakt_zeit:currentNextTime,kontaktart:currentKontaktart,notes_history};
+
+    return {
+      ...x,
+      status:currentStatus,
+      erstkontakt:currentErstkontakt,
+      naechsterkontakt:currentNextDate,
+      naechsterkontakt_zeit:currentNextTime,
+      kontaktart:currentKontaktart,
+      notes_history
+    };
   });
 
   resetNoteInputs();
@@ -1074,6 +1105,7 @@ async function markDocumentsSent(){
   renderList();
   await autosaveSelectedToSupabase();
 }
+
 
 async function addNoteEntry(){
   const c=getSelected(); if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
