@@ -686,7 +686,10 @@ async function addAttachmentsToCurrent(files){
     const fileArray=Array.from(files);
     for(const file of fileArray){
       setSaveState("Lade Datei hoch: "+file.name);
-      const safeName=file.name.replace(/[^\w.\-äöüÄÖÜß ]/g,"_");
+      const safeName = file.name
+       .normalize("NFD")
+       .replace(/[\u0300-\u036f]/g, "")   // entfernt Umlaute sauber
+       .replace(/[^a-zA-Z0-9.\-_]/g, "_"); // nur sichere Zeichen
       const filePath=firmaId+"/"+Date.now()+"_"+safeName;
       const {error:uploadError}=await supabaseClient.storage.from("crm-attachments").upload(filePath,file,{upsert:false});
       if(uploadError) throw uploadError;
