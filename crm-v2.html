@@ -36,7 +36,7 @@
   .full-span{grid-column:1 / -1}
   .toolbar{display:grid;grid-template-columns:1.2fr .9fr .9fr 1fr auto auto auto;gap:10px;align-items:end;margin-bottom:12px}
   .badge{display:inline-block;padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#111827}
-  .orange{background:var(--orange)} .gelb{background:var(--yellow)} .gruen{background:var(--green)} .violett{background:var(--violet)} .weclapp-badge{background:#bfdbfe;color:#1e3a8a;border:1px solid #93c5fd}
+  .orange{background:var(--orange)} .gelb{background:var(--yellow)} .gruen{background:var(--green)} .violett{background:var(--violet)} .weclapp-badge{background:#bfdbfe;color:#1e3a8a;border:1px solid #93c5fd} .kein-interesse-badge{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
   .mini-box{background:#f8fafc;border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:10px}
   .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
   .empty{padding:14px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);background:#fafcff}
@@ -59,6 +59,7 @@
   .attachment-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd}.attachment-meta{min-width:0}.attachment-name{font-weight:700;word-break:break-all}.attachment-sub{font-size:12px;color:var(--muted);margin-top:2px}.attachment-actions{display:flex;gap:8px;flex-wrap:wrap}
   .subcontact-card{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}.subcontact-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.subcontact-card strong{font-size:18px}.subcontact-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
   .due-banner{display:none;margin:12px 14px 0 14px;padding:12px 14px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;color:#9a3412;box-shadow:var(--shadow)}.due-banner.show{display:block}.due-banner-title{font-weight:700;margin-bottom:8px}.due-banner-list{margin:0;padding-left:18px}.due-banner-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+  .activity-actions{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.activity-actions button{white-space:nowrap}.activity-actions .no-interest{background:#dc2626!important}.activity-actions .no-interest:hover{background:#b91c1c!important}
   .note-entry{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}.note-entry-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}.note-entry-date{font-weight:700;color:#374151}.note-entry-meta{font-size:12px;color:var(--muted)}.note-entry-text{white-space:pre-wrap;line-height:1.4}.note-grid{display:grid;grid-template-columns:140px 120px 180px 140px 120px 1fr auto;gap:10px;align-items:end}
   #noteHistory{max-height:260px;overflow:auto}#subContactList{max-height:220px;overflow:auto}
   .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px}.summary-card strong{display:block;margin-bottom:4px}
@@ -97,7 +98,7 @@
         <div class="sub-title">Suche / Übersicht</div>
         <div class="toolbar">
           <div><label>Suchen</label><input id="search" placeholder="Firma, Name, Bezirk, Bundesland, Notiz ..." oninput="renderList()"></div>
-          <div><label>Status</label><select id="statusFilter" onchange="renderList()"><option>Alle</option><option>Termin vereinbart</option><option>Unterlagen versendet</option><option>Telefonat ausgemacht</option><option>Sonstiges</option><option>Archiviert</option><option>In weclapp</option></select></div>
+          <div><label>Status</label><select id="statusFilter" onchange="renderList()"><option>Alle</option><option>Ohne Status</option><option>Termin vereinbart</option><option>Unterlagen versendet</option><option>Telefonat ausgemacht</option><option>Sonstiges</option><option>Kein Interesse</option><option>Archiviert</option><option>In weclapp</option></select></div>
           <div><label>Kundentyp</label><select id="kundentypFilter" onchange="renderList()"><option>Alle</option><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option></select></div>
           <div><label>Region</label><input id="regionFilter" placeholder="Ort, Bezirk, Bundesland, PLZ" oninput="renderList()"></div>
           <button onclick="sortBy('firma')">Nach Firma</button>
@@ -164,7 +165,7 @@
           <div><label>Termindatum</label><input id="appointmentDate" type="date"></div>
           <div><label>Terminzeit</label><input id="appointmentTime" type="time"></div>
           <div><label>Notiz / Ergebnis</label><textarea id="noteText" placeholder="Zum Beispiel: Heute telefoniert, Kunde interessiert, Termin für nächste Woche vereinbart ..."></textarea></div>
-          <div><button type="button" onclick="addNoteEntry()">Eintrag hinzufügen</button></div>
+          <div class="activity-actions"><button type="button" class="no-interest" onclick="markNoInterest()">Kein Interesse</button><button type="button" onclick="addNoteEntry()">Eintrag hinzufügen</button></div>
         </div>
         <div id="noteHistory"></div>
 
@@ -219,7 +220,7 @@ function safeJoin(arr,sep=" "){ return (arr||[]).filter(v=>String(v||"").trim()!
 function isUuid(value){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||"")); }
 function getSelected(){ return contacts.find(c => c.id === selectedId) || null; }
 function setSaveState(message,isError=false){ const el=document.getElementById("saveState"); if(!el) return; el.textContent=message; el.style.color=isError?"#b91c1c":"#475569"; }
-function statusBadgeClass(status){ if(status==="In weclapp") return "weclapp-badge"; if(status==="Termin vereinbart") return "gelb"; if(status==="Unterlagen versendet") return "violett"; if(status==="Telefonat ausgemacht") return "orange"; if(status==="Sonstiges") return "gruen"; return "orange"; }
+function statusBadgeClass(status){ if(status==="In weclapp") return "weclapp-badge"; if(status==="Kein Interesse") return "kein-interesse-badge"; if(status==="Termin vereinbart") return "gelb"; if(status==="Unterlagen versendet") return "violett"; if(status==="Telefonat ausgemacht") return "orange"; if(status==="Sonstiges") return "gruen"; return "orange"; }
 
 function isInWeclapp(c){ return String(c?.weclapp||"").toLowerCase()==="ja"; }
 
@@ -237,6 +238,7 @@ function hasFutureNextContact(c){
 function getVisibleStatus(c){
   if(c.archived) return "Archiviert";
   if(isInWeclapp(c)) return "In weclapp";
+  if(String(c.status||"")==="Kein Interesse") return "Kein Interesse";
   if(hasFutureNextContact(c)) return c.status || "";
   return "";
 }
@@ -521,7 +523,16 @@ function filteredContacts(){
     const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,noteTexts].join(" ").toLowerCase();
     const sOk=search===""||hay.includes(search);
     const visibleStatus=getVisibleStatus(c);
-    const stOk=statusFilter==="Alle"?!c.archived:(statusFilter==="Archiviert"?!!c.archived:(statusFilter==="In weclapp"?isInWeclapp(c)&&!c.archived:visibleStatus===statusFilter&&!c.archived));
+    const stOk =
+      statusFilter==="Alle"
+        ? !c.archived
+        : statusFilter==="Ohne Status"
+          ? !c.archived && !isInWeclapp(c) && String(c.status||"")!=="Kein Interesse" && !hasFutureNextContact(c)
+          : statusFilter==="Archiviert"
+            ? !!c.archived
+            : statusFilter==="In weclapp"
+              ? isInWeclapp(c)&&!c.archived
+              : visibleStatus===statusFilter&&!c.archived;
     const ktOk=kundentypFilter==="Alle"||c.kundentyp===kundentypFilter;
     const rOk=region===""||[c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region);
     return sOk&&stOk&&ktOk&&rOk;
@@ -775,7 +786,7 @@ function updateCustomerSummary(){
           <div class="hint">${esc(c.naechsterkontakt_zeit||"")}</div>
           <div class="hint">${esc(c.kontaktart||"-")}</div>
           <div class="hint">Status: ${esc(c.status||"-")}</div>
-        ` : (isInWeclapp(c) ? `<div class="hint">Kontakt wurde in weclapp übernommen. Weiterführung erfolgt dort.</div>` : `<div class="hint">Keine zukünftige Wiedervorlage.</div>`)}
+        ` : (isInWeclapp(c) ? `<div class="hint">Kontakt wurde in weclapp übernommen. Weiterführung erfolgt dort.</div>` : (String(c.status||"")==="Kein Interesse" ? `<div class="hint">Kontakt ist als Kein Interesse markiert.</div>` : `<div class="hint">Keine zukünftige Wiedervorlage.</div>`))}
       </div>
     </div>
     <hr>
@@ -875,6 +886,59 @@ function renderNoteHistory(){
     return `<div class="note-entry"><div class="note-entry-head"><div><div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div><div class="note-entry-meta">${esc(n.type||"Aktivität")}</div>${appointmentInfo?`<div class="note-entry-meta">${esc(appointmentInfo)}</div>`:""}${autoInfo?`<div class="note-entry-meta">${esc(autoInfo)}</div>`:""}</div><button class="icon-btn danger" type="button" onclick="removeNoteEntry(${i})">Löschen</button></div><div class="note-entry-text">${esc(n.text||"")}</div></div>`;
   }).reverse().join("");
 }
+async function markNoInterest(){
+  const c=getSelected();
+  if(!c){
+    alert("Bitte zuerst einen Kontakt auswählen.");
+    return;
+  }
+
+  const companyName = c.firma || "diesen Kontakt";
+  if(!confirm(`"${companyName}" wirklich als "Kein Interesse" markieren?`)){
+    return;
+  }
+
+  const date=document.getElementById("noteDate").value||todayStr();
+  const time=document.getElementById("noteTime").value||"";
+  const noteText=document.getElementById("noteText").value.trim();
+  const text=noteText || "Kein Interesse vermerkt.";
+
+  contacts=contacts.map(x=>{
+    if(x.id!==selectedId) return x;
+    const notes_history=Array.isArray(x.notes_history)?[...x.notes_history]:[];
+    notes_history.push({
+      date,
+      time,
+      type:"Kein Interesse",
+      text,
+      appointment_date:"",
+      appointment_time:"",
+      auto_status:"Kein Interesse",
+      auto_naechsterkontakt:"",
+      auto_naechsterkontakt_zeit:"",
+      auto_kontaktart:"Kein Interesse"
+    });
+    return {
+      ...x,
+      status:"Kein Interesse",
+      naechsterkontakt:"",
+      naechsterkontakt_zeit:"",
+      kontaktart:"Kein Interesse",
+      notes_history
+    };
+  });
+
+  document.getElementById("status").value="Kein Interesse";
+  document.getElementById("naechsterkontakt").value="";
+  document.getElementById("naechsterkontakt_zeit").value="";
+  document.getElementById("kontaktart").value="Kein Interesse";
+
+  resetNoteInputs();
+  fillForm();
+  renderList();
+  await autosaveSelectedToSupabase();
+}
+
 async function addNoteEntry(){
   const c=getSelected(); if(!c){ alert("Bitte zuerst einen Kontakt auswählen."); return; }
   const date=document.getElementById("noteDate").value||todayStr();
