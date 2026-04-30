@@ -59,10 +59,10 @@
   .attachment-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd}.attachment-meta{min-width:0}.attachment-name{font-weight:700;word-break:break-all}.attachment-sub{font-size:12px;color:var(--muted);margin-top:2px}.attachment-actions{display:flex;gap:8px;flex-wrap:wrap}
   .subcontact-card{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}.subcontact-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.subcontact-card strong{font-size:18px}.subcontact-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
   .due-banner{display:none;margin:12px 14px 0 14px;padding:12px 14px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;color:#9a3412;box-shadow:var(--shadow)}.due-banner.show{display:block}.due-banner-title{font-weight:700;margin-bottom:8px}.due-banner-list{margin:0;padding-left:18px}.due-banner-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-  .note-entry{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}.note-entry-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}.note-entry-date{font-weight:700;color:#374151}.note-entry-meta{font-size:12px;color:var(--muted)}.note-entry-text{white-space:pre-wrap;line-height:1.4}.note-grid{display:grid;grid-template-columns:150px 150px 190px 1fr auto;gap:10px;align-items:end}
+  .note-entry{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}.note-entry-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}.note-entry-date{font-weight:700;color:#374151}.note-entry-meta{font-size:12px;color:var(--muted)}.note-entry-text{white-space:pre-wrap;line-height:1.4}.note-grid{display:grid;grid-template-columns:140px 120px 180px 140px 120px 1fr auto;gap:10px;align-items:end}
   #noteHistory{max-height:260px;overflow:auto}#subContactList{max-height:220px;overflow:auto}
   .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px}.summary-card strong{display:block;margin-bottom:4px}
-  @media (max-width:1550px){.layout{grid-template-columns:1fr}.side-card{position:static;max-height:none}}
+  @media (max-width:1550px){.layout{grid-template-columns:1fr}.side-card{position:static;max-height:none}.note-grid{grid-template-columns:1fr 1fr 1fr}}
   @media (max-width:900px){.toolbar,.group-grid-4,.group-grid-3,.subcontact-grid,.note-grid,.contact-row,.summary-grid{grid-template-columns:1fr}.contact-item-top{grid-template-columns:1fr}.contact-select{justify-self:start}}
 </style>
 </head>
@@ -156,12 +156,14 @@
         <input id="naechsterkontakt_zeit" type="hidden">
         <input id="kontaktart" type="hidden">
 
-        <div class="hint" style="margin-bottom:12px">Telefonate, E-Mails, Termine, Besuche und Unterlagen werden automatisch in Supabase gespeichert. Erinnerungen und gelbe Statusanzeigen erscheinen nur für zukünftige Wiedervorlagen.</div>
+        <div class="hint" style="margin-bottom:12px">Aktivitätsdatum = wann du etwas gemacht hast. Termindatum = wann der vereinbarte Termin/Rückruf stattfinden soll. Erinnerungen und gelbe Statusanzeigen erscheinen nur für zukünftige Wiedervorlagen.</div>
         <div class="note-grid">
-          <div><label>Datum</label><input id="noteDate" type="date"></div>
-          <div><label>Uhrzeit</label><input id="noteTime" type="time"></div>
+          <div><label>Aktivitätsdatum</label><input id="noteDate" type="date"></div>
+          <div><label>Aktivitätszeit</label><input id="noteTime" type="time"></div>
           <div><label>Art</label><select id="noteType"><option>Telefonat geführt</option><option>Mail gesendet</option><option>Termin vereinbart</option><option>Persönlicher Besuch</option><option>Unterlagen gesendet</option><option>Angebot erstellt</option><option>Rückruf vereinbart</option><option>Erstkontakt</option><option>Sonstiges</option></select></div>
-          <div><label>Notiz / Ergebnis</label><textarea id="noteText" placeholder="Zum Beispiel: Telefonat geführt, Kunde interessiert, Mail mit Unterlagen gesendet, Termin vereinbart ..."></textarea></div>
+          <div><label>Termindatum</label><input id="appointmentDate" type="date"></div>
+          <div><label>Terminzeit</label><input id="appointmentTime" type="time"></div>
+          <div><label>Notiz / Ergebnis</label><textarea id="noteText" placeholder="Zum Beispiel: Heute telefoniert, Kunde interessiert, Termin für nächste Woche vereinbart ..."></textarea></div>
           <div><button type="button" onclick="addNoteEntry()">Eintrag hinzufügen</button></div>
         </div>
         <div id="noteHistory"></div>
@@ -198,7 +200,7 @@ const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const STORAGE_KEY = "mini_crm_vertrieb_layout_v10_supabase_backup";
+const STORAGE_KEY = "mini_crm_vertrieb_layout_v11_supabase_backup";
 let contacts = [];
 let autosaveTimer = null;
 let currentSort = "";
@@ -210,6 +212,7 @@ let isLoading = false;
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0'); }
 function esc(v){ return String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function normalizeDate(value){ const v=String(value||"").trim(); return v==="" ? null : v; }
+function normalizeTime(value){ const v=String(value||"").trim(); return v==="" ? null : v; }
 function formatDateDisplay(v){ if(!v) return "-"; if(/^\d{4}-\d{2}-\d{2}$/.test(v)){ const [y,m,d]=v.split("-"); return `${d}.${m}.${y}`; } return v; }
 function humanSize(bytes){ if(!bytes && bytes!==0) return ""; if(bytes<1024) return bytes+" B"; if(bytes<1024*1024) return (bytes/1024).toFixed(1)+" KB"; return (bytes/(1024*1024)).toFixed(1)+" MB"; }
 function safeJoin(arr,sep=" "){ return (arr||[]).filter(v=>String(v||"").trim()!=="").join(sep); }
@@ -353,7 +356,19 @@ function mapDbToContact(firma,ansprechpartnerRows,historieRows,anhaengeRows){
     erstkontakt:firma.erstkontakt||"", naechsterkontakt:firma.naechsterkontakt||"", naechsterkontakt_zeit:firma.naechsterkontakt_zeit || "", kontaktart:firma.kontaktart||"Persönlicher Termin",
     weclapp:firma.weclapp||"Nein", potenzial:firma.potenzial||"mittel",
     nachname:haupt.nachname||"", vorname:haupt.vorname||"", rolle:haupt.rolle||"", telefon:haupt.telefon||"", mobil:haupt.mobil||"", email:haupt.email||"",
-    notes_history:historie.map(h=>({id:h.id,date:h.datum||"",time:"",type:h.art||"",text:h.notiz||"",auto_status:h.auto_status||"",auto_naechsterkontakt:h.auto_naechsterkontakt||"",auto_naechsterkontakt_zeit:"",auto_kontaktart:h.auto_kontaktart||""})),
+    notes_history:historie.map(h=>({
+      id:h.id,
+      date:h.datum||"",
+      time:h.uhrzeit||"",
+      type:h.art||"",
+      text:h.notiz||"",
+      appointment_date:h.termin_datum||"",
+      appointment_time:h.termin_uhrzeit||"",
+      auto_status:h.auto_status||"",
+      auto_naechsterkontakt:h.auto_naechsterkontakt||"",
+      auto_naechsterkontakt_zeit:h.termin_uhrzeit||"",
+      auto_kontaktart:h.auto_kontaktart||""
+    })),
     weitere_kontakte:weitere,
     attachments:anhaenge,
     archived:!!firma.archived
@@ -427,7 +442,18 @@ async function saveOneContactToSupabase(contact){
 
   const historieRows=(contact.notes_history||[])
     .filter(n=>String(n.text||"").trim()!==""||String(n.type||"").trim()!==""||String(n.date||"").trim()!=="")
-    .map(n=>({firma_id:firmaId,datum:normalizeDate(n.date),art:n.type||"",notiz:n.text||"",auto_status:n.auto_status||"",auto_naechsterkontakt:normalizeDate(n.auto_naechsterkontakt),auto_kontaktart:n.auto_kontaktart||""}));
+    .map(n=>({
+      firma_id:firmaId,
+      datum:normalizeDate(n.date),
+      uhrzeit:normalizeTime(n.time),
+      art:n.type||"",
+      notiz:n.text||"",
+      termin_datum:normalizeDate(n.appointment_date || n.auto_naechsterkontakt),
+      termin_uhrzeit:normalizeTime(n.appointment_time || n.auto_naechsterkontakt_zeit),
+      auto_status:n.auto_status||"",
+      auto_naechsterkontakt:normalizeDate(n.auto_naechsterkontakt),
+      auto_kontaktart:n.auto_kontaktart||""
+    }));
   if(historieRows.length){
     const {error}=await supabaseClient.from("crm_historie").insert(historieRows);
     if(error) throw error;
@@ -487,7 +513,7 @@ function filteredContacts(){
     if(dueFilterActive){
       if(!hasFutureNextContact(c) || c.naechsterkontakt !== todayStr()) return false;
     }
-    const noteTexts=(c.notes_history||[]).map(n=>`${n.type||""} ${n.text||""}`).join(" ");
+    const noteTexts=(c.notes_history||[]).map(n=>`${n.type||""} ${n.text||""} ${n.appointment_date||""}`).join(" ");
     const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,noteTexts].join(" ").toLowerCase();
     const sOk=search===""||hay.includes(search);
     const visibleStatus=getVisibleStatus(c);
@@ -544,6 +570,15 @@ function selectContact(id){ syncFormToSelected(); selectedId=id; fillForm(); ren
 function sortBy(field){ currentSort=field; renderList(); }
 function clearSearch(){ document.getElementById("search").value=""; document.getElementById("statusFilter").value="Alle"; document.getElementById("kundentypFilter").value="Alle"; document.getElementById("regionFilter").value=""; dueFilterActive=false; renderList(); }
 
+function resetNoteInputs(){
+  document.getElementById("noteDate").value=todayStr();
+  document.getElementById("noteTime").value="";
+  document.getElementById("noteType").value="Telefonat geführt";
+  document.getElementById("appointmentDate").value="";
+  document.getElementById("appointmentTime").value="";
+  document.getElementById("noteText").value="";
+}
+
 function fillForm(){
   isLoading=true;
   const c=getSelected();
@@ -551,12 +586,10 @@ function fillForm(){
     document.getElementById("pageTitle").textContent="Mini CRM Vertrieb";
     document.getElementById("pageStatus").textContent="Kein Kontakt";
     document.getElementById("pageStatus").className="badge orange";
+    document.getElementById("pageStatus").style.display = "inline-block";
     ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial"].forEach(id=>{ const el=document.getElementById(id); if(!el) return; if(el.tagName==="SELECT") el.selectedIndex=0; else el.value=""; });
     document.getElementById("attachmentList").innerHTML="";
-    document.getElementById("noteDate").value=todayStr();
-    document.getElementById("noteTime").value="";
-    document.getElementById("noteType").value="Telefonat geführt";
-    document.getElementById("noteText").value="";
+    resetNoteInputs();
     renderNoteHistory(); renderSubContacts(); updateCustomerSummary();
     isLoading=false; return;
   }
@@ -568,10 +601,7 @@ function fillForm(){
   document.getElementById("pageStatus").style.display = visibleStatus ? "inline-block" : "none";
 
   ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=c[id]||""; });
-  document.getElementById("noteDate").value=todayStr();
-  document.getElementById("noteTime").value="";
-  document.getElementById("noteType").value="Telefonat geführt";
-  document.getElementById("noteText").value="";
+  resetNoteInputs();
   renderAttachments(); renderNoteHistory(); renderSubContacts(); updateCustomerSummary();
   isLoading=false;
 }
@@ -765,11 +795,13 @@ function updateCustomerSummary(){
             n.auto_naechsterkontakt ? "Nächster Kontakt: "+formatDateDisplay(n.auto_naechsterkontakt) : "",
             n.auto_kontaktart ? "Art: "+n.auto_kontaktart : ""
           ].filter(Boolean).join(" • ");
+          const appointmentInfo = n.appointment_date ? `Termin: ${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " · "+n.appointment_time : ""}` : "";
           return `<div class="note-entry" style="margin-top:0;margin-bottom:8px;">
             <div class="note-entry-head">
               <div>
                 <div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div>
                 <div class="note-entry-meta">${esc(n.type||"Aktivität")}</div>
+                ${appointmentInfo?`<div class="note-entry-meta">${esc(appointmentInfo)}</div>`:""}
                 ${autoInfo?`<div class="note-entry-meta">${esc(autoInfo)}</div>`:""}
               </div>
             </div>
@@ -780,42 +812,49 @@ function updateCustomerSummary(){
   }
 }
 
-function isFutureDateTime(noteDate,noteTime){
-  if(!noteDate) return false;
-  const time = noteTime || "23:59";
-  const appointment = new Date(noteDate + "T" + time);
+function isFutureDateTime(dateValue,timeValue){
+  if(!dateValue) return false;
+  const time = timeValue || "23:59";
+  const appointment = new Date(dateValue + "T" + time);
   return appointment >= new Date();
 }
-function applyTimelineLogic(noteType,noteDate,noteTime){
+function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,appointmentTime){
   const type=String(noteType||"").toLowerCase();
   const statusEl=document.getElementById("status");
   const nextDateEl=document.getElementById("naechsterkontakt");
   const nextTimeEl=document.getElementById("naechsterkontakt_zeit");
   const kontaktartEl=document.getElementById("kontaktart");
   const erstkontaktEl=document.getElementById("erstkontakt");
-  const future = isFutureDateTime(noteDate,noteTime);
+  const future = isFutureDateTime(appointmentDate,appointmentTime);
 
   if(type.includes("erstkontakt")){
-    if(erstkontaktEl && !erstkontaktEl.value) erstkontaktEl.value = noteDate || todayStr();
+    if(erstkontaktEl && !erstkontaktEl.value) erstkontaktEl.value = activityDate || todayStr();
   }
 
-  if(type.includes("termin vereinbart") || type.includes("persönlicher besuch")){
+  if(type.includes("termin vereinbart")){
     statusEl.value = "Termin vereinbart";
     kontaktartEl.value = "Persönlicher Termin";
-    if(future){ nextDateEl.value = noteDate || ""; nextTimeEl.value = noteTime || ""; }
+    if(future){ nextDateEl.value = appointmentDate || ""; nextTimeEl.value = appointmentTime || ""; }
+    return;
+  }
+
+  if(type.includes("persönlicher besuch")){
+    statusEl.value = "Termin vereinbart";
+    kontaktartEl.value = "Persönlicher Besuch";
+    if(future){ nextDateEl.value = appointmentDate || ""; nextTimeEl.value = appointmentTime || ""; }
     return;
   }
 
   if(type.includes("rückruf")){
     statusEl.value = "Telefonat ausgemacht";
     kontaktartEl.value = "Rückruf";
-    if(future){ nextDateEl.value = noteDate || ""; nextTimeEl.value = noteTime || ""; }
+    if(future){ nextDateEl.value = appointmentDate || ""; nextTimeEl.value = appointmentTime || ""; }
     return;
   }
 
   if(type.includes("mail")){ statusEl.value = "Unterlagen versendet"; kontaktartEl.value = "Mail"; return; }
   if(type.includes("unterlagen") || type.includes("angebot")){ statusEl.value = "Unterlagen versendet"; kontaktartEl.value = "Unterlagen"; return; }
-  if(type.includes("telefonat")){ statusEl.value = "Telefonat ausgemacht"; kontaktartEl.value = "Telefonat"; return; }
+  if(type.includes("telefonat")){ statusEl.value = "Sonstiges"; kontaktartEl.value = "Telefonat"; return; }
 
   statusEl.value = "Sonstiges";
   kontaktartEl.value = "Sonstiges";
@@ -826,7 +865,8 @@ function renderNoteHistory(){
   if(!c||!(c.notes_history||[]).length){ box.innerHTML='<div class="empty">Noch keine Aktivitäten vorhanden.</div>'; return; }
   box.innerHTML=[...(c.notes_history||[])].map((n,i)=>{
     const autoInfo=[n.auto_status?"Status: "+n.auto_status:"",n.auto_naechsterkontakt?"Nächster Kontakt: "+formatDateDisplay(n.auto_naechsterkontakt):"",n.auto_kontaktart?"Art: "+n.auto_kontaktart:""].filter(Boolean).join(" • ");
-    return `<div class="note-entry"><div class="note-entry-head"><div><div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div><div class="note-entry-meta">${esc(n.type||"Aktivität")}</div>${autoInfo?`<div class="note-entry-meta">${esc(autoInfo)}</div>`:""}</div><button class="icon-btn danger" type="button" onclick="removeNoteEntry(${i})">Löschen</button></div><div class="note-entry-text">${esc(n.text||"")}</div></div>`;
+    const appointmentInfo = n.appointment_date ? `Termin: ${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " · "+n.appointment_time : ""}` : "";
+    return `<div class="note-entry"><div class="note-entry-head"><div><div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div><div class="note-entry-meta">${esc(n.type||"Aktivität")}</div>${appointmentInfo?`<div class="note-entry-meta">${esc(appointmentInfo)}</div>`:""}${autoInfo?`<div class="note-entry-meta">${esc(autoInfo)}</div>`:""}</div><button class="icon-btn danger" type="button" onclick="removeNoteEntry(${i})">Löschen</button></div><div class="note-entry-text">${esc(n.text||"")}</div></div>`;
   }).reverse().join("");
 }
 async function addNoteEntry(){
@@ -834,24 +874,38 @@ async function addNoteEntry(){
   const date=document.getElementById("noteDate").value||todayStr();
   const time=document.getElementById("noteTime").value||"";
   const type=document.getElementById("noteType").value||"Sonstiges";
+  const appointmentDate=document.getElementById("appointmentDate").value||"";
+  const appointmentTime=document.getElementById("appointmentTime").value||"";
   const text=document.getElementById("noteText").value.trim();
   if(!text){ alert("Bitte eine Notiz eingeben."); return; }
-  applyTimelineLogic(type,date,time);
+
+  applyTimelineLogic(type,date,time,appointmentDate,appointmentTime);
+
   const currentStatus=document.getElementById("status").value;
   const currentNextDate=document.getElementById("naechsterkontakt").value;
   const currentNextTime=document.getElementById("naechsterkontakt_zeit").value;
   const currentKontaktart=document.getElementById("kontaktart").value;
   const currentErstkontakt=document.getElementById("erstkontakt").value;
+
   contacts=contacts.map(x=>{
     if(x.id!==selectedId) return x;
     const notes_history=Array.isArray(x.notes_history)?[...x.notes_history]:[];
-    notes_history.push({date,time,type,text,auto_status:currentStatus,auto_naechsterkontakt:currentNextDate,auto_naechsterkontakt_zeit:currentNextTime,auto_kontaktart:currentKontaktart});
+    notes_history.push({
+      date,
+      time,
+      type,
+      text,
+      appointment_date:appointmentDate,
+      appointment_time:appointmentTime,
+      auto_status:currentStatus,
+      auto_naechsterkontakt:currentNextDate,
+      auto_naechsterkontakt_zeit:currentNextTime,
+      auto_kontaktart:currentKontaktart
+    });
     return {...x,status:currentStatus,erstkontakt:currentErstkontakt,naechsterkontakt:currentNextDate,naechsterkontakt_zeit:currentNextTime,kontaktart:currentKontaktart,notes_history};
   });
-  document.getElementById("noteDate").value=todayStr();
-  document.getElementById("noteTime").value="";
-  document.getElementById("noteType").value="Telefonat geführt";
-  document.getElementById("noteText").value="";
+
+  resetNoteInputs();
   fillForm(); renderList();
   await autosaveSelectedToSupabase();
 }
@@ -864,7 +918,7 @@ async function removeNoteEntry(index){
 
 function newContact(){
   const newId=Date.now().toString();
-  contacts.unshift({id:newId,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Interessent",bundesland:"Oberösterreich",bezirk:"",telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Telefonat ausgemacht",erstkontakt:"",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"Persönlicher Termin",weclapp:"Nein",potenzial:"mittel",notes_history:[],attachments:[],weitere_kontakte:[],archived:false});
+  contacts.unshift({id:newId,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Interessent",bundesland:"Oberösterreich",bezirk:"",telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Sonstiges",erstkontakt:"",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"",weclapp:"Nein",potenzial:"mittel",notes_history:[],attachments:[],weitere_kontakte:[],archived:false});
   selectedId=newId; fillForm(); renderList(); scheduleAutosave();
 }
 async function deleteCurrent(){ if(selectedId===null){ alert("Kein Kontakt ausgewählt."); return;} await deleteSingle(selectedId); }
@@ -875,7 +929,7 @@ function duplicateContact(){
   contacts.unshift(copy); selectedId=copy.id; fillForm(); renderList(); scheduleAutosave();
 }
 
-function buildBackupPayload(){ syncFormToSelected(); return {app:"Mini CRM Vertrieb",version:28,exportedAt:new Date().toISOString(),contactCount:contacts.length,selectedId,contacts}; }
+function buildBackupPayload(){ syncFormToSelected(); return {app:"Mini CRM Vertrieb",version:29,exportedAt:new Date().toISOString(),contactCount:contacts.length,selectedId,contacts}; }
 function exportJSONBackup(){ const payload=buildBackupPayload(); const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8;"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`mini_crm_backup_${new Date().toISOString().replace(/[:.]/g,"-")}.json`; a.click(); URL.revokeObjectURL(url); setSaveState("JSON Backup exportiert"); }
 function importJSONBackupFile(file){
   if(!file) return;
@@ -914,7 +968,7 @@ document.getElementById("fileInput").addEventListener("change",function(e){
     contacts=[];
     for(let i=1;i<lines.length;i++){
       const row=parseCsvLine(lines[i]);
-      contacts.push({id:String(Date.now()+i),firma:col.firma>=0?(row[col.firma]||""):"",nachname:col.nachname>=0?(row[col.nachname]||""):"",vorname:col.vorname>=0?(row[col.vorname]||""):"",rolle:col.rolle>=0?(row[col.rolle]||""):"",kundentyp:col.kundentyp>=0?(row[col.kundentyp]||"Fachpartner"):"Fachpartner",kundenstatus:col.kundenstatus>=0?(row[col.kundenstatus]||"Interessent"):"Interessent",bundesland:col.bundesland>=0?(row[col.bundesland]||"Oberösterreich"):"Oberösterreich",bezirk:col.bezirk>=0?(row[col.bezirk]||""):"",telefon:col.telefon>=0?(row[col.telefon]||""):"",mobil:col.mobil>=0?(row[col.mobil]||""):"",email:col.email>=0?(row[col.email]||""):"",strasse:col.strasse>=0?(row[col.strasse]||""):"",plz:col.plz>=0?(row[col.plz]||""):"",ort:col.ort>=0?(row[col.ort]||""):"",status:col.status>=0?(row[col.status]||"Telefonat ausgemacht"):"Telefonat ausgemacht",erstkontakt:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",naechsterkontakt:col.naechsterkontakt>=0?(row[col.naechsterkontakt]||""):"",naechsterkontakt_zeit:col.zeit>=0?(row[col.zeit]||""):"",kontaktart:col.kontaktart>=0?(row[col.kontaktart]||"Persönlicher Termin"):"Persönlicher Termin",weclapp:col.weclapp>=0?(row[col.weclapp]||"Nein"):"Nein",potenzial:col.potenzial>=0?(row[col.potenzial]||"mittel"):"mittel",notes_history:(col.notizen>=0&&(row[col.notizen]||"").trim()!=="")?[{date:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",time:"",type:"Import",text:row[col.notizen]||""}]:[],attachments:[],weitere_kontakte:[],archived:false});
+      contacts.push({id:String(Date.now()+i),firma:col.firma>=0?(row[col.firma]||""):"",nachname:col.nachname>=0?(row[col.nachname]||""):"",vorname:col.vorname>=0?(row[col.vorname]||""):"",rolle:col.rolle>=0?(row[col.rolle]||""):"",kundentyp:col.kundentyp>=0?(row[col.kundentyp]||"Fachpartner"):"Fachpartner",kundenstatus:col.kundenstatus>=0?(row[col.kundenstatus]||"Interessent"):"Interessent",bundesland:col.bundesland>=0?(row[col.bundesland]||"Oberösterreich"):"Oberösterreich",bezirk:col.bezirk>=0?(row[col.bezirk]||""):"",telefon:col.telefon>=0?(row[col.telefon]||""):"",mobil:col.mobil>=0?(row[col.mobil]||""):"",email:col.email>=0?(row[col.email]||""):"",strasse:col.strasse>=0?(row[col.strasse]||""):"",plz:col.plz>=0?(row[col.plz]||""):"",ort:col.ort>=0?(row[col.ort]||""):"",status:col.status>=0?(row[col.status]||"Sonstiges"):"Sonstiges",erstkontakt:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",naechsterkontakt:col.naechsterkontakt>=0?(row[col.naechsterkontakt]||""):"",naechsterkontakt_zeit:col.zeit>=0?(row[col.zeit]||""):"",kontaktart:col.kontaktart>=0?(row[col.kontaktart]||""):"",weclapp:col.weclapp>=0?(row[col.weclapp]||"Nein"):"Nein",potenzial:col.potenzial>=0?(row[col.potenzial]||"mittel"):"mittel",notes_history:(col.notizen>=0&&(row[col.notizen]||"").trim()!=="")?[{date:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",time:"",type:"Import",text:row[col.notizen]||"",appointment_date:"",appointment_time:""}]:[],attachments:[],weitere_kontakte:[],archived:false});
     }
     selectedId=contacts.length?contacts[0].id:null;
     fillForm(); renderList(); persistLocalBackup();
@@ -936,7 +990,7 @@ dropzone.addEventListener("dragleave",()=>dropzone.classList.remove("dragover"))
 dropzone.addEventListener("drop",e=>{ e.preventDefault(); dropzone.classList.remove("dragover"); if(e.dataTransfer?.files?.length) addAttachmentsToCurrent(e.dataTransfer.files); });
 
 function downloadJSON(filename,payload){ const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8;"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
-function createDeletionBackup(scopeLabel,ids){ const idSet=new Set(ids||[]); const backupContacts=contacts.filter(c=>idSet.has(c.id)); downloadJSON(`mini_crm_loeschbackup_${scopeLabel}_${new Date().toISOString().replace(/[:.]/g,"-")}.json`,{app:"Mini CRM Vertrieb",version:28,type:"deletion-backup",scope:scopeLabel,exportedAt:new Date().toISOString(),contactCount:backupContacts.length,contacts:backupContacts}); }
+function createDeletionBackup(scopeLabel,ids){ const idSet=new Set(ids||[]); const backupContacts=contacts.filter(c=>idSet.has(c.id)); downloadJSON(`mini_crm_loeschbackup_${scopeLabel}_${new Date().toISOString().replace(/[:.]/g,"-")}.json`,{app:"Mini CRM Vertrieb",version:29,type:"deletion-backup",scope:scopeLabel,exportedAt:new Date().toISOString(),contactCount:backupContacts.length,contacts:backupContacts}); }
 function toggleSelectContact(id){ selectedIds.has(id)?selectedIds.delete(id):selectedIds.add(id); renderList(); }
 function toggleSelectAllVisible(){ const visibleIds=filteredContacts().map(c=>c.id); const allSelected=visibleIds.length&&visibleIds.every(id=>selectedIds.has(id)); visibleIds.forEach(id=>allSelected?selectedIds.delete(id):selectedIds.add(id)); renderList(); }
 
