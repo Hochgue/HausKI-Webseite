@@ -62,8 +62,8 @@
   .activity-box{border:1px solid var(--line);border-radius:8px;background:#fbfcfd;padding:12px;margin-bottom:12px}
   .activity-box-title{font-size:15px;font-weight:800;color:#334155;margin-bottom:10px;display:flex;align-items:center;gap:8px}
   .activity-grid{display:grid;grid-template-columns:160px 140px minmax(220px,1fr);gap:12px 16px;align-items:end}
-  .appointment-grid{display:grid;grid-template-columns:180px 150px minmax(260px,1fr);gap:12px 16px;align-items:end}
-  .note-full textarea{min-height:150px;font-size:15px;line-height:1.45}
+  .appointment-grid{display:grid;grid-template-columns:180px 150px minmax(220px,1fr);gap:12px 16px;align-items:end}
+  .note-full textarea{min-height:110px;font-size:15px;line-height:1.45}.appointment-note textarea{min-height:90px;font-size:15px;line-height:1.45}.activity-subgrid{margin-top:12px}
   .activity-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.activity-actions button{white-space:nowrap}.activity-actions .no-interest{background:#dc2626!important}.activity-actions .no-interest:hover{background:#b91c1c!important}
   .note-entry{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}.note-entry-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}.note-entry-date{font-weight:700;color:#374151}.note-entry-meta{font-size:12px;color:var(--muted)}.note-entry-text{white-space:pre-wrap;line-height:1.4}.note-grid{display:grid;grid-template-columns:140px 120px 180px 140px 120px 1fr auto;gap:10px;align-items:end}
   #noteHistory{max-height:260px;overflow:auto}#subContactList{max-height:220px;overflow:auto}
@@ -173,15 +173,17 @@
               <select id="noteType">
                 <option>📞 Telefonat geführt</option>
                 <option>📧 Mail gesendet</option>
-                <option>📅 Termin vereinbart</option>
                 <option>👤 Persönlicher Besuch</option>
                 <option>📄 Unterlagen gesendet</option>
                 <option>📄 Angebot erstellt</option>
-                <option>⏰ Rückruf vereinbart</option>
                 <option>⭐ Erstkontakt</option>
                 <option>Sonstiges</option>
               </select>
             </div>
+          </div>
+          <div class="activity-subgrid note-full">
+            <label>Was wurde besprochen / Ergebnis der Aktivität</label>
+            <textarea id="activityText" placeholder="Zum Beispiel: Kunde interessiert sich für FENECON, möchte Preise, Projekt grob besprochen ..."></textarea>
           </div>
         </div>
 
@@ -190,15 +192,28 @@
           <div class="appointment-grid">
             <div><label>Termindatum</label><input id="appointmentDate" type="date"></div>
             <div><label>Terminzeit</label><input id="appointmentTime" type="time"></div>
-            <div class="hint" style="margin-top:0;">Nur ausfüllen, wenn aus der Aktivität ein zukünftiger Termin oder Rückruf entsteht.</div>
+            <div>
+              <label>Art des Termins</label>
+              <select id="appointmentType">
+                <option value="">Kein Termin / Rückruf</option>
+                <option>📅 Termin vereinbart</option>
+                <option>⏰ Rückruf vereinbart</option>
+                <option>👤 Persönlicher Termin</option>
+                <option>💻 Online-Termin</option>
+                <option>📧 Mail nachfassen</option>
+                <option>Sonstiges</option>
+              </select>
+            </div>
           </div>
+          <div class="activity-subgrid appointment-note">
+            <label>Notiz zum Termin / Rückruf</label>
+            <textarea id="appointmentText" placeholder="Zum Beispiel: Vor-Ort-Termin mit Kollegen, Projekterfassungsbogen ausfüllen, Rückruf wegen Angebot ..."></textarea>
+          </div>
+          <div class="hint">Nur ausfüllen, wenn aus der Aktivität ein zukünftiger Termin oder Rückruf entsteht.</div>
         </div>
 
         <div class="activity-box">
-          <div class="activity-box-title">📝 Notiz / Ergebnis</div>
-          <div class="note-full">
-            <textarea id="noteText" placeholder="Zum Beispiel: Heute telefoniert, Kunde interessiert, Termin für nächste Woche vereinbart ..."></textarea>
-          </div>
+          <div class="activity-box-title">✅ Eintrag speichern</div>
           <div class="activity-actions">
             <button type="button" class="no-interest" onclick="markNoInterest()">Kein Interesse</button>
             <button type="button" onclick="addNoteEntry()">Eintrag hinzufügen</button>
@@ -628,7 +643,9 @@ function resetNoteInputs(){
   document.getElementById("noteType").value="📞 Telefonat geführt";
   document.getElementById("appointmentDate").value="";
   document.getElementById("appointmentTime").value="";
-  document.getElementById("noteText").value="";
+  document.getElementById("appointmentType").value="";
+  document.getElementById("activityText").value="";
+  document.getElementById("appointmentText").value="";
 }
 
 function fillForm(){
@@ -847,7 +864,7 @@ function updateCustomerSummary(){
             n.auto_naechsterkontakt ? "Nächster Kontakt: "+formatDateDisplay(n.auto_naechsterkontakt) : "",
             n.auto_kontaktart ? "Art: "+n.auto_kontaktart : ""
           ].filter(Boolean).join(" • ");
-          const appointmentInfo = n.appointment_date ? `Termin: ${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " · "+n.appointment_time : ""}` : "";
+          const appointmentInfo = n.appointment_date ? `Termin: ${n.appointment_type ? n.appointment_type.replace(/^[^a-zA-ZÄÖÜäöüß]+\\s*/,"")+" · " : ""}${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " · "+n.appointment_time : ""}` : "";
           return `<div class="note-entry" style="margin-top:0;margin-bottom:8px;">
             <div class="note-entry-head">
               <div>
@@ -870,10 +887,11 @@ function isFutureDateTime(dateValue,timeValue){
   const appointment = new Date(dateValue + "T" + time);
   return appointment >= new Date();
 }
-function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,appointmentTime){
+function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,appointmentTime,appointmentType){
   const selected=getSelected();
   if(isInWeclapp(selected)) return;
   const type=String(noteType||"").toLowerCase();
+  const appointment=String(appointmentType||"").toLowerCase();
   const statusEl=document.getElementById("status");
   const nextDateEl=document.getElementById("naechsterkontakt");
   const nextTimeEl=document.getElementById("naechsterkontakt_zeit");
@@ -885,9 +903,9 @@ function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,a
     if(erstkontaktEl && !erstkontaktEl.value) erstkontaktEl.value = activityDate || todayStr();
   }
 
-  if(type.includes("termin vereinbart")){
+  if(type.includes("termin vereinbart") || appointment.includes("termin vereinbart") || appointment.includes("persönlicher termin") || appointment.includes("online-termin")){
     statusEl.value = "Termin vereinbart";
-    kontaktartEl.value = "Persönlicher Termin";
+    kontaktartEl.value = appointmentType ? appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,"") : "Persönlicher Termin";
     if(future){ nextDateEl.value = appointmentDate || ""; nextTimeEl.value = appointmentTime || ""; }
     return;
   }
@@ -899,13 +917,19 @@ function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,a
     return;
   }
 
-  if(type.includes("rückruf")){
+  if(type.includes("rückruf") || appointment.includes("rückruf")){
     statusEl.value = "Telefonat ausgemacht";
-    kontaktartEl.value = "Rückruf";
+    kontaktartEl.value = appointmentType ? appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,"") : "Rückruf";
     if(future){ nextDateEl.value = appointmentDate || ""; nextTimeEl.value = appointmentTime || ""; }
     return;
   }
 
+  if(appointment.includes("mail nachfassen")){
+    statusEl.value = "Telefonat ausgemacht";
+    kontaktartEl.value = "Mail nachfassen";
+    if(future){ nextDateEl.value = appointmentDate || ""; nextTimeEl.value = appointmentTime || ""; }
+    return;
+  }
   if(type.includes("mail")){ statusEl.value = "Unterlagen versendet"; kontaktartEl.value = "Mail"; return; }
   if(type.includes("unterlagen") || type.includes("angebot")){ statusEl.value = "Unterlagen versendet"; kontaktartEl.value = "Unterlagen"; return; }
   if(type.includes("telefonat")){ statusEl.value = "Sonstiges"; kontaktartEl.value = "Telefonat"; return; }
@@ -919,7 +943,7 @@ function renderNoteHistory(){
   if(!c||!(c.notes_history||[]).length){ box.innerHTML='<div class="empty">Noch keine Aktivitäten vorhanden.</div>'; return; }
   box.innerHTML=[...(c.notes_history||[])].map((n,i)=>{
     const autoInfo=[n.auto_status?"Status: "+n.auto_status:"",n.auto_naechsterkontakt?"Nächster Kontakt: "+formatDateDisplay(n.auto_naechsterkontakt):"",n.auto_kontaktart?"Art: "+n.auto_kontaktart:""].filter(Boolean).join(" • ");
-    const appointmentInfo = n.appointment_date ? `Termin: ${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " · "+n.appointment_time : ""}` : "";
+    const appointmentInfo = n.appointment_date ? `Termin: ${n.appointment_type ? n.appointment_type.replace(/^[^a-zA-ZÄÖÜäöüß]+\\s*/,"")+" · " : ""}${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " · "+n.appointment_time : ""}` : "";
     return `<div class="note-entry"><div class="note-entry-head"><div><div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div><div class="note-entry-meta">${esc(n.type||"Aktivität")}</div>${appointmentInfo?`<div class="note-entry-meta">${esc(appointmentInfo)}</div>`:""}${autoInfo?`<div class="note-entry-meta">${esc(autoInfo)}</div>`:""}</div><button class="icon-btn danger" type="button" onclick="removeNoteEntry(${i})">Löschen</button></div><div class="note-entry-text">${esc(n.text||"")}</div></div>`;
   }).reverse().join("");
 }
@@ -937,7 +961,7 @@ async function markNoInterest(){
 
   const date=document.getElementById("noteDate").value||todayStr();
   const time=document.getElementById("noteTime").value||"";
-  const noteText=document.getElementById("noteText").value.trim();
+  const noteText=document.getElementById("activityText").value.trim() || document.getElementById("appointmentText").value.trim();
   const text=noteText || "Kein Interesse vermerkt.";
 
   contacts=contacts.map(x=>{
@@ -983,10 +1007,24 @@ async function addNoteEntry(){
   const type=document.getElementById("noteType").value||"Sonstiges";
   const appointmentDate=document.getElementById("appointmentDate").value||"";
   const appointmentTime=document.getElementById("appointmentTime").value||"";
-  const text=document.getElementById("noteText").value.trim();
-  if(!text){ alert("Bitte eine Notiz eingeben."); return; }
+  const appointmentType=document.getElementById("appointmentType").value||"";
+  const activityText=document.getElementById("activityText").value.trim();
+  const appointmentText=document.getElementById("appointmentText").value.trim();
+  const textParts=[];
+  if(activityText) textParts.push("Aktivität: "+activityText);
+  if(appointmentDate || appointmentTime || appointmentType || appointmentText){
+    const terminInfo=[
+      appointmentType ? "Art: "+appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,"") : "",
+      appointmentDate ? "Datum: "+formatDateDisplay(appointmentDate) : "",
+      appointmentTime ? "Zeit: "+appointmentTime : "",
+      appointmentText ? "Notiz: "+appointmentText : ""
+    ].filter(Boolean).join(" • ");
+    textParts.push("Termin/Rückruf: "+terminInfo);
+  }
+  const text=textParts.join("\n");
+  if(!text){ alert("Bitte eine Aktivitätsnotiz oder Termininformation eingeben."); return; }
 
-  applyTimelineLogic(type,date,time,appointmentDate,appointmentTime);
+  applyTimelineLogic(type,date,time,appointmentDate,appointmentTime,appointmentType);
 
   const currentStatus=document.getElementById("status").value;
   const currentNextDate=document.getElementById("naechsterkontakt").value;
@@ -1004,6 +1042,9 @@ async function addNoteEntry(){
       text,
       appointment_date:appointmentDate,
       appointment_time:appointmentTime,
+      appointment_type:appointmentType,
+      activity_text:activityText,
+      appointment_text:appointmentText,
       auto_status:currentStatus,
       auto_naechsterkontakt:currentNextDate,
       auto_naechsterkontakt_zeit:currentNextTime,
