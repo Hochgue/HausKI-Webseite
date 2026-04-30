@@ -64,7 +64,7 @@
   .activity-grid{display:grid;grid-template-columns:160px 140px minmax(220px,1fr);gap:12px 16px;align-items:end}
   .appointment-grid{display:grid;grid-template-columns:180px 150px minmax(220px,1fr);gap:12px 16px;align-items:end}
   .note-full textarea{min-height:110px;font-size:15px;line-height:1.45}.appointment-note textarea{min-height:90px;font-size:15px;line-height:1.45}.activity-subgrid{margin-top:12px}
-  .activity-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.activity-actions button{white-space:nowrap}.activity-actions .no-interest{background:#dc2626!important}.activity-actions .no-interest:hover{background:#b91c1c!important}
+  .activity-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.activity-actions button{white-space:nowrap}.activity-actions .no-interest{background:#dc2626!important}.activity-actions .no-interest:hover{background:#b91c1c!important}.activity-actions .documents-sent{background:#7c3aed!important}.activity-actions .documents-sent:hover{background:#6d28d9!important}
   .note-entry{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfd;margin-top:8px}.note-entry-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}.note-entry-date{font-weight:700;color:#374151}.note-entry-meta{font-size:12px;color:var(--muted)}.note-entry-text{white-space:pre-wrap;line-height:1.4}.note-grid{display:grid;grid-template-columns:140px 120px 180px 140px 120px 1fr auto;gap:10px;align-items:end}
   #noteHistory{max-height:260px;overflow:auto}#subContactList{max-height:220px;overflow:auto}
   .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px}.summary-card strong{display:block;margin-bottom:4px}
@@ -218,6 +218,7 @@
         <div class="activity-box">
           <div class="activity-box-title">✅ Eintrag speichern</div>
           <div class="activity-actions">
+            <button type="button" class="documents-sent" onclick="markDocumentsSent()">📄 Unterlagen versendet</button>
             <button type="button" class="no-interest" onclick="markNoInterest()">Kein Interesse</button>
             <button type="button" onclick="addNoteEntry()">Eintrag hinzufügen</button>
           </div>
@@ -924,7 +925,7 @@ function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,a
     return;
   }
 
-  if(type.includes("rückruf") || appointment.includes("rückruf")){
+  if(type.includes("rückruf") || appointment.includes("rückruf") || appointment.includes("anruf")){
     statusEl.value = "Telefonat ausgemacht";
     kontaktartEl.value = appointmentType ? appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,"") : "Rückruf";
     if(future){ nextDateEl.value = appointmentDate || ""; nextTimeEl.value = appointmentTime || ""; }
@@ -939,7 +940,7 @@ function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,a
   }
   if(type.includes("mail")){ statusEl.value = "Unterlagen versendet"; kontaktartEl.value = "Mail"; return; }
   if(type.includes("unterlagen") || type.includes("angebot")){ statusEl.value = "Unterlagen versendet"; kontaktartEl.value = "Unterlagen"; return; }
-  if(type.includes("telefonat")){ statusEl.value = "Sonstiges"; kontaktartEl.value = "Telefonat"; return; }
+  if(type.includes("telefonat") || type.includes("teams")){ statusEl.value = "Sonstiges"; kontaktartEl.value = type.includes("teams") ? "Teams Call" : "Telefonat"; return; }
 
   statusEl.value = "Sonstiges";
   kontaktartEl.value = "Sonstiges";
@@ -1000,6 +1001,73 @@ async function markNoInterest(){
   document.getElementById("naechsterkontakt").value="";
   document.getElementById("naechsterkontakt_zeit").value="";
   document.getElementById("kontaktart").value="Kein Interesse";
+
+  resetNoteInputs();
+  fillForm();
+  renderList();
+  await autosaveSelectedToSupabase();
+}
+
+async function markDocumentsSent(){
+  const c=getSelected();
+  if(!c){
+    alert("Bitte zuerst einen Kontakt auswählen.");
+    return;
+  }
+
+  const date=document.getElementById("noteDate").value||todayStr();
+  const time=document.getElementById("noteTime").value||"";
+  const appointmentDate=document.getElementById("appointmentDate").value||"";
+  const appointmentTime=document.getElementById("appointmentTime").value||"";
+  const appointmentType=document.getElementById("appointmentType").value||"";
+  const activityText=document.getElementById("activityText").value.trim();
+  const appointmentText=document.getElementById("appointmentText").value.trim();
+
+  document.getElementById("noteType").value="📄 Unterlagen gesendet";
+
+  const textParts=[];
+  textParts.push("Aktivität: "+(activityText || "Unterlagen wurden versendet."));
+
+  if(appointmentDate || appointmentTime || appointmentType || appointmentText){
+    const terminInfo=[
+      appointmentType ? "Art: "+appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,"") : "",
+      appointmentDate ? "Datum: "+formatDateDisplay(appointmentDate) : "",
+      appointmentTime ? "Zeit: "+appointmentTime : "",
+      appointmentText ? "Notiz: "+appointmentText : ""
+    ].filter(Boolean).join(" • ");
+    textParts.push("Termin/Rückruf: "+terminInfo);
+  }
+
+  const text=textParts.join("\n");
+
+  applyTimelineLogic("📄 Unterlagen gesendet",date,time,appointmentDate,appointmentTime,appointmentType);
+
+  const currentStatus=document.getElementById("status").value || "Unterlagen versendet";
+  const currentNextDate=document.getElementById("naechsterkontakt").value;
+  const currentNextTime=document.getElementById("naechsterkontakt_zeit").value;
+  const currentKontaktart=document.getElementById("kontaktart").value || "Unterlagen";
+  const currentErstkontakt=document.getElementById("erstkontakt").value;
+
+  contacts=contacts.map(x=>{
+    if(x.id!==selectedId) return x;
+    const notes_history=Array.isArray(x.notes_history)?[...x.notes_history]:[];
+    notes_history.push({
+      date,
+      time,
+      type:"📄 Unterlagen gesendet",
+      text,
+      appointment_date:appointmentDate,
+      appointment_time:appointmentTime,
+      appointment_type:appointmentType,
+      activity_text:activityText || "Unterlagen wurden versendet.",
+      appointment_text:appointmentText,
+      auto_status:currentStatus,
+      auto_naechsterkontakt:currentNextDate,
+      auto_naechsterkontakt_zeit:currentNextTime,
+      auto_kontaktart:currentKontaktart
+    });
+    return {...x,status:currentStatus,erstkontakt:currentErstkontakt,naechsterkontakt:currentNextDate,naechsterkontakt_zeit:currentNextTime,kontaktart:currentKontaktart,notes_history};
+  });
 
   resetNoteInputs();
   fillForm();
@@ -1225,15 +1293,10 @@ function isDateInCurrentWeek(dateStr){
 
 function wasTransferredToWeclappThisWeek(contact){
   if(!isInWeclapp(contact)) return false;
-
-  // Falls es einen Aktivitätseintrag mit weclapp in dieser Woche gibt, zählt er sicher für diese Woche.
   const notes = Array.isArray(contact.notes_history) ? contact.notes_history : [];
   if(notes.some(n => isDateInCurrentWeek(n.date) && `${n.type||""} ${n.text||""} ${n.auto_status||""}`.toLowerCase().includes("weclapp"))){
     return true;
   }
-
-  // Fallback: Wenn kein eigener weclapp-Historieneintrag vorhanden ist, wird der Kontakt trotzdem im Wochenbericht angezeigt.
-  // Damit sieht der Chef zuverlässig, welche Kontakte aktuell bereits in weclapp übernommen wurden.
   return true;
 }
 
