@@ -1285,8 +1285,10 @@ function generateWeeklyReport(){
 
   const rows = reportContacts.map(c => {
     const status = getVisibleStatus(c) || c.status || (isInWeclapp(c) ? "In weclapp" : "-");
+    const inWeclapp = isInWeclapp(c) ? "Ja" : "Nein";
+
     const nextStep = isInWeclapp(c)
-      ? "In weclapp übernommen"
+      ? "Weiterführung in weclapp"
       : (hasFutureNextContact(c) ? (c.kontaktart || "-") : (c.kontaktart || "-"));
 
     const nextDate = hasFutureNextContact(c)
@@ -1298,31 +1300,86 @@ function generateWeeklyReport(){
       <td>${esc(safeJoin([c.plz,c.ort]," "))}</td>
       <td>${esc(safeJoin([c.vorname,c.nachname]," "))}</td>
       <td>${esc(status)}</td>
+      <td>${esc(inWeclapp)}</td>
       <td>${esc(nextStep)}</td>
       <td>${nextDate}</td>
       <td>${getWeekActivityText(c)}</td>
     </tr>`;
   }).join("");
 
-  const html=`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Wochenbericht KW ${kw} Hochreiter Günther</title><style>
-    body{font-family:Arial;margin:28px;color:#111827}
-    h1{margin:0 0 8px 0}
-    .meta{margin:0 0 18px 0;color:#374151}
-    table{width:100%;border-collapse:collapse}
-    th,td{border:1px solid #cfd8e3;padding:8px;text-align:left;font-size:12px;vertical-align:top}
-    th{background:#eef2f6}
-    button{background:#5f7897;color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;font-weight:700;margin-bottom:14px}
-    @media print{button{display:none} body{margin:18px} th,td{font-size:11px}}
+  const html=`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
+  <title>Wochenbericht KW ${kw} Hochreiter Günther</title>
+  <style>
+    @page{
+      size:A4 landscape;
+      margin:10mm;
+    }
+    body{
+      font-family:Arial;
+      margin:12px;
+      color:#111827;
+    }
+    h1{
+      margin:0 0 6px 0;
+      font-size:20px;
+    }
+    .meta{
+      margin:0 0 10px 0;
+      color:#374151;
+      font-size:12px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+    }
+    th,td{
+      border:1px solid #cfd8e3;
+      padding:5px;
+      text-align:left;
+      font-size:10px;
+      vertical-align:top;
+      word-wrap:break-word;
+      overflow-wrap:break-word;
+    }
+    th{
+      background:#eef2f6;
+      font-weight:700;
+    }
+    th:nth-child(1),td:nth-child(1){width:15%}
+    th:nth-child(2),td:nth-child(2){width:9%}
+    th:nth-child(3),td:nth-child(3){width:11%}
+    th:nth-child(4),td:nth-child(4){width:10%}
+    th:nth-child(5),td:nth-child(5){width:7%}
+    th:nth-child(6),td:nth-child(6){width:12%}
+    th:nth-child(7),td:nth-child(7){width:10%}
+    th:nth-child(8),td:nth-child(8){width:26%}
+    button{
+      background:#5f7897;
+      color:white;
+      border:none;
+      border-radius:4px;
+      padding:8px 12px;
+      cursor:pointer;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+    @media print{
+      button{display:none}
+      body{margin:0}
+    }
   </style></head><body>
     <h1>Wochenbericht KW ${kw} Hochreiter Günther</h1>
     <p class="meta"><strong>Datum:</strong> ${today.toLocaleDateString("de-AT")} · <strong>Anzahl Kontakte:</strong> ${reportContacts.length}</p>
     <button onclick="window.print()">Drucken / als PDF speichern</button>
+
     <table>
       <thead><tr>
         <th>Kunde</th>
         <th>Ort</th>
         <th>Ansprechpartner</th>
         <th>Status</th>
+        <th>In weclapp</th>
         <th>Nächster Schritt</th>
         <th>Termin</th>
         <th>Aktivitäten dieser Woche</th>
