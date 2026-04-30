@@ -83,6 +83,7 @@
   <button onclick="loadData()">Aus Supabase laden</button>
   <button onclick="duplicateContact()">Duplizieren</button>
   <button onclick="generateDailyReport()">Tagesbericht erstellen</button>
+  <button onclick="generateWeeklyReport()">Wochenbericht erstellen</button>
   <span id="saveState" style="margin-left:auto;font-size:12px;color:#475569;font-weight:700;">Bereit</span>
   <button onclick="clearAllData()" class="delete">Alle Kontakte löschen</button>
 </div>
@@ -740,7 +741,11 @@ async function addAttachmentsToCurrent(files){
     const fileArray=Array.from(files);
     for(const file of fileArray){
       setSaveState("Lade Datei hoch: "+file.name);
-      const safeName=file.name.replace(/[^\w.\-äöüÄÖÜß ]/g,"_");
+      const safeName = file.name
+       .normalize("NFD")
+       .replace(/[\u0300-\u036f]/g, "")
+       .replace(/[^a-zA-Z0-9.\-_]/g, "_")
+       .replace(/_+/g, "_");
       const filePath=firmaId+"/"+Date.now()+"_"+safeName;
       const {error:uploadError}=await supabaseClient.storage.from("crm-attachments").upload(filePath,file,{upsert:false});
       if(uploadError) throw uploadError;
@@ -1192,6 +1197,147 @@ function generateDailyReport(){
   const html=`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Tagesbericht Vertrieb ${esc(today)}</title><style>body{font-family:Arial;margin:28px;color:#111827}table{width:100%;border-collapse:collapse}th,td{border:1px solid #cfd8e3;padding:8px;text-align:left;font-size:12px}th{background:#eef2f6}@media print{button{display:none}}</style></head><body><h1>Tagesbericht Vertrieb</h1><p><strong>Datum:</strong> ${esc(today)} · <strong>Anzahl Kontakte:</strong> ${reportContacts.length}</p><button onclick="window.print()">Drucken / als PDF speichern</button><table><thead><tr><th>Kunde</th><th>Ort</th><th>Ansprechpartner</th><th>Status</th><th>Nächster Schritt</th><th>Nächster Kontakt</th><th>Letzte Notiz</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
   const win=window.open("","_blank"); if(!win){alert("Popup wurde blockiert."); return;} win.document.open(); win.document.write(html); win.document.close();
 }
+
+function getISOWeekNumber(date){
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+function getISOWeekYear(date){
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  return d.getUTCFullYear();
+}
+
+function isDateInCurrentWeek(dateStr){
+  if(!dateStr) return false;
+  const date = new Date(dateStr + "T12:00:00");
+  if(isNaN(date.getTime())) return false;
+  const today = new Date();
+  return getISOWeekNumber(date) === getISOWeekNumber(today) && getISOWeekYear(date) === getISOWeekYear(today);
+}
+
+function wasTransferredToWeclappThisWeek(contact){
+  if(!isInWeclapp(contact)) return false;
+
+  // Falls es einen Aktivitätseintrag mit weclapp in dieser Woche gibt, zählt er sicher für diese Woche.
+  const notes = Array.isArray(contact.notes_history) ? contact.notes_history : [];
+  if(notes.some(n => isDateInCurrentWeek(n.date) && `${n.type||""} ${n.text||""} ${n.auto_status||""}`.toLowerCase().includes("weclapp"))){
+    return true;
+  }
+
+  // Fallback: Wenn kein eigener weclapp-Historieneintrag vorhanden ist, wird der Kontakt trotzdem im Wochenbericht angezeigt.
+  // Damit sieht der Chef zuverlässig, welche Kontakte aktuell bereits in weclapp übernommen wurden.
+  return true;
+}
+
+function getWeekActivityText(contact){
+  const notes = Array.isArray(contact.notes_history) ? contact.notes_history : [];
+  const weekNotes = notes
+    .filter(n => isDateInCurrentWeek(n.date) || isDateInCurrentWeek(n.appointment_date) || isDateInCurrentWeek(n.auto_naechsterkontakt))
+    .sort((a,b) => String(a.date||"").localeCompare(String(b.date||"")));
+
+  if(!weekNotes.length){
+    if(isInWeclapp(contact)) return "In weclapp übernommen / Weiterführung in weclapp.";
+    return getLatestNoteText(contact) || "-";
+  }
+
+  return weekNotes.map(n => {
+    const termin = n.appointment_date
+      ? `Termin: ${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " "+n.appointment_time : ""}`
+      : "";
+    return [
+      `${formatDateDisplay(n.date||"")} ${n.time||""}`.trim(),
+      n.type || "Aktivität",
+      termin,
+      n.text || ""
+    ].filter(Boolean).join(" · ");
+  }).join("<br>");
+}
+
+function buildWeeklyReportContacts(){
+  return contacts.filter(c => {
+    if(wasTransferredToWeclappThisWeek(c)) return true;
+
+    if(isDateInCurrentWeek(c.naechsterkontakt)) return true;
+
+    return (c.notes_history || []).some(n =>
+      isDateInCurrentWeek(n.date) ||
+      isDateInCurrentWeek(n.appointment_date) ||
+      isDateInCurrentWeek(n.auto_naechsterkontakt)
+    );
+  });
+}
+
+function generateWeeklyReport(){
+  const today = new Date();
+  const kw = getISOWeekNumber(today);
+  const reportContacts = buildWeeklyReportContacts();
+
+  if(!reportContacts.length){
+    alert("Für diese Woche wurden keine Kontakte gefunden.");
+    return;
+  }
+
+  const rows = reportContacts.map(c => {
+    const status = getVisibleStatus(c) || c.status || (isInWeclapp(c) ? "In weclapp" : "-");
+    const nextStep = isInWeclapp(c)
+      ? "In weclapp übernommen"
+      : (hasFutureNextContact(c) ? (c.kontaktart || "-") : (c.kontaktart || "-"));
+
+    const nextDate = hasFutureNextContact(c)
+      ? esc(formatDateDisplay(c.naechsterkontakt||"")) + " " + esc(c.naechsterkontakt_zeit||"")
+      : "-";
+
+    return `<tr>
+      <td>${esc(c.firma||"-")}</td>
+      <td>${esc(safeJoin([c.plz,c.ort]," "))}</td>
+      <td>${esc(safeJoin([c.vorname,c.nachname]," "))}</td>
+      <td>${esc(status)}</td>
+      <td>${esc(nextStep)}</td>
+      <td>${nextDate}</td>
+      <td>${getWeekActivityText(c)}</td>
+    </tr>`;
+  }).join("");
+
+  const html=`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Wochenbericht KW ${kw} Hochreiter Günther</title><style>
+    body{font-family:Arial;margin:28px;color:#111827}
+    h1{margin:0 0 8px 0}
+    .meta{margin:0 0 18px 0;color:#374151}
+    table{width:100%;border-collapse:collapse}
+    th,td{border:1px solid #cfd8e3;padding:8px;text-align:left;font-size:12px;vertical-align:top}
+    th{background:#eef2f6}
+    button{background:#5f7897;color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;font-weight:700;margin-bottom:14px}
+    @media print{button{display:none} body{margin:18px} th,td{font-size:11px}}
+  </style></head><body>
+    <h1>Wochenbericht KW ${kw} Hochreiter Günther</h1>
+    <p class="meta"><strong>Datum:</strong> ${today.toLocaleDateString("de-AT")} · <strong>Anzahl Kontakte:</strong> ${reportContacts.length}</p>
+    <button onclick="window.print()">Drucken / als PDF speichern</button>
+    <table>
+      <thead><tr>
+        <th>Kunde</th>
+        <th>Ort</th>
+        <th>Ansprechpartner</th>
+        <th>Status</th>
+        <th>Nächster Schritt</th>
+        <th>Termin</th>
+        <th>Aktivitäten dieser Woche</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </body></html>`;
+
+  const win=window.open("","_blank");
+  if(!win){alert("Popup wurde blockiert."); return;}
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
+
 function getTodayDueContacts(){
   return contacts.filter(c => hasFutureNextContact(c) && c.naechsterkontakt === todayStr());
 }
