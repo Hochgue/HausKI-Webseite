@@ -36,13 +36,13 @@
   .full-span{grid-column:1 / -1}
   .toolbar{display:grid;grid-template-columns:1.2fr .9fr .9fr 1fr auto auto auto;gap:10px;align-items:end;margin-bottom:12px}
   .badge{display:inline-block;padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#111827}
-  .orange{background:var(--orange)} .gelb{background:var(--yellow)} .gruen{background:var(--green)} .violett{background:var(--violet)}
+  .orange{background:var(--orange)} .gelb{background:var(--yellow)} .gruen{background:var(--green)} .violett{background:var(--violet)} .weclapp-badge{background:#bfdbfe;color:#1e3a8a;border:1px solid #93c5fd}
   .mini-box{background:#f8fafc;border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:10px}
   .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
   .empty{padding:14px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);background:#fafcff}
   .contact-list{display:flex;flex-direction:column;gap:10px}
   .contact-item{border:1px solid var(--line);border-radius:6px;padding:12px;background:#fbfcfd;cursor:pointer}
-  .contact-item:hover{background:#f5f8fb}.contact-item.active{border-color:#9fb2c8;background:#eef4fa}
+  .contact-item:hover{background:#f5f8fb}.contact-item.active{border-color:#9fb2c8;background:#eef4fa}.contact-item.in-weclapp{border-color:#93c5fd;background:#eff6ff}
   .contact-item-top{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:12px;width:100%}
   .contact-select{margin:0;justify-self:center;align-self:center}
   .contact-row{display:grid;grid-template-columns:minmax(220px,2fr) minmax(110px,.9fr) minmax(110px,.9fr) minmax(180px,1.2fr) minmax(130px,.9fr);gap:10px;align-items:center;width:100%}
@@ -97,7 +97,7 @@
         <div class="sub-title">Suche / Übersicht</div>
         <div class="toolbar">
           <div><label>Suchen</label><input id="search" placeholder="Firma, Name, Bezirk, Bundesland, Notiz ..." oninput="renderList()"></div>
-          <div><label>Status</label><select id="statusFilter" onchange="renderList()"><option>Alle</option><option>Termin vereinbart</option><option>Unterlagen versendet</option><option>Telefonat ausgemacht</option><option>Sonstiges</option><option>Archiviert</option></select></div>
+          <div><label>Status</label><select id="statusFilter" onchange="renderList()"><option>Alle</option><option>Termin vereinbart</option><option>Unterlagen versendet</option><option>Telefonat ausgemacht</option><option>Sonstiges</option><option>Archiviert</option><option>In weclapp</option></select></div>
           <div><label>Kundentyp</label><select id="kundentypFilter" onchange="renderList()"><option>Alle</option><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option></select></div>
           <div><label>Region</label><input id="regionFilter" placeholder="Ort, Bezirk, Bundesland, PLZ" oninput="renderList()"></div>
           <button onclick="sortBy('firma')">Nach Firma</button>
@@ -219,7 +219,9 @@ function safeJoin(arr,sep=" "){ return (arr||[]).filter(v=>String(v||"").trim()!
 function isUuid(value){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||"")); }
 function getSelected(){ return contacts.find(c => c.id === selectedId) || null; }
 function setSaveState(message,isError=false){ const el=document.getElementById("saveState"); if(!el) return; el.textContent=message; el.style.color=isError?"#b91c1c":"#475569"; }
-function statusBadgeClass(status){ if(status==="Termin vereinbart") return "gelb"; if(status==="Unterlagen versendet") return "violett"; if(status==="Telefonat ausgemacht") return "orange"; if(status==="Sonstiges") return "gruen"; return "orange"; }
+function statusBadgeClass(status){ if(status==="In weclapp") return "weclapp-badge"; if(status==="Termin vereinbart") return "gelb"; if(status==="Unterlagen versendet") return "violett"; if(status==="Telefonat ausgemacht") return "orange"; if(status==="Sonstiges") return "gruen"; return "orange"; }
+
+function isInWeclapp(c){ return String(c?.weclapp||"").toLowerCase()==="ja"; }
 
 function getContactDateTime(c){
   if(!c || !c.naechsterkontakt) return null;
@@ -227,12 +229,14 @@ function getContactDateTime(c){
   return new Date(c.naechsterkontakt + "T" + time);
 }
 function hasFutureNextContact(c){
+  if(isInWeclapp(c)) return false;
   const dt = getContactDateTime(c);
   if(!dt) return false;
   return dt >= new Date();
 }
 function getVisibleStatus(c){
   if(c.archived) return "Archiviert";
+  if(isInWeclapp(c)) return "In weclapp";
   if(hasFutureNextContact(c)) return c.status || "";
   return "";
 }
@@ -517,7 +521,7 @@ function filteredContacts(){
     const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,noteTexts].join(" ").toLowerCase();
     const sOk=search===""||hay.includes(search);
     const visibleStatus=getVisibleStatus(c);
-    const stOk=statusFilter==="Alle"?!c.archived:(statusFilter==="Archiviert"?!!c.archived:visibleStatus===statusFilter&&!c.archived);
+    const stOk=statusFilter==="Alle"?!c.archived:(statusFilter==="Archiviert"?!!c.archived:(statusFilter==="In weclapp"?isInWeclapp(c)&&!c.archived:visibleStatus===statusFilter&&!c.archived));
     const ktOk=kundentypFilter==="Alle"||c.kundentyp===kundentypFilter;
     const rOk=region===""||[c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region);
     return sOk&&stOk&&ktOk&&rOk;
@@ -547,7 +551,7 @@ function renderList(){
     const name = [c.vorname,c.nachname].filter(Boolean).join(" ");
     const visibleStatus = getVisibleStatus(c);
     return `
-      <div class="contact-item ${selectedId===c.id?'active':''}" onclick="selectContact('${c.id}')">
+      <div class="contact-item ${selectedId===c.id?'active':''} ${isInWeclapp(c)?'in-weclapp':''}" onclick="selectContact('${c.id}')">
         <div class="contact-item-top">
           <input class="contact-select" type="checkbox" ${selectedIds.has(c.id)?'checked':''} onclick="event.stopPropagation();" onchange="toggleSelectContact('${c.id}')">
           <div>
@@ -559,7 +563,7 @@ function renderList(){
               <div><div>${esc(c.kundentyp||"")}</div><div class="meta-small">${esc(c.bundesland||"")}</div></div>
               <div><div>${esc(c.bezirk||"")}</div><div class="meta-small">${esc(c.ort||"")}</div></div>
               <div><div>${esc(c.mobil||c.telefon||"")}</div><div class="meta-small">${esc(c.email||"")}</div></div>
-              <div>${visibleStatus ? `<span class="badge ${c.archived?'violett':statusBadgeClass(c.status)}">${esc(visibleStatus)}</span>` : ""}</div>
+              <div>${visibleStatus ? `<span class="badge ${c.archived?'violett':statusBadgeClass(visibleStatus)}">${esc(visibleStatus)}</span>` : ""}</div>
             </div>
           </div>
         </div>
@@ -597,7 +601,7 @@ function fillForm(){
   const visibleStatus = getVisibleStatus(c);
   document.getElementById("pageTitle").textContent=c.firma||"Mini CRM Vertrieb";
   document.getElementById("pageStatus").textContent=visibleStatus || "";
-  document.getElementById("pageStatus").className="badge "+(c.archived?"violett":(visibleStatus?statusBadgeClass(c.status):"orange"));
+  document.getElementById("pageStatus").className="badge "+(c.archived?"violett":(visibleStatus?statusBadgeClass(visibleStatus):"orange"));
   document.getElementById("pageStatus").style.display = visibleStatus ? "inline-block" : "none";
 
   ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=c[id]||""; });
@@ -749,7 +753,7 @@ function updateCustomerSummary(){
   const futureStep = hasFutureNextContact(c);
 
   box.innerHTML=`
-    <div><strong style="font-size:18px">${esc(c.firma||"-")}</strong></div>
+    <div><strong style="font-size:18px">${esc(c.firma||"-")}</strong> ${isInWeclapp(c)?`<span class="badge weclapp-badge" style="margin-left:8px;">In weclapp</span>`:""}</div>
     <div class="hint">
       ${esc(c.strasse||"")}<br>
       ${esc([c.plz,c.ort].filter(Boolean).join(" "))}<br>
@@ -771,7 +775,7 @@ function updateCustomerSummary(){
           <div class="hint">${esc(c.naechsterkontakt_zeit||"")}</div>
           <div class="hint">${esc(c.kontaktart||"-")}</div>
           <div class="hint">Status: ${esc(c.status||"-")}</div>
-        ` : `<div class="hint">Keine zukünftige Wiedervorlage.</div>`}
+        ` : (isInWeclapp(c) ? `<div class="hint">Kontakt wurde in weclapp übernommen. Weiterführung erfolgt dort.</div>` : `<div class="hint">Keine zukünftige Wiedervorlage.</div>`)}
       </div>
     </div>
     <hr>
@@ -819,6 +823,8 @@ function isFutureDateTime(dateValue,timeValue){
   return appointment >= new Date();
 }
 function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,appointmentTime){
+  const selected=getSelected();
+  if(isInWeclapp(selected)) return;
   const type=String(noteType||"").toLowerCase();
   const statusEl=document.getElementById("status");
   const nextDateEl=document.getElementById("naechsterkontakt");
@@ -1036,7 +1042,7 @@ function showArchivedOnly(){ document.getElementById("statusFilter").value="Arch
 function hideArchivedFilter(){ document.getElementById("statusFilter").value="Alle"; dueFilterActive=false; renderList(); }
 
 function getLatestNoteText(contact){ const notes=Array.isArray(contact.notes_history)?contact.notes_history:[]; if(!notes.length) return ""; const latest=[...notes].sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0]||{}; return [latest.type||"",latest.text||""].filter(Boolean).join(": "); }
-function buildDailyReportContacts(){ const today=todayStr(); return contacts.filter(c=>(hasFutureNextContact(c) && c.naechsterkontakt===today)||(c.notes_history||[]).some(n=>(n.date||"")===today)); }
+function buildDailyReportContacts(){ const today=todayStr(); return contacts.filter(c=>!isInWeclapp(c) && ((hasFutureNextContact(c) && c.naechsterkontakt===today)||(c.notes_history||[]).some(n=>(n.date||"")===today))); }
 function generateDailyReport(){
   const today=todayStr(); const reportContacts=buildDailyReportContacts();
   if(!reportContacts.length){ alert("Für heute wurden keine Kontakte gefunden."); return; }
