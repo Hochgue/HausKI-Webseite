@@ -1449,21 +1449,29 @@ function wasTransferredToWeclappThisWeek(contact){
   );
 }
 
+
 function getWeekActivityText(contact){
   const notes = Array.isArray(contact.notes_history) ? contact.notes_history : [];
+
   const weekNotes = notes
-    .filter(n => isDateInCurrentWeek(n.date) || isDateInCurrentWeek(n.appointment_date) || isDateInCurrentWeek(n.auto_naechsterkontakt))
+    .filter(n =>
+      isDateInCurrentWeek(n.date) ||
+      isDateInCurrentWeek(n.appointment_date)
+    )
     .sort((a,b) => String(a.date||"").localeCompare(String(b.date||"")));
 
   if(!weekNotes.length){
-    if(isInWeclapp(contact)) return "In weclapp übernommen / Weiterführung in weclapp.";
-    return getLatestNoteText(contact) || "-";
+    if(isDateInCurrentWeek(contact.naechsterkontakt)){
+      return "Wiedervorlage / geplanter nächster Kontakt in aktueller KW.";
+    }
+    return "-";
   }
 
   return weekNotes.map(n => {
     const termin = n.appointment_date
       ? `Termin: ${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " "+n.appointment_time : ""}`
       : "";
+
     return [
       `${formatDateDisplay(n.date||"")} ${n.time||""}`.trim(),
       n.type || "Aktivität",
@@ -1475,15 +1483,21 @@ function getWeekActivityText(contact){
 
 function buildWeeklyReportContacts(){
   return contacts.filter(c => {
-    if(wasTransferredToWeclappThisWeek(c)) return true;
+    const notes = Array.isArray(c.notes_history) ? c.notes_history : [];
 
-    if(isDateInCurrentWeek(c.naechsterkontakt)) return true;
-
-    return (c.notes_history || []).some(n =>
-      isDateInCurrentWeek(n.date) ||
-      isDateInCurrentWeek(n.appointment_date) ||
-      isDateInCurrentWeek(n.auto_naechsterkontakt)
+    const hasActivityThisWeek = notes.some(n =>
+      isDateInCurrentWeek(n.date)
     );
+
+    const hasAppointmentThisWeek = notes.some(n =>
+      isDateInCurrentWeek(n.appointment_date)
+    );
+
+    const hasFollowUpThisWeek =
+      !isInWeclapp(c) &&
+      isDateInCurrentWeek(c.naechsterkontakt);
+
+    return hasActivityThisWeek || hasAppointmentThisWeek || hasFollowUpThisWeek;
   });
 }
 
