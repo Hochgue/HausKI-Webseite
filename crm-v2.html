@@ -1539,6 +1539,207 @@ async function initApp(){
     }
   }
 }
+function cleanPhone(v){
+  return String(v || "").replace(/[^+\d]/g,"");
+}
+
+function phoneLink(v){
+  const raw = String(v || "").trim();
+  if(!raw) return "";
+  return `<a href="tel:${cleanPhone(raw)}" onclick="event.stopPropagation();" style="color:#2563eb;font-weight:700;text-decoration:none;">${esc(raw)}</a>`;
+}
+
+function mailLink(v){
+  const raw = String(v || "").trim();
+  if(!raw) return "";
+  return `<a href="mailto:${esc(raw)}" onclick="event.stopPropagation();" style="color:#2563eb;font-weight:700;text-decoration:none;">${esc(raw)}</a>`;
+}
+
+function ensureTerminAbgesagtOption(){
+  const filter = document.getElementById("statusFilter");
+  if(filter && ![...filter.options].some(o => o.value === "Termin abgesagt")){
+    const opt = document.createElement("option");
+    opt.textContent = "Termin abgesagt";
+    opt.value = "Termin abgesagt";
+    const ref = [...filter.options].find(o => o.value === "Unterlagen versendet");
+    filter.insertBefore(opt, ref || null);
+  }
+}
+
+const oldStatusBadgeClass = statusBadgeClass;
+statusBadgeClass = function(status){
+  if(status === "Termin abgesagt") return "kein-interesse-badge";
+  return oldStatusBadgeClass(status);
+};
+
+async function cancelAppointmentFromNote(index){
+  const c = getSelected();
+  if(!c) return;
+
+  const notes = Array.isArray(c.notes_history) ? [...c.notes_history] : [];
+  const note = notes[index];
+  if(!note) return;
+
+  if(!confirm("Diesen Termin wirklich als abgesagt markieren?")){
+    return;
+  }
+
+  notes[index] = {
+    ...note,
+    type: "Termin abgesagt",
+    text: (note.text || "") + "\n\nTermin wurde abgesagt.",
+    auto_status: "Termin abgesagt",
+    auto_naechsterkontakt: "",
+    auto_naechsterkontakt_zeit: "",
+    auto_kontaktart: "Termin abgesagt"
+  };
+
+  contacts = contacts.map(x => {
+    if(x.id !== selectedId) return x;
+
+    const sameAppointment =
+      x.naechsterkontakt &&
+      note.appointment_date &&
+      x.naechsterkontakt === note.appointment_date;
+
+    return {
+      ...x,
+      status: "Termin abgesagt",
+      naechsterkontakt: sameAppointment ? "" : x.naechsterkontakt,
+      naechsterkontakt_zeit: sameAppointment ? "" : x.naechsterkontakt_zeit,
+      kontaktart: sameAppointment ? "Termin abgesagt" : x.kontaktart,
+      notes_history: notes
+    };
+  });
+
+  fillForm();
+  renderList();
+  await autosaveSelectedToSupabase();
+}
+
+const oldRenderList = renderList;
+renderList = function(){
+  ensureTerminAbgesagtOption();
+
+  showDueTodayBanner();
+  const list=document.getElementById("contactList");
+  const arr=filteredContacts();
+  const search=document.getElementById("search").value.trim();
+  const statusFilter=document.getElementById("statusFilter").value;
+  const kundentypFilter=document.getElementById("kundentypFilter").value;
+  const region=document.getElementById("regionFilter").value.trim();
+  const showRecent=document.getElementById("showRecent").checked;
+  const selectionInfo=document.getElementById("selectionInfo");
+
+  if(selectionInfo) selectionInfo.textContent=selectedIds.size+" markiert";
+
+  const hasFilter=search!==""||statusFilter!=="Alle"||kundentypFilter!=="Alle"||region!==""||dueFilterActive;
+
+  if(!hasFilter&&!showRecent){
+    list.innerHTML='<div class="empty">Die Kontaktliste ist ausgeblendet.</div>';
+    return;
+  }
+
+  let visible=arr;
+  if(!hasFilter&&showRecent) visible=[...arr].slice(0,8);
+
+  if(!visible.length){
+    list.innerHTML='<div class="empty">Keine Kontakte gefunden.</div>';
+    return;
+  }
+
+  list.innerHTML=visible.map(c=>{
+    const name = [c.vorname,c.nachname].filter(Boolean).join(" ");
+    const visibleStatus = getVisibleStatus(c);
+
+    return `
+      <div class="contact-item ${selectedId===c.id?'active':''} ${isInWeclapp(c)?'in-weclapp':''}" onclick="selectContact('${c.id}')">
+        <div class="contact-item-top">
+          <input class="contact-select" type="checkbox" ${selectedIds.has(c.id)?'checked':''} onclick="event.stopPropagation();" onchange="toggleSelectContact('${c.id}')">
+          <div>
+            <div class="contact-row">
+              <div>
+                <div style="font-weight:700">${esc(c.firma||"(ohne Firma)")}</div>
+                ${name ? `<div class="meta-small">${esc(name)}</div>` : ""}
+              </div>
+              <div>
+                <div>${esc(c.kundentyp||"")}</div>
+                <div class="meta-small">${esc(c.bundesland||"")}</div>
+              </div>
+              <div>
+                <div>${esc(c.bezirk||"")}</div>
+                <div class="meta-small">${esc(c.ort||"")}</div>
+              </div>
+              <div>
+                <div>${phoneLink(c.mobil || c.telefon) || ""}</div>
+                <div class="meta-small">${mailLink(c.email) || ""}</div>
+              </div>
+              <div>${visibleStatus ? `<span class="badge ${c.archived?'violett':statusBadgeClass(visibleStatus)}">${esc(visibleStatus)}</span>` : ""}</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+};
+
+const oldRenderNoteHistory = renderNoteHistory;
+renderNoteHistory = function(){
+  const c=getSelected();
+  const box=document.getElementById("noteHistory");
+
+  if(!box) return;
+
+  if(!c||!(c.notes_history||[]).length){
+    box.innerHTML='<div class="empty">Noch keine Aktivitäten vorhanden.</div>';
+    return;
+  }
+
+  box.innerHTML=[...(c.notes_history||[])].map((n,i)=>{
+    const autoInfo=[
+      n.auto_status ? "Status: "+n.auto_status : "",
+      n.auto_naechsterkontakt ? "Nächster Kontakt: "+formatDateDisplay(n.auto_naechsterkontakt) : "",
+      n.auto_kontaktart ? "Art: "+n.auto_kontaktart : ""
+    ].filter(Boolean).join(" • ");
+
+    const appointmentInfo = n.appointment_date
+      ? `Termin: ${n.appointment_type ? n.appointment_type.replace(/^[^a-zA-ZÄÖÜäöüß]+\\s*/,"")+" · " : ""}${formatDateDisplay(n.appointment_date)}${n.appointment_time ? " · "+n.appointment_time : ""}`
+      : "";
+
+    return `
+      <div class="note-entry">
+        <div class="note-entry-head">
+          <div>
+            <div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div>
+            <div class="note-entry-meta">${esc(n.type||"Aktivität")}</div>
+            ${appointmentInfo?`<div class="note-entry-meta">${esc(appointmentInfo)}</div>`:""}
+            ${autoInfo?`<div class="note-entry-meta">${esc(autoInfo)}</div>`:""}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${n.appointment_date ? `<button class="icon-btn archive" type="button" onclick="cancelAppointmentFromNote(${i})">Termin abgesagt</button>` : ""}
+            <button class="icon-btn danger" type="button" onclick="removeNoteEntry(${i})">Löschen</button>
+          </div>
+        </div>
+        <div class="note-entry-text">${esc(n.text||"")}</div>
+      </div>`;
+  }).reverse().join("");
+};
+
+const oldUpdateCustomerSummary = updateCustomerSummary;
+updateCustomerSummary = function(){
+  oldUpdateCustomerSummary();
+
+  const c = getSelected();
+  if(!c) return;
+
+  document.querySelectorAll("#customerSummary .summary-card").forEach(card => {
+    card.innerHTML = card.innerHTML
+      .replace(new RegExp(`<div class="hint">${esc(c.telefon||"")}</div>`, "g"), `<div class="hint">Telefon: ${phoneLink(c.telefon) || "-"}</div>`)
+      .replace(new RegExp(`<div class="hint">${esc(c.mobil||"")}</div>`, "g"), `<div class="hint">Mobil: ${phoneLink(c.mobil) || "-"}</div>`)
+      .replace(new RegExp(`<div class="hint">${esc(c.email||"")}</div>`, "g"), `<div class="hint">E-Mail: ${mailLink(c.email) || "-"}</div>`);
+  });
+};
+
+ensureTerminAbgesagtOption();
 initApp();
 </script>
 </body>
