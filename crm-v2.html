@@ -1438,11 +1438,15 @@ function isDateInCurrentWeek(dateStr){
 
 function wasTransferredToWeclappThisWeek(contact){
   if(!isInWeclapp(contact)) return false;
+
   const notes = Array.isArray(contact.notes_history) ? contact.notes_history : [];
-  if(notes.some(n => isDateInCurrentWeek(n.date) && `${n.type||""} ${n.text||""} ${n.auto_status||""}`.toLowerCase().includes("weclapp"))){
-    return true;
-  }
-  return true;
+
+  return notes.some(n =>
+    isDateInCurrentWeek(n.date) &&
+    `${n.type||""} ${n.text||""} ${n.auto_status||""}`
+      .toLowerCase()
+      .includes("weclapp")
+  );
 }
 
 function getWeekActivityText(contact){
@@ -1857,4 +1861,4 @@ ensureTerminAbgesagtOption();
 initApp();
 </script>
 </body>
-</html>
+</html>git add <div class=""></div>
