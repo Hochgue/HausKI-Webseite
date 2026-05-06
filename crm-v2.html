@@ -328,7 +328,9 @@ function sanitizeContacts(list){
     firma:c.firma||"", strasse:c.strasse||"", plz:c.plz||"", ort:c.ort||"", bezirk:c.bezirk||"", bundesland:c.bundesland||"Oberösterreich",
     kundentyp:c.kundentyp||"Fachpartner", kundenstatus:c.kundenstatus||"Interessent", status:c.status||"Telefonat ausgemacht",
     erstkontakt:c.erstkontakt||"", naechsterkontakt:c.naechsterkontakt||"", naechsterkontakt_zeit:c.naechsterkontakt_zeit||"", kontaktart:c.kontaktart||"Persönlicher Termin",
-    weclapp:c.weclapp||"Nein", potenzial:c.potenzial||"mittel",
+    weclapp:c.weclapp||"Nein",
+    potenzial:c.potenzial||"mittel",
+    chancenbewertung:c.chancenbewertung||"",
     nachname:c.nachname||"", vorname:c.vorname||"", rolle:c.rolle||"", telefon:c.telefon||"", mobil:c.mobil||"", email:c.email||"",
     notes_history:Array.isArray(c.notes_history)?c.notes_history:[],
     weitere_kontakte:Array.isArray(c.weitere_kontakte)?c.weitere_kontakte:[],
@@ -365,7 +367,8 @@ function syncFormToSelected(){
     naechsterkontakt_zeit:getVal("naechsterkontakt_zeit"),
     kontaktart:getVal("kontaktart"),
     weclapp:getVal("weclapp"),
-    potenzial:getVal("potenzial")
+    potenzial:getVal("potenzial"),
+    chancenbewertung:getVal("chancenbewertung")
   }:x);
 }
 
@@ -671,7 +674,7 @@ function fillForm(){
     document.getElementById("pageStatus").textContent="Kein Kontakt";
     document.getElementById("pageStatus").className="badge orange";
     document.getElementById("pageStatus").style.display = "inline-block";
-    ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial"].forEach(id=>{ const el=document.getElementById(id); if(!el) return; if(el.tagName==="SELECT") el.selectedIndex=0; else el.value=""; });
+    ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{ const el=document.getElementById(id); if(!el) return; if(el.tagName==="SELECT") el.selectedIndex=0; else el.value=""; });
     document.getElementById("attachmentList").innerHTML="";
     resetNoteInputs();
     renderNoteHistory(); renderSubContacts(); updateCustomerSummary();
@@ -1173,7 +1176,7 @@ async function removeNoteEntry(index){
 
 function newContact(){
   const newId=Date.now().toString();
-  contacts.unshift({id:newId,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Interessent",bundesland:"Oberösterreich",bezirk:"",telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Sonstiges",erstkontakt:"",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"",weclapp:"Nein",potenzial:"mittel",notes_history:[],attachments:[],weitere_kontakte:[],archived:false});
+  contacts.unshift({id:newId,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Interessent",bundesland:"Oberösterreich",bezirk:"",telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Sonstiges",erstkontakt:"",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"",weclapp:"Nein",potenzial:"mittel",chancenbewertung:"",notes_history:[],attachments:[],weitere_kontakte:[],archived:false});
   selectedId=newId; fillForm(); renderList(); scheduleAutosave();
 }
 async function deleteCurrent(){ if(selectedId===null){ alert("Kein Kontakt ausgewählt."); return;} await deleteSingle(selectedId); }
@@ -1203,8 +1206,8 @@ function importJSONBackupFile(file){
 }
 function exportCSV(){
   syncFormToSelected();
-  const headers=["Firma","Nachname","Vorname","Rolle","Kundentyp","Kundenstatus","Bundesland","Bezirk","Telefon","Mobil","E-Mail","Straße","PLZ","Ort","Status","Erstkontakt","Nächster Kontakt","Uhrzeit","Art nächster Kontakt","In weclapp übernommen","Potenzial","Anzahl Aktivitäten","Anzahl Anhänge"];
-  const rows=contacts.map(c=>[c.firma,c.nachname,c.vorname,c.rolle,c.kundentyp,c.kundenstatus,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,c.status,c.erstkontakt,c.naechsterkontakt,c.naechsterkontakt_zeit,c.kontaktart,c.weclapp,c.potenzial,(c.notes_history||[]).length,(c.attachments||[]).length]);
+  const headers=["Firma","Nachname","Vorname","Rolle","Kundentyp","Kundenstatus","Bundesland","Bezirk","Telefon","Mobil","E-Mail","Straße","PLZ","Ort","Status","Erstkontakt","Nächster Kontakt","Uhrzeit","Art nächster Kontakt","In weclapp übernommen","Potenzial","Potenzial","Anzahl Aktivitäten","Anzahl Anhänge"];
+  const rows=contacts.map(c=>[c.firma,c.nachname,c.vorname,c.rolle,c.kundentyp,c.kundenstatus,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,c.status,c.erstkontakt,c.naechsterkontakt,c.naechsterkontakt_zeit,c.kontaktart,c.weclapp,c.potenzial,c.chancenbewertung,(c.notes_history||[]).length,(c.attachments||[]).length]);
   const csv=[headers,...rows].map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(";")).join("\n");
   const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
   const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="mini_crm_vertrieb_export.csv"; a.click(); URL.revokeObjectURL(url);
@@ -1232,7 +1235,7 @@ document.getElementById("fileInput").addEventListener("change",function(e){
   reader.readAsText(file,"UTF-8");
 });
 
-["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial"].forEach(id=>{
+["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung","chancenbewertung"].forEach(id=>{
   const el=document.getElementById(id); if(!el) return;
   el.addEventListener("input",scheduleAutosave);
   el.addEventListener("change",scheduleAutosave);
