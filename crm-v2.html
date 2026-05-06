@@ -70,6 +70,40 @@
   .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px}.summary-card strong{display:block;margin-bottom:4px}
   @media (max-width:1550px){.layout{grid-template-columns:1fr}.side-card{position:static;max-height:none}.note-grid{grid-template-columns:1fr 1fr 1fr}.activity-grid,.appointment-grid{grid-template-columns:1fr 1fr 1fr}}
   @media (max-width:900px){.toolbar,.group-grid-4,.group-grid-3,.subcontact-grid,.note-grid,.activity-grid,.appointment-grid,.contact-row,.summary-grid{grid-template-columns:1fr}.contact-item-top{grid-template-columns:1fr}.contact-select{justify-self:start}}
+
+/* HausKI CRM v3 UI Upgrade */
+:root{
+  --bg:#edf2f7;
+  --panel:#ffffff;
+  --line:#d9e2ec;
+  --text:#1e293b;
+  --muted:#64748b;
+  --blue:#4f6b8a;
+  --blue2:#5d7b9d;
+  --red2:#ef4444;
+  --orange:#fb923c;
+  --yellow:#facc15;
+  --green:#22c55e;
+  --violet:#c4b5fd;
+  --shadow:0 10px 25px rgba(15,23,42,.08);
+  --radius:14px;
+}
+body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button{border-radius:10px;padding:10px 14px;transition:.15s ease}
+button:hover{transform:translateY(-1px)}
+.main-card,.side-card{border-radius:var(--radius);box-shadow:var(--shadow)}
+.section-title{font-size:24px;font-weight:800;margin-bottom:14px}
+.contact-item{border-radius:12px;padding:14px;background:#ffffff;transition:.15s ease}
+.contact-item:hover{background:#f8fbff;transform:translateY(-1px)}
+.summary-card{border-radius:12px;padding:14px}
+.chance-badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;margin-top:4px}
+.chance-sehr-hoch{background:#bbf7d0;color:#14532d;border:1px solid #86efac}
+.chance-hoch{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.chance-mittel{background:#fef9c3;color:#854d0e;border:1px solid #fde68a}
+.chance-gering{background:#ffedd5;color:#9a3412;border:1px solid #fdba74}
+.chance-sehr-gering{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.chance-none{background:#e2e8f0;color:#475569;border:1px solid #cbd5e1}
+
 </style>
 </head>
 <body>
@@ -131,12 +165,69 @@
           <div><label>PLZ</label><input id="plz"></div>
           <div><label>Ort</label><input id="ort"></div>
           <div><label>Bezirk</label><input id="bezirk"></div>
-          <div><label>Bundesland</label><select id="bundesland"><option>Burgenland</option><option>Kärnten</option><option>Niederösterreich</option><option>Oberösterreich</option><option>Salzburg</option><option>Steiermark</option><option>Tirol</option><option>Vorarlberg</option><option>Wien</option></select></div>
-          <div><label>Kundentyp</label><select id="kundentyp"><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option></select></div>
-          <div><label>Kundenstatus</label><select id="kundenstatus"><option>Kunde</option><option>Interessent</option><option>Sonstiges</option></select></div>
-          <div><label>In weclapp übernommen</label><select id="weclapp"><option>Nein</option><option>Ja</option></select></div>
-          <div><label>Potenzial</label><select id="potenzial"><option>klein</option><option>mittel</option><option>groß</option></select></div>
-          <div><label>Chancenbewertung</label><select id="chancenbewertung"><option value="">Noch nicht bewertet</option><option>Sehr hoch</option><option>Hoch</option><option>Mittel</option><option>Gering</option><option>Sehr gering</option></select></div>
+
+          <div>
+            <label>Bundesland</label>
+            <select id="bundesland">
+              <option>Burgenland</option>
+              <option>Kärnten</option>
+              <option>Niederösterreich</option>
+              <option>Oberösterreich</option>
+              <option>Salzburg</option>
+              <option>Steiermark</option>
+              <option>Tirol</option>
+              <option>Vorarlberg</option>
+              <option>Wien</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Kundentyp</label>
+            <select id="kundentyp">
+              <option>Fachpartner</option>
+              <option>B2B</option>
+              <option>Privat</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Kundenstatus</label>
+            <select id="kundenstatus">
+              <option>Kunde</option>
+              <option>Interessent</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+
+          <div>
+            <label>In weclapp übernommen</label>
+            <select id="weclapp">
+              <option>Nein</option>
+              <option>Ja</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Potenzial</label>
+            <select id="potenzial">
+              <option>klein</option>
+              <option>mittel</option>
+              <option>groß</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Chancenbewertung</label>
+            <select id="chancenbewertung">
+              <option value="">Noch nicht bewertet</option>
+              <option>Sehr hoch</option>
+              <option>Hoch</option>
+              <option>Mittel</option>
+              <option>Gering</option>
+              <option>Sehr gering</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -594,7 +685,7 @@ function filteredContacts(){
       if(!hasFutureNextContact(c) || c.naechsterkontakt !== todayStr()) return false;
     }
     const noteTexts=(c.notes_history||[]).map(n=>`${n.type||""} ${n.text||""} ${n.appointment_date||""}`).join(" ");
-    const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,noteTexts].join(" ").toLowerCase();
+    const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,c.chancenbewertung,noteTexts].join(" ").toLowerCase();
     const sOk=search===""||hay.includes(search);
     const visibleStatus=getVisibleStatus(c);
     const stOk =
@@ -645,7 +736,7 @@ function renderList(){
                 <div style="font-weight:700">${esc(c.firma||"(ohne Firma)")}</div>
                 ${name ? `<div class="meta-small">${esc(name)}</div>` : ""}
               </div>
-              <div><div>${esc(c.kundentyp||"")}</div><div class="meta-small">${esc(c.bundesland||"")}</div></div>
+              <div><div>${esc(c.kundentyp||"")}</div><div class="meta-small">${esc(c.bundesland||"")}</div><div class="chance-badge ${chanceClass(c.chancenbewertung)}">${esc(chanceLabel(c.chancenbewertung))}</div></div>
               <div><div>${esc(c.bezirk||"")}</div><div class="meta-small">${esc(c.ort||"")}</div></div>
               <div><div>${esc(c.mobil||c.telefon||"")}</div><div class="meta-small">${esc(c.email||"")}</div></div>
               <div>${visibleStatus ? `<span class="badge ${c.archived?'violett':statusBadgeClass(visibleStatus)}">${esc(visibleStatus)}</span>` : ""}</div>
@@ -819,6 +910,20 @@ async function removeAttachment(index){
   }
 }
 
+function chanceClass(value){
+  const v = String(value || "").toLowerCase().trim();
+  if(v === "sehr hoch") return "chance-sehr-hoch";
+  if(v === "hoch") return "chance-hoch";
+  if(v === "mittel") return "chance-mittel";
+  if(v === "gering") return "chance-gering";
+  if(v === "sehr gering") return "chance-sehr-gering";
+  return "chance-none";
+}
+function chanceLabel(value){
+  const v = String(value || "").trim();
+  return v || "Noch nicht bewertet";
+}
+
 function updateCustomerSummary(){
   const c=getSelected();
   const box=document.getElementById("customerSummary");
@@ -857,7 +962,7 @@ function updateCustomerSummary(){
         <div class="hint">Kundentyp: ${esc(c.kundentyp||"-")}</div>
         <div class="hint">Kundenstatus: ${esc(c.kundenstatus||"-")}</div>
         <div class="hint">Potenzial: ${esc(c.potenzial||"-")}</div>
-        <div class="hint">Chancenbewertung: ${esc(c.chancenbewertung||"Noch nicht bewertet")}</div>
+        <div class="hint">Chance: <span class="chance-badge ${chanceClass(c.chancenbewertung)}">${esc(chanceLabel(c.chancenbewertung))}</span></div>
         <div class="hint">In weclapp übernommen: ${esc(c.weclapp||"Nein")}</div>
       </div>
       <div class="summary-card">
@@ -1227,7 +1332,7 @@ document.getElementById("fileInput").addEventListener("change",function(e){
     if(lines.length<2) return;
     const headers=parseCsvLine(lines[0]).map(normalizeHeader);
     function idx(names){ for(const n of names){ const i=headers.indexOf(n); if(i>=0) return i; } return -1; }
-    const col={firma:idx(["firma"]),nachname:idx(["nachname"]),vorname:idx(["vorname"]),rolle:idx(["rolle","position"]),kundentyp:idx(["kundentyp","typ"]),kundenstatus:idx(["kundenstatus"]),bundesland:idx(["bundesland"]),bezirk:idx(["bezirk"]),telefon:idx(["telefon"]),mobil:idx(["mobil","handy"]),email:idx(["e-mail","email","mail"]),strasse:idx(["strasse","straße"]),plz:idx(["plz","postleitzahl"]),ort:idx(["ort"]),status:idx(["status"]),erstkontakt:idx(["erstkontakt"]),naechsterkontakt:idx(["naechster kontakt","nächster kontakt","naechsterkontakt","nächsterkontakt"]),zeit:idx(["uhrzeit","zeit"]),kontaktart:idx(["art nächster kontakt","art naechster kontakt","kontaktart"]),weclapp:idx(["in weclapp uebernommen","in weclapp übernommen","weclapp"]),potenzial:idx(["potenzial"]),chancenbewertung:idx(["chancenbewertung","chance","chancenbewertung vertrieb"]),notizen:idx(["notizen","notiz"])};
+    const col={firma:idx(["firma"]),nachname:idx(["nachname"]),vorname:idx(["vorname"]),rolle:idx(["rolle","position"]),kundentyp:idx(["kundentyp","typ"]),kundenstatus:idx(["kundenstatus"]),bundesland:idx(["bundesland"]),bezirk:idx(["bezirk"]),telefon:idx(["telefon"]),mobil:idx(["mobil","handy"]),email:idx(["e-mail","email","mail"]),strasse:idx(["strasse","straße"]),plz:idx(["plz","postleitzahl"]),ort:idx(["ort"]),status:idx(["status"]),erstkontakt:idx(["erstkontakt"]),naechsterkontakt:idx(["naechster kontakt","nächster kontakt","naechsterkontakt","nächsterkontakt"]),zeit:idx(["uhrzeit","zeit"]),kontaktart:idx(["art nächster kontakt","art naechster kontakt","kontaktart"]),weclapp:idx(["in weclapp uebernommen","in weclapp übernommen","weclapp"]),potenzial:idx(["potenzial"]),chancenbewertung:idx(["chancenbewertung","chance","chancen bewertung"]),notizen:idx(["notizen","notiz"])};
     contacts=[];
     for(let i=1;i<lines.length;i++){
       const row=parseCsvLine(lines[i]);
@@ -1673,6 +1778,7 @@ renderList = function(){
               <div>
                 <div>${esc(c.kundentyp||"")}</div>
                 <div class="meta-small">${esc(c.bundesland||"")}</div>
+                <div class="chance-badge ${chanceClass(c.chancenbewertung)}">${esc(chanceLabel(c.chancenbewertung))}</div>
               </div>
               <div>
                 <div>${esc(c.bezirk||"")}</div>
