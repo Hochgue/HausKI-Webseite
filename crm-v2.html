@@ -1367,7 +1367,7 @@ document.getElementById("fileInput").addEventListener("change",function(e){
   reader.readAsText(file,"UTF-8");
 });
 
-["firma","nachname","vorname","rolle","kundentyp","kundenstatus","leadquelle""bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{
+["firma","nachname","vorname","rolle","kundentyp","kundenstatus","leadquelle","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{
   const el=document.getElementById(id); if(!el) return;
   el.addEventListener("input",scheduleAutosave);
   el.addEventListener("change",scheduleAutosave);
