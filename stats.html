@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Statistiken</title>
+
+<style>
+
+:root{
+  --bg:#edf2f7;
+  --panel:#ffffff;
+  --line:#d8e1ea;
+  --text:#1e293b;
+  --muted:#64748b;
+
+  --blue:#4f6b8a;
+  --green:#16a34a;
+  --orange:#f59e0b;
+
+  --shadow:0 10px 25px rgba(15,23,42,.08);
+  --radius:18px;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.page{
+  max-width:1600px;
+  margin:auto;
+  padding:24px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+}
+
+.title{
+  font-size:34px;
+  font-weight:800;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin-top:6px;
+}
+
+button{
+  border:none;
+  border-radius:12px;
+  padding:12px 16px;
+  cursor:pointer;
+  font-weight:700;
+  background:var(--blue);
+  color:white;
+}
+
+button:hover{
+  opacity:.9;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:22px;
+  margin-bottom:22px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:24px;
+  box-shadow:var(--shadow);
+}
+
+.card-title{
+  font-size:26px;
+  font-weight:800;
+  margin-bottom:22px;
+}
+
+/* =========================
+   SALES CHART
+========================= */
+
+.sales-chart{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  height:340px;
+}
+
+.week-group{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.week-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  height:280px;
+}
+
+.bar{
+  width:24px;
+  border-radius:10px 10px 0 0;
+}
+
+.bar.calls{
+  background:#4f6b8a;
+}
+
+.bar.fpv{
+  background:#f59e0b;
+}
+
+.bar.partner{
+  background:#16a34a;
+}
+
+.week-label{
+  margin-top:12px;
+  font-size:13px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+.legend{
+  display:flex;
+  gap:18px;
+  margin-top:20px;
+  flex-wrap:wrap;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.legend-color{
+  width:14px;
+  height:14px;
+  border-radius:4px;
+}
+
+/* =========================
+   STATES
+========================= */
+
+.state-chart{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.state-row{
+  display:grid;
+  grid-template-columns:150px 1fr 40px;
+  gap:12px;
+  align-items:center;
+}
+
+.state-name{
+  font-size:14px;
+  font-weight:700;
+}
+
+.state-bar-wrap{
+  height:18px;
+  background:#e2e8f0;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.state-bar{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(
+    90deg,
+    #16a34a,
+    #22c55e
+  );
+}
+
+.state-value{
+  font-weight:800;
+  text-align:right;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.stats-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.stats-table th{
+  text-align:left;
+  padding:14px;
+  background:#f8fafc;
+  border-bottom:1px solid var(--line);
+}
+
+.stats-table td{
+  padding:14px;
+  border-bottom:1px solid #edf2f7;
+}
+
+@media(max-width:1100px){
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="header">
+
+    <div>
+      <div class="title">
+        Vertriebsstatistiken
+      </div>
+
+      <div class="subtitle">
+        Verlauf, Bundesländer und Conversion Übersicht
+      </div>
+    </div>
+
+    <button onclick="window.location.href='crm-v3.html'">
+      Zurück zum CRM
+    </button>
+
+  </div>
+
+  <!-- CHARTS -->
+
+  <div class="grid">
+
+    <!-- SALES -->
+
+    <div class="card">
+
+      <div class="card-title">
+        Vertriebsverlauf
+      </div>
+
+      <div class="sales-chart">
+
+        <div class="week-group">
+          <div class="week-bars">
+            <div class="bar calls" style="height:180px;"></div>
+            <div class="bar fpv" style="height:110px;"></div>
+            <div class="bar partner" style="height:40px;"></div>
+          </div>
+          <div class="week-label">KW18</div>
+        </div>
+
+        <div class="week-group">
+          <div class="week-bars">
+            <div class="bar calls" style="height:220px;"></div>
+            <div class="bar fpv" style="height:140px;"></div>
+            <div class="bar partner" style="height:60px;"></div>
+          </div>
+          <div class="week-label">KW19</div>
+        </div>
+
+        <div class="week-group">
+          <div class="week-bars">
+            <div class="bar calls" style="height:250px;"></div>
+            <div class="bar fpv" style="height:180px;"></div>
+            <div class="bar partner" style="height:80px;"></div>
+          </div>
+          <div class="week-label">KW20</div>
+        </div>
+
+        <div class="week-group">
+          <div class="week-bars">
+            <div class="bar calls" style="height:160px;"></div>
+            <div class="bar fpv" style="height:120px;"></div>
+            <div class="bar partner" style="height:30px;"></div>
+          </div>
+          <div class="week-label">KW21</div>
+        </div>
+
+        <div class="week-group">
+          <div class="week-bars">
+            <div class="bar calls" style="height:280px;"></div>
+            <div class="bar fpv" style="height:190px;"></div>
+            <div class="bar partner" style="height:100px;"></div>
+          </div>
+          <div class="week-label">KW22</div>
+        </div>
+
+      </div>
+
+      <div class="legend">
+
+        <div class="legend-item">
+          <div class="legend-color" style="background:#4f6b8a;"></div>
+          Erstkontakte
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-color" style="background:#f59e0b;"></div>
+          FPV / Unterlagen
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-color" style="background:#16a34a;"></div>
+          Neue Fachpartner
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- STATES -->
+
+    <div class="card">
+
+      <div class="card-title">
+        Fachpartner nach Bundesland
+      </div>
+
+      <div class="state-chart">
+
+        <div class="state-row">
+          <div class="state-name">Oberösterreich</div>
+          <div class="state-bar-wrap"><div class="state-bar" style="width:85%;"></div></div>
+          <div class="state-value">12</div>
+        </div>
+
+        <div class="state-row">
+          <div class="state-name">Niederösterreich</div>
+          <div class="state-bar-wrap"><div class="state-bar" style="width:55%;"></div></div>
+          <div class="state-value">7</div>
+        </div>
+
+        <div class="state-row">
+          <div class="state-name">Steiermark</div>
+          <div class="state-bar-wrap"><div class="state-bar" style="width:40%;"></div></div>
+          <div class="state-value">5</div>
+        </div>
+
+        <div class="state-row">
+          <div class="state-name">Salzburg</div>
+          <div class="state-bar-wrap"><div class="state-bar" style="width:32%;"></div></div>
+          <div class="state-value">4</div>
+        </div>
+
+        <div class="state-row">
+          <div class="state-name">Wien</div>
+          <div class="state-bar-wrap"><div class="state-bar" style="width:25%;"></div></div>
+          <div class="state-value">3</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TABLE -->
+
+  <div class="card">
+
+    <div class="card-title">
+      Wochenübersicht
+    </div>
+
+    <table class="stats-table">
+
+      <thead>
+        <tr>
+          <th>KW</th>
+          <th>Erstkontakte</th>
+          <th>FPV</th>
+          <th>Neue Partner</th>
+          <th>Conversion</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr>
+          <td>KW18</td>
+          <td>28</td>
+          <td>12</td>
+          <td>2</td>
+          <td>7,1%</td>
+        </tr>
+
+        <tr>
+          <td>KW19</td>
+          <td>35</td>
+          <td>16</td>
+          <td>3</td>
+          <td>8,5%</td>
+        </tr>
+
+        <tr>
+          <td>KW20</td>
+          <td>42</td>
+          <td>20</td>
+          <td>5</td>
+          <td>11,9%</td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+</body>
+</html>
