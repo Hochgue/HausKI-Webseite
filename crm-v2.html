@@ -465,6 +465,7 @@ function syncFormToSelected(){
     rolle:String(getVal("rolle")).trim(),
     kundentyp:getVal("kundentyp"),
     kundenstatus:getVal("kundenstatus"),
+    leadquelle:getVal("leadquelle"),
     bundesland:getVal("bundesland"),
     bezirk:String(getVal("bezirk")).trim(),
     telefon:String(getVal("telefon")).trim(),
@@ -525,6 +526,7 @@ function baseCompanyPayload(contact){
     naechsterkontakt_zeit:contact.naechsterkontakt_zeit || "",
     kontaktart:contact.kontaktart||"",
     weclapp:contact.weclapp||"",
+    leadquelle:contact.leadquelle||"",
     potenzial:contact.potenzial||"",
     chancenbewertung:contact.chancenbewertung||"",
     archived:!!contact.archived,
@@ -789,7 +791,7 @@ function fillForm(){
     document.getElementById("pageStatus").textContent="Kein Kontakt";
     document.getElementById("pageStatus").className="badge orange";
     document.getElementById("pageStatus").style.display = "inline-block";
-    ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{ const el=document.getElementById(id); if(!el) return; if(el.tagName==="SELECT") el.selectedIndex=0; else el.value=""; });
+    ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","leadquelle","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{ const el=document.getElementById(id); if(!el) return; if(el.tagName==="SELECT") el.selectedIndex=0; else el.value=""; });
     document.getElementById("attachmentList").innerHTML="";
     resetNoteInputs();
     renderNoteHistory(); renderSubContacts(); updateCustomerSummary();
@@ -802,7 +804,7 @@ function fillForm(){
   document.getElementById("pageStatus").className="badge "+(c.archived?"violett":(visibleStatus?statusBadgeClass(visibleStatus):"orange"));
   document.getElementById("pageStatus").style.display = visibleStatus ? "inline-block" : "none";
 
-  ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=c[id]||""; });
+  ["firma","nachname","vorname","rolle","kundentyp","kundenstatus","leadquelle","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=c[id]||""; });
   resetNoteInputs();
   renderAttachments(); renderNoteHistory(); renderSubContacts(); updateCustomerSummary();
   isLoading=false;
@@ -1306,7 +1308,7 @@ async function removeNoteEntry(index){
 
 function newContact(){
   const newId=Date.now().toString();
-  contacts.unshift({id:newId,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Interessent",bundesland:"Oberösterreich",bezirk:"",telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Sonstiges",erstkontakt:"",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"",weclapp:"Nein",potenzial:"mittel",chancenbewertung:"",notes_history:[],attachments:[],weitere_kontakte:[],archived:false});
+  contacts.unshift({id:newId,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Interessent",bundesland:"Oberösterreich",bezirk:"",telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Sonstiges",erstkontakt:"",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"",leadquelle:"",potenzial:"mittel",chancenbewertung:"",notes_history:[],attachments:[],weitere_kontakte:[],archived:false});
   selectedId=newId; fillForm(); renderList(); scheduleAutosave();
 }
 async function deleteCurrent(){ if(selectedId===null){ alert("Kein Kontakt ausgewählt."); return;} await deleteSingle(selectedId); }
@@ -1336,8 +1338,8 @@ function importJSONBackupFile(file){
 }
 function exportCSV(){
   syncFormToSelected();
-  const headers=["Firma","Nachname","Vorname","Rolle","Kundentyp","Kundenstatus","Bundesland","Bezirk","Telefon","Mobil","E-Mail","Straße","PLZ","Ort","Status","Erstkontakt","Nächster Kontakt","Uhrzeit","Art nächster Kontakt","In weclapp übernommen","Potenzial","Chancenbewertung","Anzahl Aktivitäten","Anzahl Anhänge"];
-  const rows=contacts.map(c=>[c.firma,c.nachname,c.vorname,c.rolle,c.kundentyp,c.kundenstatus,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,c.status,c.erstkontakt,c.naechsterkontakt,c.naechsterkontakt_zeit,c.kontaktart,c.weclapp,c.potenzial,c.chancenbewertung,(c.notes_history||[]).length,(c.attachments||[]).length]);
+  const headers=["Firma","Nachname","Vorname","Rolle","Kundentyp","Kundenstatus","Leadquelle","Bundesland","Bezirk","Telefon","Mobil","E-Mail","Straße","PLZ","Ort","Status","Erstkontakt","Nächster Kontakt","Uhrzeit","Art nächster Kontakt","In weclapp übernommen","Potenzial","Chancenbewertung","Anzahl Aktivitäten","Anzahl Anhänge"];
+  const rows=contacts.map(c=>[c.firma,c.nachname,c.vorname,c.rolle,c.kundentyp,c.kundenstatus,c.leadquelle,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,c.status,c.erstkontakt,c.naechsterkontakt,c.naechsterkontakt_zeit,c.kontaktart,c.weclapp,c.potenzial,c.chancenbewertung,(c.notes_history||[]).length,(c.attachments||[]).length]);
   const csv=[headers,...rows].map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(";")).join("\n");
   const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
   const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="mini_crm_vertrieb_export.csv"; a.click(); URL.revokeObjectURL(url);
@@ -1352,11 +1354,11 @@ document.getElementById("fileInput").addEventListener("change",function(e){
     if(lines.length<2) return;
     const headers=parseCsvLine(lines[0]).map(normalizeHeader);
     function idx(names){ for(const n of names){ const i=headers.indexOf(n); if(i>=0) return i; } return -1; }
-    const col={firma:idx(["firma"]),nachname:idx(["nachname"]),vorname:idx(["vorname"]),rolle:idx(["rolle","position"]),kundentyp:idx(["kundentyp","typ"]),kundenstatus:idx(["kundenstatus"]),bundesland:idx(["bundesland"]),bezirk:idx(["bezirk"]),telefon:idx(["telefon"]),mobil:idx(["mobil","handy"]),email:idx(["e-mail","email","mail"]),strasse:idx(["strasse","straße"]),plz:idx(["plz","postleitzahl"]),ort:idx(["ort"]),status:idx(["status"]),erstkontakt:idx(["erstkontakt"]),naechsterkontakt:idx(["naechster kontakt","nächster kontakt","naechsterkontakt","nächsterkontakt"]),zeit:idx(["uhrzeit","zeit"]),kontaktart:idx(["art nächster kontakt","art naechster kontakt","kontaktart"]),weclapp:idx(["in weclapp uebernommen","in weclapp übernommen","weclapp"]),potenzial:idx(["potenzial"]),chancenbewertung:idx(["chancenbewertung","chance","chancen bewertung"]),notizen:idx(["notizen","notiz"])};
+    const col={firma:idx(["firma"]),nachname:idx(["nachname"]),vorname:idx(["vorname"]),rolle:idx(["rolle","position"]),kundentyp:idx(["kundentyp","typ"]),kundenstatus:idx(["kundenstatus"]),bundesland:idx(["bundesland"]),bezirk:idx(["bezirk"]),telefon:idx(["telefon"]),mobil:idx(["mobil","handy"]),email:idx(["e-mail","email","mail"]),strasse:idx(["strasse","straße"]),plz:idx(["plz","postleitzahl"]),ort:idx(["ort"]),status:idx(["status"]),erstkontakt:idx(["erstkontakt"]),naechsterkontakt:idx(["naechster kontakt","nächster kontakt","naechsterkontakt","nächsterkontakt"]),zeit:idx(["uhrzeit","zeit"]),kontaktart:idx(["art nächster kontakt","art naechster kontakt","kontaktart"]),weclapp:idx(["in weclapp uebernommen","in weclapp übernommen","weclapp"]),leadquelle:idx(["leadquelle","lead quelle"]),potenzial:idx(["potenzial"]),chancenbewertung:idx(["chancenbewertung","chance","chancen bewertung"]),notizen:idx(["notizen","notiz"])};
     contacts=[];
     for(let i=1;i<lines.length;i++){
       const row=parseCsvLine(lines[i]);
-      contacts.push({id:String(Date.now()+i),firma:col.firma>=0?(row[col.firma]||""):"",nachname:col.nachname>=0?(row[col.nachname]||""):"",vorname:col.vorname>=0?(row[col.vorname]||""):"",rolle:col.rolle>=0?(row[col.rolle]||""):"",kundentyp:col.kundentyp>=0?(row[col.kundentyp]||"Fachpartner"):"Fachpartner",kundenstatus:col.kundenstatus>=0?(row[col.kundenstatus]||"Interessent"):"Interessent",bundesland:col.bundesland>=0?(row[col.bundesland]||"Oberösterreich"):"Oberösterreich",bezirk:col.bezirk>=0?(row[col.bezirk]||""):"",telefon:col.telefon>=0?(row[col.telefon]||""):"",mobil:col.mobil>=0?(row[col.mobil]||""):"",email:col.email>=0?(row[col.email]||""):"",strasse:col.strasse>=0?(row[col.strasse]||""):"",plz:col.plz>=0?(row[col.plz]||""):"",ort:col.ort>=0?(row[col.ort]||""):"",status:col.status>=0?(row[col.status]||"Sonstiges"):"Sonstiges",erstkontakt:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",naechsterkontakt:col.naechsterkontakt>=0?(row[col.naechsterkontakt]||""):"",naechsterkontakt_zeit:col.zeit>=0?(row[col.zeit]||""):"",kontaktart:col.kontaktart>=0?(row[col.kontaktart]||""):"",weclapp:col.weclapp>=0?(row[col.weclapp]||"Nein"):"Nein",potenzial:col.potenzial>=0?(row[col.potenzial]||"mittel"):"mittel",chancenbewertung:col.chancenbewertung>=0?(row[col.chancenbewertung]||""):"",notes_history:(col.notizen>=0&&(row[col.notizen]||"").trim()!=="")?[{date:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",time:"",type:"Import",text:row[col.notizen]||"",appointment_date:"",appointment_time:""}]:[],attachments:[],weitere_kontakte:[],archived:false});
+      contacts.push({id:String(Date.now()+i),firma:col.firma>=0?(row[col.firma]||""):"",nachname:col.nachname>=0?(row[col.nachname]||""):"",vorname:col.vorname>=0?(row[col.vorname]||""):"",rolle:col.rolle>=0?(row[col.rolle]||""):"",kundentyp:col.kundentyp>=0?(row[col.kundentyp]||"Fachpartner"):"Fachpartner",kundenstatus:col.kundenstatus>=0?(row[col.kundenstatus]||"Interessent"):"Interessent",bundesland:col.bundesland>=0?(row[col.bundesland]||"Oberösterreich"):"Oberösterreich",bezirk:col.bezirk>=0?(row[col.bezirk]||""):"",telefon:col.telefon>=0?(row[col.telefon]||""):"",mobil:col.mobil>=0?(row[col.mobil]||""):"",email:col.email>=0?(row[col.email]||""):"",strasse:col.strasse>=0?(row[col.strasse]||""):"",plz:col.plz>=0?(row[col.plz]||""):"",ort:col.ort>=0?(row[col.ort]||""):"",status:col.status>=0?(row[col.status]||"Sonstiges"):"Sonstiges",erstkontakt:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",naechsterkontakt:col.naechsterkontakt>=0?(row[col.naechsterkontakt]||""):"",naechsterkontakt_zeit:col.zeit>=0?(row[col.zeit]||""):"",kontaktart:col.kontaktart>=0?(row[col.kontaktart]||""):"",weclapp:col.weclapp>=0?(row[col.weclapp]||"Nein"):"Nein",leadquelle:col.leadquelle>=0?(row[col.leadquelle]||""):"",potenzial:col.potenzial>=0?(row[col.potenzial]||"mittel"):"mittel",chancenbewertung:col.chancenbewertung>=0?(row[col.chancenbewertung]||""):"",notes_history:(col.notizen>=0&&(row[col.notizen]||"").trim()!=="")?[{date:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",time:"",type:"Import",text:row[col.notizen]||"",appointment_date:"",appointment_time:""}]:[],attachments:[],weitere_kontakte:[],archived:false});
     }
     selectedId=contacts.length?contacts[0].id:null;
     fillForm(); renderList(); persistLocalBackup();
@@ -1365,7 +1367,7 @@ document.getElementById("fileInput").addEventListener("change",function(e){
   reader.readAsText(file,"UTF-8");
 });
 
-["firma","nachname","vorname","rolle","kundentyp","kundenstatus","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{
+["firma","nachname","vorname","rolle","kundentyp","kundenstatus","leadquelle""bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung"].forEach(id=>{
   const el=document.getElementById(id); if(!el) return;
   el.addEventListener("input",scheduleAutosave);
   el.addEventListener("change",scheduleAutosave);
@@ -1895,4 +1897,4 @@ ensureTerminAbgesagtOption();
 initApp();
 </script>
 </body>
-</html>git add <div class=""></div>
+</html>
