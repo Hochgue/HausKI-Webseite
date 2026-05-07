@@ -2,11 +2,10 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Mini CRM Pro Active</title>
+<title>Mini CRM Pro Active — v1.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* --- MINIMAL MODERN UI (Variante A) ------------------- */
 body {
   margin: 0;
   font-family: system-ui, Arial;
@@ -17,79 +16,83 @@ body {
   overflow: hidden;
 }
 
-#app { display: grid; grid-template-columns: 300px 1fr 350px; width: 100%; }
+#app {
+  display: grid;
+  grid-template-columns: 300px 1fr 350px;
+  height: 100%;
+  width: 100%;
+}
 
-/* --- Seiten: links / mitte / rechts ------------------- */
+/* Sidebar */
 .sidebar {
+  background: white;
+  padding: 14px;
   border-right: 1px solid #dce2ea;
-  padding: 12px;
-  overflow-y: auto;
-  background: #ffffff;
-}
-
-.content {
-  padding: 16px;
   overflow-y: auto;
 }
 
-.panel {
-  border-left: 1px solid #dce2ea;
-  padding: 16px;
-  overflow-y: auto;
-  background: #ffffff;
-}
-
-/* Kontaktliste */
 .contact-item {
   padding: 10px;
+  border: 1px solid #dbe2ec;
   border-radius: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   cursor: pointer;
-  border: 1px solid #e0e5ec;
 }
+.contact-item:hover { background: #eef3ff; }
 .contact-item.active {
-  background: #e8f0fe;
+  background: #e4edff;
   border-color: #90b4ff;
 }
 
-/* Hauptkarte */
-.card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 16px;
-  border: 1px solid #e0e5ec;
-  margin-bottom: 16px;
+/* Content */
+.content {
+  padding: 20px;
+  overflow-y: auto;
 }
 
-/* Timeline (Chat-Stil) */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid #dde3ec;
+  margin-bottom: 20px;
+}
+
+/* Timeline */
 .timeline-item {
   background: #f1f5f9;
   padding: 12px;
   border-radius: 12px;
-  margin-bottom: 10px;
-  white-space: pre-wrap;
+  margin-bottom: 12px;
 }
 
-/* Eingabefeld */
+/* Eingabe */
 #activityInput {
   width: 100%;
   padding: 12px;
-  border-radius: 12px;
+  font-size: 15px;
+  border-radius: 10px;
   border: 1px solid #cdd4df;
   margin-top: 10px;
-  font-size: 15px;
 }
 
 /* Buttons */
 .btn {
   padding: 10px 14px;
   border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
   border: none;
+  cursor: pointer;
 }
-.btn-primary { background: #2563eb; color: #fff; }
+.btn-primary { background: #2563eb; color: white; }
 .btn-light { background: #e2e8f0; color: #1e293b; }
+
+/* Right panel */
+.panel {
+  background: white;
+  border-left: 1px solid #dce2ea;
+  padding: 20px;
+  overflow-y: auto;
+}
 </style>
 </head>
 
@@ -97,89 +100,92 @@ body {
 
 <div id="app">
 
-  <!-- -----------------------------------------------
-       LINKER BEREICH — KONTAKTLISTE / SUCHE
-  --------------------------------------------------->
+  <!-- LINKS: Kontaktliste -->
   <div class="sidebar">
     <h2>Kontakte</h2>
 
-    <input id="search" placeholder="Suchen..." style="width:100%;padding:10px;" oninput="filterContacts()">
+    <input id="search" placeholder="Suchen..." style="width:100%;padding:10px;margin-bottom:10px;" oninput="filterContacts()">
 
     <div id="contactList"></div>
   </div>
 
-  <!-- -----------------------------------------------
-       MITTE — KONTAKTKARTE + TIMELINE
-  --------------------------------------------------->
+  <!-- MITTE: Kontaktkarte + Timeline -->
   <div class="content">
-    <div id="contactView"></div>
+    <div id="contactView">Bitte Kontakt auswählen.</div>
   </div>
 
-  <!-- -----------------------------------------------
-       RECHTS — KI-PANEL / ZUSAMMENFASSUNG
-  --------------------------------------------------->
+  <!-- RECHTS: KI Panel -->
   <div class="panel">
     <h3>KI Analyse</h3>
-    <div id="aiSummary" class="card">Kein Kontakt ausgewählt.</div>
+    <div id="aiSummary" class="card">
+      Kein Kontakt ausgewählt.
+    </div>
   </div>
 
 </div>
 
 
+<!-- JAVASCRIPT -->
 <script type="module">
 
 /* -------------------------------------------------------
    KONFIGURATION
 --------------------------------------------------------- */
-const OPENAI_API_KEY = "DEIN_OPENAI_API_KEY_HIER";
-const SUPABASE_URL = "DEINE_SUPABASE_URL";
-const SUPABASE_KEY = "DEIN_SUPABASE_ANON_KEY";
+const OPENAI_API_KEY = "DEIN_OPENAI_KEY";
+const SUPABASE_URL = "DEINE_URL";
+const SUPABASE_KEY = "DEIN_SUPABASE_ANON";
 
+/* Supabase Client */
 import { createClient } from "[cdn.jsdelivr.net](https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm)";
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* -------------------------------------------------------
-   GLOBALER STATE
---------------------------------------------------------- */
+/* GLOBALER STATE */
 let contacts = [];
 let activeContact = null;
 
 /* -------------------------------------------------------
-   OpenAI KI-FUNKTIONEN
+   KI AKTIVITÄTS-ANALYSE
 --------------------------------------------------------- */
 async function aiAnalyzeActivity(text) {
   const prompt = `
-Analysiere diese Vertriebsaktivität und extrahiere:
+Analysiere die folgende Vertriebsaktivität:
 
-1) Type (Telefon, Mail, Besuch, Unterlagen, Angebot, Sonstiges)
-2) Kurze Zusammenfassung
-3) Nächster sinnvoller Schritt
-4) Datum für Wiedervorlage (falls erkennbar)
-5) Statusänderung (falls sinnvoll)
+"${text}"
 
-Text: "${text}"
-Erwarte JSON.
-  `;
+Extrahiere:
+- Aktivitätstyp
+- Kurz-Zusammenfassung
+- sinnvollen nächsten Schritt
+- Wiedervorlage-Datum (falls erkennbar)
+- passenden Status
 
-  const r = await fetch("[api.openai.com](https://api.openai.com/v1/chat/completions)", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: "Bearer " + OPENAI_API_KEY },
-    body: JSON.stringify({
-      model: "gpt-4.1-mini",
-      messages: [{ role: "user", content: prompt }]
-    })
-  });
+Antwort als JSON.
+`;
 
-  const data = await r.json();
   try {
+    const r = await fetch("[api.openai.com](https://api.openai.com/v1/chat/completions)", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + OPENAI_API_KEY
+      },
+      body: JSON.stringify({
+        model: "gpt-4.1-mini",
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await r.json();
     return JSON.parse(data.choices[0].message.content);
-  } catch {
+
+  } catch (err) {
+    console.error("AI Fehler:", err);
     return null;
   }
 }
 
 /* -------------------------------------------------------
-   SUPABASE LADEN
+   KONTAKTE LADEN
 --------------------------------------------------------- */
 async function loadContacts() {
   const { data } = await db.from("contacts").select("*").order("updated_at", { ascending: false });
@@ -188,42 +194,48 @@ async function loadContacts() {
 }
 
 /* -------------------------------------------------------
-   RENDER LISTE
+   KONTAKTLISTE RENDERN
 --------------------------------------------------------- */
 function renderList() {
   const box = document.getElementById("contactList");
-  box.innerHTML = contacts
-    .map(c => `
-      <div class="contact-item ${activeContact?.id === c.id ? "active" : ""}" onclick="selectContact('${c.id}')">
-        <strong>${c.firma || "(ohne Firma)"}</strong><br>
-        <span style="font-size:13px;color:#64748b;">${c.ort || ""}</span>
-      </div>
-    `).join("");
+
+  box.innerHTML = contacts.map(c => `
+    <div class="contact-item ${activeContact?.id === c.id ? "active" : ""}"
+         onclick="selectContact('${c.id}')">
+      <strong>${c.firma || "(ohne Firma)"}</strong><br>
+      <span style="font-size:13px;color:#64748b;">${c.ort || ""}</span>
+    </div>
+  `).join("");
 }
 
 /* -------------------------------------------------------
-   KONTAKT AUSWÄHLEN
+   KONTAKT AUSWÄHLEN (GLOBAL)
 --------------------------------------------------------- */
-window.selectContact = function(id) {
+window.selectContact = async function(id) {
   activeContact = contacts.find(c => c.id === id);
   renderContactView();
+  updateAISummary();
 };
 
 /* -------------------------------------------------------
-   RENDER KONTAKTDETAILS
+   KONTAKT-DETAILS MITTE
 --------------------------------------------------------- */
 async function renderContactView() {
-  if (!activeContact) return;
+  if (!activeContact) {
+    document.getElementById("contactView").innerHTML = "Bitte Kontakt auswählen.";
+    return;
+  }
+
+  const c = activeContact;
 
   const html = `
     <div class="card">
-      <h2>${activeContact.firma}</h2>
-      <div>${activeContact.name || ""}</div>
-      <div>${activeContact.telefon || ""}</div>
-      <div>${activeContact.email || ""}</div>
-      <div style="margin-top:10px;color:#64748b;">
-        Status: ${activeContact.status || "-"}
-      </div>
+      <h2>${c.firma || "(ohne Firma)"}</h2>
+      <div>${c.name || "–"}</div>
+      <div>${c.telefon || "–"}</div>
+      <div>${c.email || "–"}</div>
+      <div>${c.ort || "–"}</div>
+      <div style="margin-top:10px;">Status: ${c.status || "Neu"}</div>
     </div>
 
     <h3>Aktivitäten</h3>
@@ -235,22 +247,20 @@ async function renderContactView() {
 
   document.getElementById("contactView").innerHTML = html;
 
+  // Timeline laden
   const { data: activities } = await db.from("activities")
     .select("*")
-    .eq("contact_id", activeContact.id)
+    .eq("contact_id", c.id)
     .order("created_at", { ascending: false });
 
   const tl = document.getElementById("timeline");
-  tl.innerHTML = activities
-    .map(a => `<div class="timeline-item">${a.text}</div>`)
-    .join("");
-
-  // KI-Zusammenfassung mitladen
-  updateAISummary();
+  tl.innerHTML = (activities?.length)
+    ? activities.map(a => `<div class="timeline-item">${a.text}</div>`).join("")
+    : "<div class='timeline-item'>Noch keine Aktivitäten</div>";
 }
 
 /* -------------------------------------------------------
-   NEUE AKTIVITÄT (mit KI)
+   AKTIVITÄT HINZUFÜGEN
 --------------------------------------------------------- */
 window.addActivity = async function() {
   const text = document.getElementById("activityInput").value.trim();
@@ -260,15 +270,15 @@ window.addActivity = async function() {
 
   await db.from("activities").insert({
     contact_id: activeContact.id,
-    text: text,
+    text,
     ai_summary: ai?.summary || "",
     ai_next_step: ai?.next_step || "",
-    ai_followup: ai?.followup_date || "",
+    ai_followup: ai?.followup || null,
     ai_status: ai?.status || ""
   });
 
-  // ggf. Status aktualisieren
-  if (ai && ai.status) {
+  // Kontaktstatus updaten
+  if (ai?.status) {
     await db.from("contacts").update({ status: ai.status }).eq("id", activeContact.id);
   }
 
@@ -276,58 +286,75 @@ window.addActivity = async function() {
 
   loadContacts();
   renderContactView();
+  updateAISummary();
 };
 
 /* -------------------------------------------------------
-   KI PANEL UPDATEN
+   KI-ZUSAMMENFASSUNG (RIGHT PANEL)
 --------------------------------------------------------- */
 async function updateAISummary() {
-  if (!activeContact) return;
+  if (!activeContact) {
+    document.getElementById("aiSummary").innerText = "Kein Kontakt ausgewählt.";
+    return;
+  }
 
   const prompt = `
-Fasse den Kontakt kurz zusammen:
+Erstelle eine kurze, präzise Zusammenfassung für den Vertrieb:
 
 Firma: ${activeContact.firma}
-Letzte Aktivitäten: kurz in 1-2 Sätzen, priorisiert für Vertrieb.
+Ort: ${activeContact.ort}
+Status: ${activeContact.status}
+
+Schreibe 1–2 Sätze.
 `;
 
-  const r = await fetch("[api.openai.com](https://api.openai.com/v1/chat/completions)", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: "Bearer " + OPENAI_API_KEY },
-    body: JSON.stringify({
-      model: "gpt-4.1-mini",
-      messages: [{ role: "user", content: prompt }]
-    })
-  });
+  try {
+    const r = await fetch("[api.openai.com](https://api.openai.com/v1/chat/completions)", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + OPENAI_API_KEY
+      },
+      body: JSON.stringify({
+        model: "gpt-4.1-mini",
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
 
-  const data = await r.json();
-  const summary = data.choices?.[0]?.message?.content || "Keine Daten.";
+    const data = await r.json();
+    document.getElementById("aiSummary").innerText = data.choices[0].message.content;
 
-  document.getElementById("aiSummary").innerText = summary;
+  } catch {
+    document.getElementById("aiSummary").innerText = "Zusammenfassung nicht verfügbar.";
+  }
 }
 
 /* -------------------------------------------------------
-   SUCHE
+   FILTER
 --------------------------------------------------------- */
 window.filterContacts = function() {
   const s = document.getElementById("search").value.toLowerCase();
+
   const filtered = contacts.filter(c =>
     (c.firma || "").toLowerCase().includes(s) ||
-    (c.ort || "").toLowerCase().includes(s)
+    (c.ort || "").toLowerCase().includes(s) ||
+    (c.name || "").toLowerCase().includes(s)
   );
+
   const box = document.getElementById("contactList");
-  box.innerHTML = filtered
-    .map(c => `
-      <div class="contact-item" onclick="selectContact('${c.id}')">
-        <strong>${c.firma}</strong><br>
-        <span style="font-size:13px;color:#64748b;">${c.ort}</span>
-      </div>
-    `).join("");
+  box.innerHTML = filtered.map(c => `
+    <div class="contact-item" onclick="selectContact('${c.id}')">
+      <strong>${c.firma}</strong><br>
+      <span style="font-size:13px;color:#64748b;">${c.ort || ""}</span>
+    </div>
+  `).join("");
 };
 
-/* INITIAL LOAD */
+/* INITIAL LADEN */
 loadContacts();
 
 </script>
+
 </body>
 </html>
+
