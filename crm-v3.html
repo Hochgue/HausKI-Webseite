@@ -400,9 +400,10 @@ button.light{background:#e2e8f0;color:#1e293b}
   align-items:flex-end;
   justify-content:space-between;
   gap:18px;
-  height:320px;
-  margin-top:30px;
+  height:260px;
+  margin-top:20px;
 }
+
 
 .week-group{
   flex:1;
@@ -597,401 +598,66 @@ button.light{background:#e2e8f0;color:#1e293b}
 
   <main class="main">
 
-    <div class="dashboard-grid">
+    <main class="main">
 
-  <div class="kpi-card">
-    <div class="kpi-title">
-      Leads
-    </div>
-
-    <div class="kpi-value">
-      42
-    </div>
+  <div class="dashboard-grid">
+    <div class="kpi-card"><div class="kpi-title">Leads</div><div class="kpi-value">42</div></div>
+    <div class="kpi-card"><div class="kpi-title">Termine offen</div><div class="kpi-value">8</div></div>
+    <div class="kpi-card"><div class="kpi-title">Angebote</div><div class="kpi-value">5</div></div>
+    <div class="kpi-card"><div class="kpi-title">Hohe Chancen</div><div class="kpi-value">12</div></div>
   </div>
-
-  <div class="kpi-card">
-    <div class="kpi-title">
-      Termine offen
-    </div>
-
-    <div class="kpi-value">
-      8
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-title">
-      Angebote
-    </div>
-
-    <div class="kpi-value">
-      5
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-title">
-      Hohe Chancen
-    </div>
-
-    <div class="kpi-value">
-      12
-    </div>
-  </div>
-
-</div>
-
-<div class="card">
-
-  <div class="card-title">
-    Vertriebsverlauf
-  </div>
-
-  <div class="sales-chart">
-
-    <!-- KW18 -->
-    <div class="week-group">
-
-      <div class="week-bars">
-
-        <div
-          class="bar calls"
-          style="height:180px;"
-          title="28 Erstkontakte"
-        ></div>
-
-        <div
-          class="bar fpv"
-          style="height:110px;"
-          title="12 FPV"
-        ></div>
-
-        <div
-          class="bar partner"
-          style="height:40px;"
-          title="2 Partner"
-        ></div>
-
-      </div>
-
-      <div class="week-label">
-        KW18
-      </div>
-
-    </div>
-
-    <!-- KW19 -->
-    <div class="week-group">
-
-      <div class="week-bars">
-
-        <div class="bar calls" style="height:220px;"></div>
-        <div class="bar fpv" style="height:140px;"></div>
-        <div class="bar partner" style="height:60px;"></div>
-
-      </div>
-
-      <div class="week-label">
-        KW19
-      </div>
-
-    </div>
-
-    <!-- KW20 -->
-    <div class="week-group">
-
-      <div class="week-bars">
-
-        <div class="bar calls" style="height:250px;"></div>
-        <div class="bar fpv" style="height:180px;"></div>
-        <div class="bar partner" style="height:80px;"></div>
-
-      </div>
-
-      <div class="week-label">
-        KW20
-      </div>
-
-    </div>
-
-    <!-- KW21 -->
-    <div class="week-group">
-
-      <div class="week-bars">
-
-        <div class="bar calls" style="height:160px;"></div>
-        <div class="bar fpv" style="height:120px;"></div>
-        <div class="bar partner" style="height:30px;"></div>
-
-      </div>
-
-      <div class="week-label">
-        KW21
-      </div>
-
-    </div>
-
-    <!-- KW22 -->
-    <div class="week-group">
-
-      <div class="week-bars">
-
-        <div class="bar calls" style="height:280px;"></div>
-        <div class="bar fpv" style="height:190px;"></div>
-        <div class="bar partner" style="height:100px;"></div>
-
-      </div>
-
-      <div class="week-label">
-        KW22
-      </div>
-
-    </div>
-
-  </div>
-
-  <div class="chart-legend">
-
-    <div class="legend-item">
-      <div class="legend-color calls"></div>
-      Erstkontakte
-    </div>
-
-    <div class="legend-item">
-      <div class="legend-color fpv"></div>
-      FPV / Unterlagen
-    </div>
-
-    <div class="legend-item">
-      <div class="legend-color partner"></div>
-      Neue Fachpartner
-    </div>
-
-  </div>
-
-</div>
-
-
-<div class="dashboard-row">
 
   <div class="dashboard-charts">
 
-  <!-- VERTRIEBSVERLAUF -->
+    <div class="card">
+      <div class="card-title">Vertriebsverlauf</div>
 
-  <div class="card">
-
-    <div class="card-title">
-      Vertriebsverlauf
-    </div>
-
-    <div class="sales-chart">
-
-      <!-- KW18 -->
-      <div class="week-group">
-
-        <div class="week-bars">
-          <div class="bar calls" style="height:180px;"></div>
-          <div class="bar fpv" style="height:110px;"></div>
-          <div class="bar partner" style="height:40px;"></div>
-        </div>
-
-        <div class="week-label">
-          KW18
-        </div>
-
+      <div class="sales-chart compact">
+        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:180px;"></div><div class="bar fpv" style="height:110px;"></div><div class="bar partner" style="height:40px;"></div></div><div class="week-label">KW18</div></div>
+        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:220px;"></div><div class="bar fpv" style="height:140px;"></div><div class="bar partner" style="height:60px;"></div></div><div class="week-label">KW19</div></div>
+        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:250px;"></div><div class="bar fpv" style="height:180px;"></div><div class="bar partner" style="height:80px;"></div></div><div class="week-label">KW20</div></div>
+        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:160px;"></div><div class="bar fpv" style="height:120px;"></div><div class="bar partner" style="height:30px;"></div></div><div class="week-label">KW21</div></div>
+        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:280px;"></div><div class="bar fpv" style="height:190px;"></div><div class="bar partner" style="height:100px;"></div></div><div class="week-label">KW22</div></div>
       </div>
 
-      <!-- KW19 -->
-      <div class="week-group">
-
-        <div class="week-bars">
-          <div class="bar calls" style="height:220px;"></div>
-          <div class="bar fpv" style="height:140px;"></div>
-          <div class="bar partner" style="height:60px;"></div>
-        </div>
-
-        <div class="week-label">
-          KW19
-        </div>
-
-      </div>
-
-      <!-- KW20 -->
-      <div class="week-group">
-
-        <div class="week-bars">
-          <div class="bar calls" style="height:250px;"></div>
-          <div class="bar fpv" style="height:180px;"></div>
-          <div class="bar partner" style="height:80px;"></div>
-        </div>
-
-        <div class="week-label">
-          KW20
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- BUNDESLÄNDER -->
-
-  <div class="card">
-
-    <div class="card-title">
-      Fachpartner nach Bundesland
-    </div>
-
-    <div class="state-chart">
-
-      <div class="state-row">
-
-        <div class="state-name">
-          Oberösterreich
-        </div>
-
-        <div class="state-bar-wrap">
-
-          <div
-            class="state-bar"
-            style="width:85%;"
-          ></div>
-
-        </div>
-
-        <div class="state-value">
-          12
-        </div>
-
-      </div>
-
-      <div class="state-row">
-
-        <div class="state-name">
-          Niederösterreich
-        </div>
-
-        <div class="state-bar-wrap">
-
-          <div
-            class="state-bar"
-            style="width:55%;"
-          ></div>
-
-        </div>
-
-        <div class="state-value">
-          7
-        </div>
-
-      </div>
-
-      <div class="state-row">
-
-        <div class="state-name">
-          Wien
-        </div>
-
-        <div class="state-bar-wrap">
-
-          <div
-            class="state-bar"
-            style="width:30%;"
-          ></div>
-
-        </div>
-
-        <div class="state-value">
-          3
-        </div>
-
-      </div>
-
-      <div class="state-row">
-
-        <div class="state-name">
-          Steiermark
-        </div>
-
-        <div class="state-bar-wrap">
-
-          <div
-            class="state-bar"
-            style="width:20%;"
-          ></div>
-
-        </div>
-
-        <div class="state-value">
-          2
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-  <div class="dashboard-list">
-
-    <div class="dashboard-list-title">
-      Heute fällig
-    </div>
-
-    <div class="dashboard-item">
-      <div class="dashboard-item-title">
-        Elektro Huber
-      </div>
-
-      <div class="dashboard-item-meta">
-        Rückruf wegen Angebot
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-color calls"></div>Erstkontakte</div>
+        <div class="legend-item"><div class="legend-color fpv"></div>FPV / Unterlagen</div>
+        <div class="legend-item"><div class="legend-color partner"></div>Neue Fachpartner</div>
       </div>
     </div>
 
-    <div class="dashboard-item">
-      <div class="dashboard-item-title">
-        Solar Partner GmbH
-      </div>
+    <div class="card">
+      <div class="card-title">Fachpartner nach Bundesland</div>
 
-      <div class="dashboard-item-meta">
-        Termin vorbereiten
+      <div class="state-chart">
+        <div class="state-row"><div class="state-name">Oberösterreich</div><div class="state-bar-wrap"><div class="state-bar" style="width:85%;"></div></div><div class="state-value">12</div></div>
+        <div class="state-row"><div class="state-name">Niederösterreich</div><div class="state-bar-wrap"><div class="state-bar" style="width:55%;"></div></div><div class="state-value">7</div></div>
+        <div class="state-row"><div class="state-name">Steiermark</div><div class="state-bar-wrap"><div class="state-bar" style="width:40%;"></div></div><div class="state-value">5</div></div>
+        <div class="state-row"><div class="state-name">Salzburg</div><div class="state-bar-wrap"><div class="state-bar" style="width:32%;"></div></div><div class="state-value">4</div></div>
+        <div class="state-row"><div class="state-name">Wien</div><div class="state-bar-wrap"><div class="state-bar" style="width:25%;"></div></div><div class="state-value">3</div></div>
+        <div class="state-row"><div class="state-name">Burgenland</div><div class="state-bar-wrap"><div class="state-bar" style="width:16%;"></div></div><div class="state-value">2</div></div>
+        <div class="state-row"><div class="state-name">Kärnten</div><div class="state-bar-wrap"><div class="state-bar" style="width:8%;"></div></div><div class="state-value">1</div></div>
       </div>
     </div>
 
   </div>
 
-  <div class="dashboard-list">
-
-    <div class="dashboard-list-title">
-      Letzte Aktivitäten
+  <div class="dashboard-row">
+    <div class="dashboard-list">
+      <div class="dashboard-list-title">Heute fällig</div>
+      <div class="dashboard-item"><div class="dashboard-item-title">Elektro Huber</div><div class="dashboard-item-meta">Rückruf wegen Angebot</div></div>
+      <div class="dashboard-item"><div class="dashboard-item-title">Solar Partner GmbH</div><div class="dashboard-item-meta">Termin vorbereiten</div></div>
     </div>
 
-    <div class="dashboard-item">
-      <div class="dashboard-item-title">
-        FENECON Angebot gesendet
-      </div>
-
-      <div class="dashboard-item-meta">
-        vor 2 Stunden
-      </div>
+    <div class="dashboard-list">
+      <div class="dashboard-list-title">Letzte Aktivitäten</div>
+      <div class="dashboard-item"><div class="dashboard-item-title">FENECON Angebot gesendet</div><div class="dashboard-item-meta">vor 2 Stunden</div></div>
+      <div class="dashboard-item"><div class="dashboard-item-title">Neuer Lead importiert</div><div class="dashboard-item-meta">heute</div></div>
     </div>
-
-    <div class="dashboard-item">
-      <div class="dashboard-item-title">
-        Neuer Lead importiert
-      </div>
-
-      <div class="dashboard-item-meta">
-        heute
-      </div>
-    </div>
-
   </div>
 
-</div>
+</main>
 
   </main>
 
