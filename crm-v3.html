@@ -8,32 +8,23 @@
 <style>
 :root{
   --bg:#e9eef5;
-
   --sidebar:#0f172a;
   --sidebar-light:#1e293b;
-
   --panel:#ffffff;
   --panel-soft:#f8fafc;
-
   --line:#d8e1ea;
-
   --text:#1e293b;
   --muted:#64748b;
-
   --blue:#4f6b8a;
   --blue-hover:#5f7897;
-
   --green:#16a34a;
   --orange:#f59e0b;
   --red:#dc2626;
-
   --shadow:0 10px 25px rgba(15,23,42,.08);
   --radius:16px;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -44,33 +35,17 @@ body{
   overflow:hidden;
 }
 
-/* =========================
-   LAYOUT
-========================= */
-
 #app{
   display:grid;
   grid-template-columns:320px 1fr 360px;
   height:100vh;
 }
 
-/* =========================
-   SIDEBAR LINKS
-========================= */
-
 .sidebar{
-  background:linear-gradient(
-    180deg,
-    var(--sidebar),
-    #162235
-  );
-
+  background:linear-gradient(180deg,var(--sidebar),#162235);
   color:white;
-
   border-right:1px solid rgba(255,255,255,.05);
-
   padding:18px;
-
   overflow-y:auto;
 }
 
@@ -91,16 +66,19 @@ body{
   margin-bottom:10px;
 }
 
-/* =========================
-   MITTE
-========================= */
-
 .main{
   padding:22px;
   overflow-y:auto;
 }
 
-.card{
+.panel{
+  background:#f4f7fb;
+  border-left:1px solid var(--line);
+  padding:18px;
+  overflow-y:auto;
+}
+
+.card,.panel-box{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:var(--radius);
@@ -109,42 +87,18 @@ body{
   box-shadow:var(--shadow);
 }
 
+.panel-box{
+  border-radius:14px;
+  padding:14px;
+}
+
 .card-title{
   font-size:22px;
   font-weight:800;
   margin-bottom:16px;
 }
 
-/* =========================
-   RECHTE SEITE
-========================= */
-
-.panel{
-  background:#f4f7fb;
-
-  border-left:1px solid var(--line);
-
-  padding:18px;
-
-  overflow-y:auto;
-}
-
-.panel-box{
-  background:white;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:16px;
-  box-shadow:var(--shadow);
-}
-
-/* =========================
-   INPUTS
-========================= */
-
-input,
-select,
-textarea{
+input,select,textarea{
   width:100%;
   border:1px solid #cbd5e1;
   border-radius:12px;
@@ -158,10 +112,6 @@ textarea{
   min-height:110px;
   resize:vertical;
 }
-
-/* =========================
-   BUTTONS
-========================= */
 
 button{
   border:none;
@@ -179,35 +129,18 @@ button:hover{
   transform:translateY(-1px);
 }
 
-button.green{
-  background:var(--green);
-}
-
-button.orange{
-  background:var(--orange);
-}
-
-button.red{
-  background:var(--red);
-}
-
-/* =========================
-   CONTACT ITEM
-========================= */
+button.green{background:var(--green)}
+button.orange{background:var(--orange)}
+button.red{background:var(--red)}
+button.light{background:#e2e8f0;color:#1e293b}
 
 .contact-item{
   background:rgba(255,255,255,.05);
-
   border:1px solid rgba(255,255,255,.06);
-
   border-radius:14px;
-
   padding:12px;
-
   margin-bottom:10px;
-
   cursor:pointer;
-
   transition:.15s;
 }
 
@@ -215,9 +148,7 @@ button.red{
   background:rgba(255,255,255,.08);
 }
 
-.contact-name{
-  font-weight:700;
-}
+.contact-name{font-weight:700}
 
 .contact-meta{
   font-size:12px;
@@ -225,39 +156,95 @@ button.red{
   margin-top:4px;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+.grid3{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:14px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.actions.right{
+  justify-content:flex-end;
+}
+
+.mt{margin-top:18px}
+
+.hint{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.small{font-size:12px}
+.muted{color:var(--muted)}
+
+.sub-block{
+  background:var(--panel-soft);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+}
+
+.sub-block-title{
+  font-weight:800;
+  margin-bottom:14px;
+  font-size:18px;
+}
+
+.timeline-item{
+  background:var(--panel-soft);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+}
+
+.timeline-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:10px;
+}
+
+.timeline-text{
+  white-space:pre-wrap;
+  line-height:1.5;
+}
+
+.dropzone{
+  border:2px dashed #b6c2d1;
+  border-radius:16px;
+  padding:28px;
+  text-align:center;
+  background:#f8fbff;
+}
+
+.file-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--panel-soft);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+}
 
 @media(max-width:1200px){
-
-  #app{
-    grid-template-columns:300px 1fr;
-  }
-
-  .panel{
-    display:none;
-  }
+  #app{grid-template-columns:300px 1fr}
+  .panel{display:none}
 }
 
 @media(max-width:850px){
-
-  body{
-    overflow:auto;
-    height:auto;
-  }
-
-  #app{
-    display:block;
-    height:auto;
-  }
-
-  .sidebar,
-  .main,
-  .panel{
-    display:block;
-    width:100%;
-  }
+  body{overflow:auto;height:auto}
+  #app{display:block;height:auto}
+  .sidebar,.main,.panel{display:block;width:100%}
+  .grid3{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -266,403 +253,192 @@ button.red{
 
 <div id="app">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
 
     <h1>CRM v4</h1>
 
     <div class="sidebar-section">
-
-      <div class="sidebar-title">
-        Suche
-      </div>
-
-      <input
-        type="text"
-        placeholder="Firma, Ort, Ansprechpartner..."
-      >
-
+      <div class="sidebar-title">Suche</div>
+      <input type="text" placeholder="Firma, Ort, Ansprechpartner...">
     </div>
 
     <div class="sidebar-section">
+      <div class="sidebar-title">Kontakte</div>
 
-      <div class="sidebar-title">
-        Kontakte
+      <div class="contact-item">
+        <div class="contact-name">Musterkunde GmbH</div>
+        <div class="contact-meta">Linz · Fachpartner</div>
       </div>
 
       <div class="contact-item">
-        <div class="contact-name">
-          Musterkunde GmbH
-        </div>
-
-        <div class="contact-meta">
-          Linz · Fachpartner
-        </div>
+        <div class="contact-name">Elektro Beispiel</div>
+        <div class="contact-meta">Wels · B2B</div>
       </div>
-
-      <div class="contact-item">
-        <div class="contact-name">
-          Elektro Beispiel
-        </div>
-
-        <div class="contact-meta">
-          Wels · B2B
-        </div>
-      </div>
-
     </div>
 
   </aside>
 
-  <!-- MITTE -->
   <main class="main">
 
     <div class="card">
-
-      <div class="card-title">
-        Kundenakte
-      </div>
-
+      <div class="card-title">Kundenakte</div>
       <input placeholder="Firma">
-
       <input placeholder="Ansprechpartner">
-
       <textarea placeholder="Notizen..."></textarea>
-
-      <button>
-        Speichern
-      </button>
-
+      <button>Speichern</button>
     </div>
 
     <div class="card">
+      <div class="card-title">Neue Aktivität</div>
 
-      <div class="card-title">
-        Aktivitäten
+      <div class="hint" style="margin-bottom:18px;">
+        Aktivitätsdatum = wann du etwas gemacht hast.
+        Termindatum = wann der vereinbarte Termin/Rückruf stattfinden soll.
       </div>
 
-      <textarea placeholder="Neue Aktivität eintragen..."></textarea>
+      <div class="sub-block">
+        <div class="sub-block-title">📞 Aktivität</div>
 
-      <button class="green">
-        Aktivität speichern
-      </button>
+        <div class="grid3">
+          <div>
+            <label>Aktivitätsdatum</label>
+            <input type="date" id="noteDate">
+          </div>
 
+          <div>
+            <label>Aktivitätszeit</label>
+            <input type="time" id="noteTime">
+          </div>
+
+          <div>
+            <label>Art der Aktivität</label>
+            <select id="noteType">
+              <option>📞 Telefonat geführt</option>
+              <option>📧 Mail gesendet</option>
+              <option>👤 Persönlicher Besuch</option>
+              <option>💻 Teams Call</option>
+              <option>📄 Unterlagen gesendet</option>
+              <option>📄 Angebot erstellt</option>
+              <option>⭐ Erstkontakt</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Was wurde besprochen / Ergebnis</label>
+        <textarea id="activityText" placeholder="Zum Beispiel: Kunde interessiert sich für FENECON, möchte Preise, Projekt grob besprochen ..."></textarea>
+      </div>
+
+      <div class="sub-block mt">
+        <div class="sub-block-title">📅 Termin / Rückruf optional</div>
+
+        <div class="grid3">
+          <div>
+            <label>Termindatum</label>
+            <input type="date" id="appointmentDate">
+          </div>
+
+          <div>
+            <label>Terminzeit</label>
+            <input type="time" id="appointmentTime">
+          </div>
+
+          <div>
+            <label>Art des Termins</label>
+            <select id="appointmentType">
+              <option value="">Kein Termin / Rückruf</option>
+              <option>📅 Termin vereinbart</option>
+              <option>📞 Anruf</option>
+              <option>⏰ Rückruf vereinbart</option>
+              <option>👤 Persönlicher Termin</option>
+              <option>💻 Online-Termin</option>
+              <option>📧 Mail nachfassen</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Notiz zum Termin / Rückruf</label>
+        <textarea id="appointmentText" placeholder="Zum Beispiel: Rückruf wegen Angebot, Vor-Ort-Termin, Unterlagen nachfassen ..."></textarea>
+      </div>
+
+      <div class="actions right mt">
+        <button class="orange">📄 Unterlagen versendet</button>
+        <button class="red">Kein Interesse</button>
+        <button class="green">Eintrag hinzufügen</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Aktivitäten / Timeline</div>
+
+      <div id="timelineContainer">
+        <div class="timeline-item">
+          <div class="timeline-top">
+            <div>
+              <strong>07.05.2026 · 10:30</strong>
+              <div class="muted small">📞 Telefonat geführt</div>
+            </div>
+          </div>
+
+          <div class="timeline-text">
+Kunde interessiert sich für FENECON Home.
+Preise senden.
+Rückruf nächste Woche.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Anhänge / Unterlagen</div>
+
+      <div class="dropzone" id="dropzone">
+        <strong>Dateien hier auf den Kunden ziehen</strong>
+
+        <div class="hint" style="margin-top:8px;">
+          Outlook-Mail als .msg, PDF, Angebot, Screenshot oder sonstige Unterlagen.
+        </div>
+
+        <div style="margin-top:16px;">
+          <button>Dateien auswählen</button>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div class="file-row">
+          <div>
+            <strong>Angebot_Fenecon.pdf</strong>
+            <div class="small muted">PDF · 1.2 MB</div>
+          </div>
+
+          <button class="light">Öffnen</button>
+        </div>
+      </div>
     </div>
 
   </main>
 
-  <!-- RECHTS -->
   <aside class="panel">
 
     <div class="panel-box">
-
-      <strong>
-        Heute fällig
-      </strong>
-
-      <p>
-        4 Kontakte nachfassen
-      </p>
-
+      <strong>Heute fällig</strong>
+      <p>4 Kontakte nachfassen</p>
     </div>
 
     <div class="panel-box">
-
-      <strong>
-        KI Empfehlungen
-      </strong>
-
-      <p>
-        Kunde seit 14 Tagen ohne Aktivität.
-      </p>
-
+      <strong>KI Empfehlungen</strong>
+      <p>Kunde seit 14 Tagen ohne Aktivität.</p>
     </div>
 
     <div class="panel-box">
-
-      <strong>
-        Chancenbewertung
-      </strong>
-
-      <p>
-        Hoch
-      </p>
-
+      <strong>Chancenbewertung</strong>
+      <p>Hoch</p>
     </div>
 
   </aside>
 
 </div>
-<!-- =====================================================
-     BLOCK 2 – AKTIVITÄTEN / TERMIN / ANHÄNGE
-===================================================== -->
 
-<div class="card">
-
-  <div class="card-title">
-    Neue Aktivität
-  </div>
-
-  <div class="hint" style="margin-bottom:18px;">
-    Aktivitätsdatum = wann du etwas gemacht hast.
-    Termindatum = wann der vereinbarte Termin/Rückruf stattfinden soll.
-  </div>
-
-  <!-- AKTIVITÄT -->
-  <div class="sub-block">
-
-    <div class="sub-block-title">
-      📞 Aktivität
-    </div>
-
-    <div class="grid3">
-
-      <div>
-        <label>Aktivitätsdatum</label>
-        <input
-          type="date"
-          id="noteDate"
-        >
-      </div>
-
-      <div>
-        <label>Aktivitätszeit</label>
-        <input
-          type="time"
-          id="noteTime"
-        >
-      </div>
-
-      <div>
-        <label>Art der Aktivität</label>
-
-        <select id="noteType">
-          <option>📞 Telefonat geführt</option>
-          <option>📧 Mail gesendet</option>
-          <option>👤 Persönlicher Besuch</option>
-          <option>💻 Teams Call</option>
-          <option>📄 Unterlagen gesendet</option>
-          <option>📄 Angebot erstellt</option>
-          <option>⭐ Erstkontakt</option>
-          <option>Sonstiges</option>
-        </select>
-
-      </div>
-
-    </div>
-
-    <label>
-      Was wurde besprochen / Ergebnis
-    </label>
-
-    <textarea
-      id="activityText"
-      placeholder="Zum Beispiel: Kunde interessiert sich für FENECON, möchte Preise, Projekt grob besprochen ..."
-    ></textarea>
-
-  </div>
-
-  <!-- TERMIN -->
-  <div class="sub-block mt">
-
-    <div class="sub-block-title">
-      📅 Termin / Rückruf optional
-    </div>
-
-    <div class="grid3">
-
-      <div>
-        <label>Termindatum</label>
-
-        <input
-          type="date"
-          id="appointmentDate"
-        >
-      </div>
-
-      <div>
-        <label>Terminzeit</label>
-
-        <input
-          type="time"
-          id="appointmentTime"
-        >
-      </div>
-
-      <div>
-        <label>Art des Termins</label>
-
-        <select id="appointmentType">
-          <option value="">
-            Kein Termin / Rückruf
-          </option>
-
-          <option>
-            📅 Termin vereinbart
-          </option>
-
-          <option>
-            📞 Anruf
-          </option>
-
-          <option>
-            ⏰ Rückruf vereinbart
-          </option>
-
-          <option>
-            👤 Persönlicher Termin
-          </option>
-
-          <option>
-            💻 Online-Termin
-          </option>
-
-          <option>
-            📧 Mail nachfassen
-          </option>
-
-          <option>
-            Sonstiges
-          </option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-    <label>
-      Notiz zum Termin / Rückruf
-    </label>
-
-    <textarea
-      id="appointmentText"
-      placeholder="Zum Beispiel: Rückruf wegen Angebot, Vor-Ort-Termin, Unterlagen nachfassen ..."
-    ></textarea>
-
-  </div>
-
-  <!-- BUTTONS -->
-  <div class="actions right mt">
-
-    <button class="orange">
-      📄 Unterlagen versendet
-    </button>
-
-    <button class="red">
-      Kein Interesse
-    </button>
-
-    <button class="green">
-      Eintrag hinzufügen
-    </button>
-
-  </div>
-
-</div>
-
-<!-- =====================================================
-     TIMELINE
-===================================================== -->
-
-<div class="card">
-
-  <div class="card-title">
-    Aktivitäten / Timeline
-  </div>
-
-  <div id="timelineContainer">
-
-    <div class="timeline-item">
-
-      <div class="timeline-top">
-
-        <div>
-          <strong>
-            07.05.2026 · 10:30
-          </strong>
-
-          <div class="muted small">
-            📞 Telefonat geführt
-          </div>
-        </div>
-
-      </div>
-
-      <div class="timeline-text">
-        Kunde interessiert sich für FENECON Home.
-        Preise senden.
-        Rückruf nächste Woche.
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<!-- =====================================================
-     ANHÄNGE
-===================================================== -->
-
-<div class="card">
-
-  <div class="card-title">
-    Anhänge / Unterlagen
-  </div>
-
-  <div
-    class="dropzone"
-    id="dropzone"
-  >
-
-    <strong>
-      Dateien hier auf den Kunden ziehen
-    </strong>
-
-    <div class="hint" style="margin-top:8px;">
-
-      Outlook-Mail als .msg,
-      PDF,
-      Angebot,
-      Screenshot
-      oder sonstige Unterlagen.
-
-    </div>
-
-    <div style="margin-top:16px;">
-
-      <button>
-        Dateien auswählen
-      </button>
-
-    </div>
-
-  </div>
-
-  <div style="margin-top:18px;">
-
-    <div class="file-row">
-
-      <div>
-        <strong>
-          Angebot_Fenecon.pdf
-        </strong>
-
-        <div class="small muted">
-          PDF · 1.2 MB
-        </div>
-      </div>
-
-      <button class="light">
-        Öffnen
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
 </body>
 </html>
-
