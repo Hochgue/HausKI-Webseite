@@ -508,7 +508,11 @@ async function addNoteEntry(){
   applyTimelineLogic(type,date,appointmentDate,appointmentTime,appointmentType);
   const note={date,time,type,text,appointment_date:appointmentDate,appointment_time:appointmentTime,appointment_type:appointmentType,activity_text:activityText,appointment_text:appointmentText,auto_status:$("status").value,auto_naechsterkontakt:$("naechsterkontakt").value,auto_naechsterkontakt_zeit:$("naechsterkontakt_zeit").value,auto_kontaktart:$("kontaktart").value};
   contacts=contacts.map(x=>x.id===selectedId?{...x,status:$("status").value,erstkontakt:$("erstkontakt").value,naechsterkontakt:$("naechsterkontakt").value,naechsterkontakt_zeit:$("naechsterkontakt_zeit").value,kontaktart:$("kontaktart").value,notes_history:[...(x.notes_history||[]),note]}:x);
-  renderContactView();renderList();renderPanels();await autosaveSelectedToSupabase();
+  await saveNewHistoryNote(note);
+  renderContactView();
+  renderList();
+  renderPanels();
+await autosaveSelectedToSupabase();
 }
 async function markNoInterest(){const c=getSelected();if(!c)return;if(!confirm(`"${c.firma||'Kontakt'}" wirklich als Kein Interesse markieren?`))return;const date=$("noteDate").value||todayStr(),time=$("noteTime").value||"",text=$("activityText").value.trim()||"Kein Interesse vermerkt.";contacts=contacts.map(x=>x.id===selectedId?{...x,status:"Kein Interesse",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"Kein Interesse",notes_history:[...(x.notes_history||[]),{date,time,type:"Kein Interesse",text,auto_status:"Kein Interesse",auto_naechsterkontakt:"",auto_naechsterkontakt_zeit:"",auto_kontaktart:"Kein Interesse"}]}:x);renderContactView();renderList();renderPanels();await autosaveSelectedToSupabase()}
 async function markDocumentsSent(){const c=getSelected();if(!c)return;const date=$("noteDate").value||todayStr(),time=$("noteTime").value||"";let appointmentDate=$("appointmentDate").value||addDays(date,14),appointmentTime=$("appointmentTime").value||"";const activityText=$("activityText").value.trim()||"Unterlagen wurden versendet.";const note={date,time,type:"📄 Unterlagen gesendet",text:"Aktivität: "+activityText+"\nTermin/Rückruf: Art: Nachfassen Unterlagen • Datum: "+formatDateDisplay(appointmentDate),appointment_date:appointmentDate,appointment_time:appointmentTime,appointment_type:"Nachfassen Unterlagen",auto_status:"Unterlagen versendet",auto_naechsterkontakt:appointmentDate,auto_naechsterkontakt_zeit:appointmentTime,auto_kontaktart:"Nachfassen Unterlagen"};contacts=contacts.map(x=>x.id===selectedId?{...x,status:"Unterlagen versendet",naechsterkontakt:appointmentDate,naechsterkontakt_zeit:appointmentTime,kontaktart:"Nachfassen Unterlagen",notes_history:[...(x.notes_history||[]),note]}:x);renderContactView();renderList();renderPanels();await autosaveSelectedToSupabase()}
@@ -533,7 +537,33 @@ function duplicateContact(){const c=getSelected();if(!c)return alert("Bitte Kont
 async function deleteCurrent(){const c=getSelected();if(!c)return;if(!confirm(`Kontakt "${c.firma||c.id}" wirklich löschen?`))return;try{if(isUuid(c.id)){const {error}=await supabaseClient.from("crm_firmen").delete().eq("id",c.id);if(error)throw error}contacts=contacts.filter(x=>x.id!==c.id);selectedId=contacts.length?contacts[0].id:null;renderAll();persistLocalBackup();setSaveState("Kontakt gelöscht")}catch(e){alert("Löschen fehlgeschlagen: "+(e.message||""))}}
 async function markFollowupToday(){const c=getSelected();if(!c)return;contacts=contacts.map(x=>x.id===selectedId?{...x,naechsterkontakt:todayStr(),status:x.status||"Telefonat ausgemacht",kontaktart:x.kontaktart||"Nachfassen"}:x);renderAll();await autosaveSelectedToSupabase()}
 
-function renderAll(){renderList();renderContactView();renderPanels()}
+async function saveNewHistoryNote(note){
+  const c = getSelected();
+  if(!c) return;
+
+  const firmaId = await ensureSelectedHasSupabaseId();
+
+  const {error} = await supabaseClient.from("crm_historie").insert({
+    firma_id: firmaId,
+    datum: normalizeDate(note.date),
+    uhrzeit: normalizeTime(note.time),
+    art: note.type || "",
+    notiz: note.text || "",
+    termin_datum: normalizeDate(note.appointment_date || note.auto_naechsterkontakt),
+    termin_uhrzeit: normalizeTime(note.appointment_time || note.auto_naechsterkontakt_zeit),
+    auto_status: note.auto_status || "",
+    auto_naechsterkontakt: normalizeDate(note.auto_naechsterkontakt),
+    auto_kontaktart: note.auto_kontaktart || ""
+  });
+
+  if(error) throw error;
+}
+
+function renderAll(){
+  renderList();
+  renderContactView();
+  renderPanels();
+}
 
 /* =========================================================
    START
