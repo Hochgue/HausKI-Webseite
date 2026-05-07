@@ -44,6 +44,7 @@ input,select,textarea{width:100%;padding:10px 11px;border:1px solid #cbd5e1;bord
 
     <div class="top-actions mt">
       <button onclick="newContact()">+ Neuer Kontakt</button>
+      <button class="light" onclick="document.getElementById('csvInput').click()">CSV Import</button>
       <button class="light" onclick="loadData()">Neu laden</button>
     </div>
 
@@ -467,6 +468,71 @@ function renderAll(){renderList();renderContactView();renderPanels()}
 async function initApp(){
   try{await loadAllFromSupabase()}catch(e){console.warn(e);try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");contacts=sanitizeContacts(saved.contacts||[]);selectedId=contacts.length?contacts[0].id:null;renderAll();setSaveState("Lokale Sicherung geladen",true)}catch(_){contacts=[];selectedId=null;renderAll();setSaveState("Keine Daten vorhanden",true)}}
 }
+document.getElementById("csvInput").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(evt){
+    const text = evt.target.result;
+    const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
+
+    if(lines.length < 2){
+      alert("CSV enthält keine Daten.");
+      return;
+    }
+
+    const headers = lines[0].split(";").map(h => h.trim().toLowerCase());
+
+    function col(name){
+      return headers.indexOf(name.toLowerCase());
+    }
+
+    const imported = [];
+
+    for(let i=1;i<lines.length;i++){
+      const row = lines[i].split(";");
+
+      imported.push({
+        id: String(Date.now()+i),
+        firma: row[col("firma")] || "",
+        nachname: row[col("nachname")] || "",
+        vorname: row[col("vorname")] || "",
+        telefon: row[col("telefon")] || "",
+        mobil: row[col("mobil")] || "",
+        email: row[col("e-mail")] || row[col("email")] || "",
+        strasse: row[col("straße")] || row[col("strasse")] || "",
+        plz: row[col("plz")] || "",
+        ort: row[col("ort")] || "",
+        bezirk: row[col("bezirk")] || "",
+        bundesland: row[col("bundesland")] || "Oberösterreich",
+        kundentyp: row[col("kundentyp")] || "Fachpartner",
+        kundenstatus: row[col("kundenstatus")] || "Lead",
+        status: row[col("status")] || "Sonstiges",
+        weclapp: "Nein",
+        leadquelle: "CSV Import",
+        potenzial: "mittel",
+        chancenbewertung: "",
+        notes_history: [],
+        attachments: [],
+        weitere_kontakte: [],
+        archived: false
+      });
+    }
+
+    contacts = [...imported, ...contacts];
+    selectedId = contacts[0]?.id || null;
+
+    renderAll();
+    persistLocalBackup();
+
+    alert(imported.length + " Kontakte aus CSV geladen. Danach speichern.");
+  };
+
+  reader.readAsText(file, "UTF-8");
+  e.target.value = "";
+});
 initApp();
 </script>
 </body>
