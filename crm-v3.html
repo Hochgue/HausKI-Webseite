@@ -2,224 +2,332 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="robots" content="noindex,nofollow">
+<title>Mini CRM Pro Active</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini CRM Vertrieb – v3</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{
-  --bg:#edf2f7;--panel:#fff;--line:#d9e2ec;--text:#1e293b;--muted:#64748b;
-  --blue:#4f6b8a;--blue2:#5d7b9d;--green:#16a34a;--red:#dc2626;--yellow:#facc15;--orange:#fb923c;--violet:#c4b5fd;
-  --shadow:0 10px 25px rgba(15,23,42,.08);--radius:14px;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-button{background:var(--blue);color:white;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:800;font-size:13px;transition:.15s ease}
-button:hover{background:var(--blue2);transform:translateY(-1px)}
-button.delete{background:var(--red)!important}button.primary{background:var(--green)!important}.btn-light{background:#e2e8f0;color:#111827}.btn-mail{background:#2563eb}.btn-web{background:#0f766e}.btn-phone{background:#16a34a}
-.topbar{background:#f8fafc;border-bottom:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.page{padding:14px}.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.header h1{margin:0;font-size:28px}
-.layout{display:grid;grid-template-columns:minmax(760px,1.15fr) minmax(420px,.85fr);gap:14px;align-items:start}.main-card,.side-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.side-card{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto}
-.section{padding:14px;border-bottom:1px solid #edf1f5}.section:last-child{border-bottom:none}.section-title{font-size:24px;font-weight:900;margin-bottom:14px}.sub-title{font-size:18px;font-weight:900;margin-bottom:12px;color:#334155}
-label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:800}input,select,textarea{width:100%;padding:10px;border:1px solid #cfd8e3;border-radius:8px;background:white;color:var(--text);font-size:14px}textarea{min-height:100px;resize:vertical}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 16px}.full{grid-column:1/-1}
-.toolbar{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .9fr auto auto auto;gap:10px;align-items:end;margin-bottom:12px}.toggle-row{display:flex;align-items:center;gap:8px;margin-top:8px}.toggle-row input{width:auto}
-.badge{display:inline-block;padding:7px 11px;border-radius:999px;font-weight:900;font-size:12px;color:#111827}.badge-blue{background:#bfdbfe;color:#1e3a8a;border:1px solid #93c5fd}.badge-yellow{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}.badge-green{background:#dcfce7;color:#166534;border:1px solid #86efac}.badge-red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}.badge-gray{background:#e2e8f0;color:#475569;border:1px solid #cbd5e1}.badge-violet{background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd}.badge-orange{background:#ffedd5;color:#9a3412;border:1px solid #fdba74}
-.empty{padding:14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);background:#fafcff}.hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}.mini-box{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
-.contact-list{display:flex;flex-direction:column;gap:10px}.contact-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:white;cursor:pointer;transition:.15s ease}.contact-item:hover{background:#f8fbff;transform:translateY(-1px)}.contact-list{display:flex;flex-direction:column;gap:10px}.contact-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:white;cursor:pointer;transition:.15s ease}.contact-item:hover{background:#f8fbff;transform:translateY(-1px)}.contact-item.active{border-color:#93c5fd;background:#eff6ff}.contact-item-top{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:12px}.contact-select{width:auto;margin:0}.contact-row{
-}.meta{font-size:12px;color:var(--muted);margin-top:3px}
-a{color:#2563eb;font-weight:800;text-decoration:none}a:hover{text-decoration:underline}.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-card{background:white;border:1px solid var(--line);border-radius:12px;padding:14px}.summary-card strong{display:block;margin-bottom:4px}.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.note-entry{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fbfcfd;margin-top:8px}.note-entry-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px}.note-entry-date{font-weight:900;color:#334155}.note-entry-meta{font-size:12px;color:var(--muted)}.note-entry-text{white-space:pre-wrap;line-height:1.4}
-.dropzone{border:2px dashed #a8b6c6;border-radius:12px;padding:16px;background:#f8fbff;text-align:center;color:#455468}.dropzone.dragover{border-color:#5f7897;background:#edf4fb}.dropzone input[type=file]{display:none}.attachment-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}.attachment-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fbfcfd}.attachment-name{font-weight:900;word-break:break-all}.attachment-sub{font-size:12px;color:var(--muted);margin-top:2px}
-.activity-box{border:1px solid var(--line);border-radius:12px;background:#fbfcfd;padding:12px;margin-bottom:12px}.activity-title{font-size:15px;font-weight:900;color:#334155;margin-bottom:10px}.activity-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.savebar{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}.list-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.due-banner{display:none;margin:12px 14px 0 14px;padding:12px 14px;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;color:#9a3412;box-shadow:var(--shadow)}.due-banner.show{display:block}
-@media(max-width:1100px){
-  .layout{grid-template-columns:1fr}
-  .side-card{position:static;max-height:none}
-  .toolbar{grid-template-columns:1fr 1fr 1fr}
-  .grid4,.grid3{grid-template-columns:1fr 1fr}
+/* --- MINIMAL MODERN UI (Variante A) ------------------- */
+body {
+  margin: 0;
+  font-family: system-ui, Arial;
+  background: #f5f7fa;
+  color: #1e293b;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
 }
 
-@media(min-width:1551px){
-  .layout{grid-template-columns:minmax(760px,1.15fr) minmax(420px,.85fr)}
-  .grid4{grid-template-columns:repeat(4,1fr)}
-  .grid3{grid-template-columns:repeat(3,1fr)}
-  .grid2{grid-template-columns:repeat(2,1fr)}
-  .toolbar{grid-template-columns:1.2fr .8fr .8fr .8fr .9fr auto auto auto}
-  .contact-row{grid-template-columns:minmax(220px,2fr) minmax(110px,.8fr) minmax(100px,.7fr) minmax(170px,1.1fr) minmax(110px,.7fr)}
+#app { display: grid; grid-template-columns: 300px 1fr 350px; width: 100%; }
+
+/* --- Seiten: links / mitte / rechts ------------------- */
+.sidebar {
+  border-right: 1px solid #dce2ea;
+  padding: 12px;
+  overflow-y: auto;
+  background: #ffffff;
 }
-@media(max-width:900px){.toolbar,.grid4,.grid3,.grid2,.contact-row,.summary-grid{grid-template-columns:1fr}.contact-item-top{grid-template-columns:1fr}.contact-select{justify-self:start}}
+
+.content {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.panel {
+  border-left: 1px solid #dce2ea;
+  padding: 16px;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+/* Kontaktliste */
+.contact-item {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  border: 1px solid #e0e5ec;
+}
+.contact-item.active {
+  background: #e8f0fe;
+  border-color: #90b4ff;
+}
+
+/* Hauptkarte */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid #e0e5ec;
+  margin-bottom: 16px;
+}
+
+/* Timeline (Chat-Stil) */
+.timeline-item {
+  background: #f1f5f9;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+}
+
+/* Eingabefeld */
+#activityInput {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #cdd4df;
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary { background: #2563eb; color: #fff; }
+.btn-light { background: #e2e8f0; color: #1e293b; }
 </style>
 </head>
+
 <body>
-<div class="topbar">
-  <button onclick="newContact()">+ Neuer Kontakt</button>
-  <button onclick="document.getElementById('fileInput').click()">CSV Import</button>
-  <button onclick="exportCSV()">CSV Export</button>
-  <button onclick="exportLeadsCSV()">Leads exportieren</button>
-  <button onclick="exportJSONBackup()">JSON Backup</button>
-  <button onclick="document.getElementById('jsonFileInput').click()">JSON Wiederherstellen</button>
-  <button onclick="saveData()">Alles in Supabase speichern</button>
-  <button onclick="loadData()">Aus Supabase laden</button>
-  <button onclick="duplicateContact()">Duplizieren</button>
-  <button onclick="generateDailyReport()">Tagesbericht</button>
-  <button onclick="generateWeeklyReport()">Wochenbericht</button>
-  <span id="saveState" style="margin-left:auto;font-size:12px;color:#475569;font-weight:800;">Bereit</span>
-  <button onclick="clearAllData()" class="delete">Alle Kontakte löschen</button>
-</div>
-<div id="dueBanner" class="due-banner"></div>
-<input type="file" id="fileInput" accept=".csv" style="display:none">
-<input type="file" id="jsonFileInput" accept=".json" style="display:none">
-<div class="page">
-  <div class="header"><h1 id="pageTitle">Mini CRM Vertrieb v3</h1><div class="badge badge-orange" id="pageStatus">Kein Kontakt</div></div>
-  <div class="layout">
-    <div class="main-card">
-      <div class="section">
-        <div class="sub-title">Suche / Übersicht</div>
-        <div class="toolbar">
-          <div><label>Suchen</label><input id="search" placeholder="Firma, Name, Bezirk, Bundesland, Notiz ..." oninput="renderList()"></div>
-          <div><label>Status</label><select id="statusFilter" onchange="renderList()"><option>Alle</option><option>Lead</option><option>Ohne Status</option><option>Termin vereinbart</option><option>Termin abgesagt</option><option>Unterlagen versendet</option><option>Telefonat ausgemacht</option><option>Sonstiges</option><option>Kein Interesse</option><option>Archiviert</option><option>In weclapp</option></select></div>
-          <div><label>Kundentyp</label><select id="kundentypFilter" onchange="renderList()"><option>Alle</option><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option></select></div>
-          <div><label>Leadquelle</label><select id="leadquelleFilter" onchange="renderList()"><option>Alle</option><option>MP Liste</option><option>Telefonakquise</option><option>Solar Solutions</option><option>Empfehlung</option><option>Website</option><option>Bestandskunde</option><option>Sonstiges</option></select></div>
-          <div><label>Region</label><input id="regionFilter" placeholder="Ort, Bezirk, Bundesland, PLZ" oninput="renderList()"></div>
-          <button onclick="sortBy('firma')">Nach Firma</button><button onclick="sortBy('ort')">Nach Ort</button><button onclick="clearSearch()">Suche leeren</button>
-        </div>
-        <div class="toggle-row"><input type="checkbox" id="showRecent" onchange="renderList()" checked><label for="showRecent" style="margin:0;font-size:13px;">Ohne Suche die letzten 8 Kontakte anzeigen</label></div>
-        <div id="contactList" class="contact-list" style="margin-top:12px;"></div>
-        <div class="list-actions"><button onclick="toggleSelectAllVisible()">Sichtbare markieren / abwählen</button><button onclick="archiveSelected()">Auswahl archivieren</button><button onclick="deleteSelected()">Auswahl löschen</button><button onclick="showArchivedOnly()">Nur Archiv anzeigen</button><button onclick="hideArchivedFilter()">Archivfilter zurücksetzen</button><span class="hint" id="selectionInfo">0 markiert</span></div>
-      </div>
-      <div class="section">
-        <div class="section-title">Stammdaten</div>
-        <div class="grid4">
-          <div class="full"><label>Firma</label><input id="firma"></div>
-          <div><label>Straße</label><input id="strasse"></div><div><label>PLZ</label><input id="plz"></div><div><label>Ort</label><input id="ort"></div><div><label>Bezirk</label><input id="bezirk"></div>
-          <div><label>Bundesland</label><select id="bundesland"><option>Burgenland</option><option>Kärnten</option><option>Niederösterreich</option><option>Oberösterreich</option><option>Salzburg</option><option>Steiermark</option><option>Tirol</option><option>Vorarlberg</option><option>Wien</option></select></div>
-          <div><label>Kundentyp</label><select id="kundentyp"><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option></select></div>
-          <div><label>Kundenstatus</label><select id="kundenstatus"><option>Lead</option><option>Interessent</option><option>Angebot</option><option>Partner</option><option>Kunde</option><option>Bestandskunde</option><option>Kein Interesse</option></select></div>
-          <div><label>Leadquelle</label><select id="leadquelle"><option value="">Bitte wählen</option><option>MP Liste</option><option>Telefonakquise</option><option>Solar Solutions</option><option>Empfehlung</option><option>Website</option><option>Bestandskunde</option><option>Sonstiges</option></select></div>
-          <div><label>In weclapp übernommen</label><select id="weclapp"><option>Nein</option><option>Ja</option></select></div><div><label>Potenzial</label><select id="potenzial"><option>klein</option><option>mittel</option><option>groß</option></select></div><div><label>Chancenbewertung</label><select id="chancenbewertung"><option value="">Noch nicht bewertet</option><option>Sehr hoch</option><option>Hoch</option><option>Mittel</option><option>Gering</option><option>Sehr gering</option></select></div>
-          <div><label>MP Score</label><input id="mp_score" type="number" step="0.1" min="0" max="5"></div>
-          <div class="full"><label>Website</label><input id="website" placeholder="https://..."></div>
-          <div class="full"><label>Kategorie / Zusatzinfo</label><textarea id="kategorie" placeholder="Kategorie, weitere E-Mails, Importnotizen ..."></textarea></div>
-        </div>
-      </div>
-      <div class="section">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;"><div class="section-title" style="margin:0;">Ansprechpartner</div><button type="button" onclick="addSubContact()">+ Ansprechpartner</button></div>
-        <div class="grid3"><div><label>Ansprechpartner / Nachname</label><input id="nachname"></div><div><label>Vorname</label><input id="vorname"></div><div><label>Rolle / Position</label><input id="rolle"></div><div><label>Telefon</label><input id="telefon"></div><div><label>Mobil</label><input id="mobil"></div><div><label>E-Mail</label><input id="email"></div></div>
-        <div id="subContactList" style="margin-top:10px;"></div>
-      </div>
-      <div class="section">
-        <div class="section-title">Neue Aktivität</div>
-        <input id="status" type="hidden" value="Sonstiges"><input id="erstkontakt" type="hidden"><input id="naechsterkontakt" type="hidden"><input id="naechsterkontakt_zeit" type="hidden"><input id="kontaktart" type="hidden">
-        <div class="hint" style="margin-bottom:12px">Aktivitätsdatum = wann du etwas gemacht hast. Termindatum = wann der Termin/Rückruf stattfinden soll.</div>
-        <div class="activity-box"><div class="activity-title">📞 Aktivität</div><div class="grid3"><div><label>Aktivitätsdatum</label><input id="noteDate" type="date"></div><div><label>Aktivitätszeit</label><input id="noteTime" type="time"></div><div><label>Art der Aktivität</label><select id="noteType"><option>📞 Telefonat geführt</option><option>📧 Mail gesendet</option><option>👤 Persönlicher Besuch</option><option>💻 Teams Call</option><option>📄 Unterlagen gesendet</option><option>📄 Angebot erstellt</option><option>⭐ Erstkontakt</option><option>Sonstiges</option></select></div></div><div style="margin-top:12px"><label>Was wurde besprochen / Ergebnis</label><textarea id="activityText" placeholder="Zum Beispiel: Kunde interessiert sich für FENECON, möchte Preise ..."></textarea></div></div>
-        <div class="activity-box"><div class="activity-title">📅 Termin / Rückruf optional</div><div class="grid3"><div><label>Termindatum</label><input id="appointmentDate" type="date"></div><div><label>Terminzeit</label><input id="appointmentTime" type="time"></div><div><label>Art des Termins</label><select id="appointmentType"><option value="">Kein Termin / Rückruf</option><option>📅 Termin vereinbart</option><option>📞 Anruf</option><option>⏰ Rückruf vereinbart</option><option>👤 Persönlicher Termin</option><option>💻 Online-Termin</option><option>📧 Mail nachfassen</option><option>Sonstiges</option></select></div></div><div style="margin-top:12px"><label>Notiz zum Termin / Rückruf</label><textarea id="appointmentText"></textarea></div></div>
-        <div class="activity-actions"><button type="button" class="btn-mail" onclick="markDocumentsSent()">📄 Unterlagen versendet</button><button type="button" class="delete" onclick="markNoInterest()">Kein Interesse</button><button type="button" class="primary" onclick="addNoteEntry()">Eintrag hinzufügen</button></div>
-        <div id="noteHistory"></div>
-        <div style="margin-top:16px"><label>E-Mail / Dateien / Unterlagen zum Kunden anhängen</label><div id="dropzone" class="dropzone"><div><strong>Dateien hier auf den Kunden ziehen</strong></div><div class="hint">Outlook-Mail als .msg, PDF, Angebot, Screenshot oder sonstige Unterlagen. Dateien werden in Supabase Storage gespeichert.</div><div style="margin-top:10px"><button type="button" onclick="document.getElementById('attachmentInput').click()">Dateien auswählen</button><input id="attachmentInput" type="file" multiple onchange="handleAttachmentInput(event)"></div></div><div id="attachmentList" class="attachment-list"></div></div>
-        <div class="savebar"><button class="primary" onclick="saveCurrentContact()">Änderungen übernehmen</button><button onclick="newContact()">Neuer Kontakt</button><button class="delete" onclick="deleteCurrent()">Kontakt löschen</button></div>
-        <div class="hint">Supabase ist der Hauptspeicher. LocalStorage wird nur noch als Notfall-Backup verwendet.</div>
-      </div>
-    </div>
-    <div class="side-card"><div class="section"><div class="sub-title">Kundenakte</div><div class="mini-box" id="customerSummary">Kein Kontakt ausgewählt.</div></div><div class="section"><div class="sub-title">Anhänge / Unterlagen</div><div class="mini-box" id="customerAttachmentsSummary">Keine Anhänge vorhanden.</div></div><div class="section"><div class="sub-title">Letzte Aktivitäten</div><div class="mini-box" id="customerActivitySummary">Keine Aktivitäten vorhanden.</div></div></div>
+
+<div id="app">
+
+  <!-- -----------------------------------------------
+       LINKER BEREICH — KONTAKTLISTE / SUCHE
+  --------------------------------------------------->
+  <div class="sidebar">
+    <h2>Kontakte</h2>
+
+    <input id="search" placeholder="Suchen..." style="width:100%;padding:10px;" oninput="filterContacts()">
+
+    <div id="contactList"></div>
   </div>
+
+  <!-- -----------------------------------------------
+       MITTE — KONTAKTKARTE + TIMELINE
+  --------------------------------------------------->
+  <div class="content">
+    <div id="contactView"></div>
+  </div>
+
+  <!-- -----------------------------------------------
+       RECHTS — KI-PANEL / ZUSAMMENFASSUNG
+  --------------------------------------------------->
+  <div class="panel">
+    <h3>KI Analyse</h3>
+    <div id="aiSummary" class="card">Kein Kontakt ausgewählt.</div>
+  </div>
+
 </div>
-<script>
-const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const STORAGE_KEY="mini_crm_vertrieb_v3_backup";
-let contacts=[],autosaveTimer=null,currentSort="",selectedId=null,selectedIds=new Set(),dueFilterActive=false,isLoading=false;
-const FORM_IDS=["firma","nachname","vorname","rolle","kundentyp","kundenstatus","leadquelle","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","status","erstkontakt","naechsterkontakt","naechsterkontakt_zeit","kontaktart","weclapp","potenzial","chancenbewertung","website","kategorie","mp_score"];
-function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-function addDays(dateStr,days){if(!dateStr)return"";const d=new Date(dateStr+"T12:00:00");d.setDate(d.getDate()+days);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-function normalizeDate(v){v=String(v||"").trim();return v===""?null:v}function normalizeTime(v){v=String(v||"").trim();return v===""?null:v}
-function formatDateDisplay(v){if(!v)return"-";if(/^\d{4}-\d{2}-\d{2}$/.test(v)){const[y,m,d]=v.split("-");return`${d}.${m}.${y}`}return v}
-function humanSize(bytes){if(!bytes&&bytes!==0)return"";if(bytes<1024)return bytes+" B";if(bytes<1024*1024)return(bytes/1024).toFixed(1)+" KB";return(bytes/(1024*1024)).toFixed(1)+" MB"}
-function safeJoin(arr,sep=" "){return(arr||[]).filter(v=>String(v||"").trim()!=="").join(sep)}
-function isUuid(v){return/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v||""))}
-function getSelected(){return contacts.find(c=>c.id===selectedId)||null}function setSaveState(msg,isError=false){const el=document.getElementById("saveState");if(el){el.textContent=msg;el.style.color=isError?"#b91c1c":"#475569"}}
-function cleanPhone(v){return String(v||"").replace(/[^+\d]/g,"")}function phoneLink(v){const raw=String(v||"").trim();return raw?`<a href="tel:${cleanPhone(raw)}" onclick="event.stopPropagation();">${esc(raw)}</a>`:""}function mailLink(v){const raw=String(v||"").trim();return raw?`<a href="mailto:${esc(raw)}" onclick="event.stopPropagation();">${esc(raw)}</a>`:""}function webLink(v){let raw=String(v||"").trim();if(!raw)return"";const href=/^https?:\/\//i.test(raw)?raw:"https://"+raw;return`<a href="${esc(href)}" target="_blank" onclick="event.stopPropagation();">${esc(raw)}</a>`}
-function isInWeclapp(c){return String(c?.weclapp||"").toLowerCase()==="ja"}function getContactDateTime(c){if(!c||!c.naechsterkontakt)return null;return new Date(c.naechsterkontakt+"T"+(c.naechsterkontakt_zeit||"00:00"))}function hasFutureNextContact(c){if(isInWeclapp(c))return false;const dt=getContactDateTime(c);return !!dt&&dt>=new Date()}
-function getVisibleStatus(c){if(c.archived)return"Archiviert";if(isInWeclapp(c))return"In weclapp";if(String(c.status||"")==="Kein Interesse")return"Kein Interesse";if(hasFutureNextContact(c))return c.status||"";return""}
-function statusBadgeClass(status){if(status==="In weclapp")return"badge-blue";if(status==="Kein Interesse"||status==="Termin abgesagt")return"badge-red";if(status==="Termin vereinbart")return"badge-yellow";if(status==="Unterlagen versendet")return"badge-violet";if(status==="Telefonat ausgemacht")return"badge-orange";if(status==="Archiviert")return"badge-violet";return"badge-gray"}
-function kundenstatusBadgeClass(status){if(status==="Lead")return"badge-blue";if(status==="Kunde"||status==="Bestandskunde"||status==="Partner")return"badge-green";if(status==="Kein Interesse")return"badge-red";if(status==="Angebot")return"badge-orange";return"badge-gray"}
-function chanceClass(v){v=String(v||"").toLowerCase().trim();if(v==="sehr hoch"||v==="hoch")return"badge-green";if(v==="mittel")return"badge-yellow";if(v==="gering"||v==="sehr gering")return"badge-red";return"badge-gray"}function chanceLabel(v){return String(v||"").trim()||"Noch nicht bewertet"}
-function parseCsvLine(line){const result=[];let cur="",inQuotes=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(inQuotes&&line[i+1]==='"'){cur+='"';i++}else inQuotes=!inQuotes}else if(ch===';'&&!inQuotes){result.push(cur);cur=""}else cur+=ch}result.push(cur);return result}
-function normalizeHeader(h){return String(h||"").trim().toLowerCase().replace(/^\ufeff/,"").replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")}
-function extractWebsite(text){const m=String(text||"").match(/(?:https?:\/\/)?(?:www\.)?[a-z0-9-]+\.[a-z]{2,}(?:\/[\w\-.~:/?#[\]@!$&'()*+,;=%]*)?/i);return m?m[0]:""}
-function extractMpScore(text){const m=String(text||"").match(/MP\s*Score\s*:\s*([0-9]+(?:[.,][0-9]+)?)/i);return m?m[1].replace(",","."):""}
-function cleanKategorie(text){return String(text||"").replace(/Website:\s*[^|]+\|?/i,"").replace(/MP\s*Score\s*:\s*[0-9]+(?:[.,][0-9]+)?/i,"").trim()}
-function sanitizeContacts(list){return(Array.isArray(list)?list:[]).map(c=>({id:c.id||String(Date.now()+Math.random()),firma:c.firma||"",strasse:c.strasse||"",plz:c.plz||"",ort:c.ort||"",bezirk:c.bezirk||"",bundesland:c.bundesland||"Oberösterreich",kundentyp:c.kundentyp||"Fachpartner",kundenstatus:c.kundenstatus||"Interessent",status:c.status||"Sonstiges",erstkontakt:c.erstkontakt||"",naechsterkontakt:c.naechsterkontakt||"",naechsterkontakt_zeit:c.naechsterkontakt_zeit||"",kontaktart:c.kontaktart||"",weclapp:c.weclapp||"Nein",leadquelle:c.leadquelle||"",potenzial:c.potenzial||"mittel",chancenbewertung:c.chancenbewertung||"",website:c.website||"",kategorie:c.kategorie||"",mp_score:c.mp_score||"",nachname:c.nachname||"",vorname:c.vorname||"",rolle:c.rolle||"",telefon:c.telefon||"",mobil:c.mobil||"",email:c.email||"",notes_history:Array.isArray(c.notes_history)?c.notes_history:[],weitere_kontakte:Array.isArray(c.weitere_kontakte)?c.weitere_kontakte:[],attachments:Array.isArray(c.attachments)?c.attachments:[],archived:!!c.archived}))}
-function persistLocalBackup(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({saved_at:new Date().toISOString(),contacts}))}catch(e){}}
-function syncFormToSelected(){const c=getSelected();if(!c||isLoading)return;const getVal=id=>{const el=document.getElementById(id);return el?el.value:""};contacts=contacts.map(x=>x.id===selectedId?{...x,firma:String(getVal("firma")).trim(),nachname:String(getVal("nachname")).trim(),vorname:String(getVal("vorname")).trim(),rolle:String(getVal("rolle")).trim(),kundentyp:getVal("kundentyp"),kundenstatus:getVal("kundenstatus"),leadquelle:getVal("leadquelle"),bundesland:getVal("bundesland"),bezirk:String(getVal("bezirk")).trim(),telefon:String(getVal("telefon")).trim(),mobil:String(getVal("mobil")).trim(),email:String(getVal("email")).trim(),strasse:String(getVal("strasse")).trim(),plz:String(getVal("plz")).trim(),ort:String(getVal("ort")).trim(),status:getVal("status"),erstkontakt:getVal("erstkontakt"),naechsterkontakt:getVal("naechsterkontakt"),naechsterkontakt_zeit:getVal("naechsterkontakt_zeit"),kontaktart:getVal("kontaktart"),weclapp:getVal("weclapp"),potenzial:getVal("potenzial"),chancenbewertung:getVal("chancenbewertung"),website:String(getVal("website")).trim(),kategorie:String(getVal("kategorie")).trim(),mp_score:String(getVal("mp_score")).trim()}:x)}
-function scheduleAutosave(){if(isLoading)return;syncFormToSelected();updateCustomerSummary();setSaveState("Änderungen für Supabase vorgemerkt ...");clearTimeout(autosaveTimer);autosaveTimer=setTimeout(()=>autosaveSelectedToSupabase(),900)}
-async function autosaveSelectedToSupabase(){const c=getSelected();if(!c)return;try{syncFormToSelected();setSaveState("Speichere automatisch in Supabase ...");await saveOneContactToSupabase(getSelected());persistLocalBackup();setSaveState("Automatisch in Supabase gespeichert");renderList();updateCustomerSummary()}catch(e){console.error(e);setSaveState("Autosave fehlgeschlagen",true)}}
-function baseCompanyPayload(c){return{firma:c.firma||"",strasse:c.strasse||"",plz:c.plz||"",ort:c.ort||"",bezirk:c.bezirk||"",bundesland:c.bundesland||"",kundentyp:c.kundentyp||"",kundenstatus:c.kundenstatus||"",status:c.status||"",erstkontakt:normalizeDate(c.erstkontakt),naechsterkontakt:normalizeDate(c.naechsterkontakt),naechsterkontakt_zeit:c.naechsterkontakt_zeit||"",kontaktart:c.kontaktart||"",weclapp:c.weclapp||"",leadquelle:c.leadquelle||"",potenzial:c.potenzial||"",chancenbewertung:c.chancenbewertung||"",website:c.website||"",kategorie:c.kategorie||"",mp_score:c.mp_score===""?null:Number(c.mp_score),archived:!!c.archived,updated_at:new Date().toISOString()}}
-function mapDbToContact(firma,ansprechpartnerRows,historieRows,anhaengeRows){const rows=(ansprechpartnerRows||[]).filter(r=>r.firma_id===firma.id);const historie=(historieRows||[]).filter(r=>r.firma_id===firma.id).sort((a,b)=>String(a.datum||"").localeCompare(String(b.datum||"")));const anhaenge=(anhaengeRows||[]).filter(r=>r.firma_id===firma.id);const haupt=rows.find(r=>r.hauptkontakt)||rows[0]||{};const weitere=rows.filter(r=>!r.hauptkontakt).map(r=>({vorname:r.vorname||"",nachname:r.nachname||"",telefon:r.telefon||"",mobil:r.mobil||"",email:r.email||"",position:r.rolle||"",notiz:""}));return sanitizeContacts([{id:firma.id,firma:firma.firma||"",strasse:firma.strasse||"",plz:firma.plz||"",ort:firma.ort||"",bezirk:firma.bezirk||"",bundesland:firma.bundesland||"Oberösterreich",kundentyp:firma.kundentyp||"Fachpartner",kundenstatus:firma.kundenstatus||"Interessent",status:firma.status||"Sonstiges",erstkontakt:firma.erstkontakt||"",naechsterkontakt:firma.naechsterkontakt||"",naechsterkontakt_zeit:firma.naechsterkontakt_zeit||"",kontaktart:firma.kontaktart||"",weclapp:firma.weclapp||"Nein",leadquelle:firma.leadquelle||"",potenzial:firma.potenzial||"mittel",chancenbewertung:firma.chancenbewertung||"",website:firma.website||"",kategorie:firma.kategorie||"",mp_score:firma.mp_score??"",nachname:haupt.nachname||"",vorname:haupt.vorname||"",rolle:haupt.rolle||"",telefon:haupt.telefon||"",mobil:haupt.mobil||"",email:haupt.email||"",notes_history:historie.map(h=>({id:h.id,date:h.datum||"",time:h.uhrzeit||"",type:h.art||"",text:h.notiz||"",appointment_date:h.termin_datum||"",appointment_time:h.termin_uhrzeit||"",auto_status:h.auto_status||"",auto_naechsterkontakt:h.auto_naechsterkontakt||"",auto_naechsterkontakt_zeit:h.termin_uhrzeit||"",auto_kontaktart:h.auto_kontaktart||""})),weitere_kontakte:weitere,attachments:anhaenge,archived:!!firma.archived}])[0]}
-async function loadAllFromSupabase(){isLoading=true;setSaveState("Lade aus Supabase ...");const[{data:firmen,error:firmenError},{data:ansprechpartner,error:ansprechpartnerError},{data:historie,error:historieError},{data:anhaenge,error:anhaengeError}]=await Promise.all([supabaseClient.from("crm_firmen").select("*").order("firma",{ascending:true}),supabaseClient.from("crm_ansprechpartner").select("*").order("created_at",{ascending:true}),supabaseClient.from("crm_historie").select("*").order("datum",{ascending:true}),supabaseClient.from("crm_anhaenge").select("*").order("created_at",{ascending:false})]);if(firmenError)throw firmenError;if(ansprechpartnerError)throw ansprechpartnerError;if(historieError)throw historieError;if(anhaengeError)throw anhaengeError;contacts=(firmen||[]).map(f=>mapDbToContact(f,ansprechpartner||[],historie||[],anhaenge||[]));selectedId=contacts.length?contacts[0].id:null;isLoading=false;fillForm();renderList();showDueTodayBanner();persistLocalBackup();setSaveState("Aus Supabase geladen")}
-async function saveOneContactToSupabase(contact){if(!contact)return;let firmaId=isUuid(contact.id)?contact.id:null;const payload=baseCompanyPayload(contact);if(firmaId){const{error}=await supabaseClient.from("crm_firmen").update(payload).eq("id",firmaId);if(error)throw error}else{let query=supabaseClient.from("crm_firmen").select("id").eq("firma",contact.firma||"").eq("ort",contact.ort||"").limit(1);const{data:existing}=await query;if(existing&&existing.length){firmaId=existing[0].id;const{error}=await supabaseClient.from("crm_firmen").update(payload).eq("id",firmaId);if(error)throw error;const oldId=contact.id;contacts=contacts.map(x=>x.id===oldId?{...x,id:firmaId}:x);if(selectedId===oldId)selectedId=firmaId}else{const{data,error}=await supabaseClient.from("crm_firmen").insert(payload).select().single();if(error)throw error;firmaId=data.id;const oldId=contact.id;contacts=contacts.map(x=>x.id===oldId?{...x,id:firmaId}:x);if(selectedId===oldId)selectedId=firmaId}}
-const current=getSelected()||contact;const{error:delAnError}=await supabaseClient.from("crm_ansprechpartner").delete().eq("firma_id",firmaId);if(delAnError)throw delAnError;const ansprechpartnerRows=[];if([current.vorname,current.nachname,current.rolle,current.telefon,current.mobil,current.email].some(v=>String(v||"").trim()!=="")){ansprechpartnerRows.push({firma_id:firmaId,vorname:current.vorname||"",nachname:current.nachname||"",rolle:current.rolle||"",telefon:current.telefon||"",mobil:current.mobil||"",email:current.email||"",hauptkontakt:true})}(current.weitere_kontakte||[]).forEach(p=>{if(![p.vorname,p.nachname,p.position,p.telefon,p.mobil,p.email,p.notiz].some(v=>String(v||"").trim()!==""))return;ansprechpartnerRows.push({firma_id:firmaId,vorname:p.vorname||"",nachname:p.nachname||"",rolle:p.position||"",telefon:p.telefon||"",mobil:p.mobil||"",email:p.email||"",hauptkontakt:false})});if(ansprechpartnerRows.length){const{error}=await supabaseClient.from("crm_ansprechpartner").insert(ansprechpartnerRows);if(error)throw error}const{error:delHisError}=await supabaseClient.from("crm_historie").delete().eq("firma_id",firmaId);if(delHisError)throw delHisError;const historieRows=(current.notes_history||[]).filter(n=>String(n.text||"").trim()!==""||String(n.type||"").trim()!==""||String(n.date||"").trim()!=="").map(n=>({firma_id:firmaId,datum:normalizeDate(n.date),uhrzeit:normalizeTime(n.time),art:n.type||"",notiz:n.text||"",termin_datum:normalizeDate(n.appointment_date||n.auto_naechsterkontakt),termin_uhrzeit:normalizeTime(n.appointment_time||n.auto_naechsterkontakt_zeit),auto_status:n.auto_status||"",auto_naechsterkontakt:normalizeDate(n.auto_naechsterkontakt),auto_kontaktart:n.auto_kontaktart||""}));if(historieRows.length){const{error}=await supabaseClient.from("crm_historie").insert(historieRows);if(error)throw error}}
-async function saveCurrentContact(){const c=getSelected();if(!c){alert("Bitte zuerst einen Kontakt auswählen.");return}try{syncFormToSelected();setSaveState("Speichere in Supabase ...");await saveOneContactToSupabase(getSelected());await loadAttachmentsForCurrent();persistLocalBackup();fillForm();renderList();setSaveState("In Supabase gespeichert")}catch(e){console.error(e);setSaveState("Supabase-Speichern fehlgeschlagen",true);alert("Speichern in Supabase fehlgeschlagen: "+(e.message||""))}}
-async function saveData(){try{syncFormToSelected();setSaveState("Speichere alle Kontakte in Supabase ...");const errors=[];for(const contact of[...contacts]){try{await saveOneContactToSupabase(contact)}catch(e){errors.push(contact.firma||contact.id);console.error("Fehler bei Kontakt:",contact.firma,e)}}persistLocalBackup();await loadAllFromSupabase();if(errors.length){setSaveState("Teilweise gespeichert – "+errors.length+" Fehler",true);alert("Speichern abgeschlossen mit "+errors.length+" Fehler(n):\n"+errors.slice(0,10).join("\n"))}else{setSaveState("Alle Kontakte in Supabase gespeichert");alert("Alle Kontakte in Supabase gespeichert.")}}catch(e){console.error(e);setSaveState("Supabase-Speichern fehlgeschlagen",true);alert("Speichern in Supabase fehlgeschlagen: "+(e.message||""))}}
-async function loadData(){try{await loadAllFromSupabase();alert("Daten aus Supabase geladen.")}catch(e){console.error(e);setSaveState("Supabase-Laden fehlgeschlagen",true);alert("Laden aus Supabase fehlgeschlagen: "+(e.message||""))}}
-function filteredContacts(){const search=document.getElementById("search").value.toLowerCase().trim();const statusFilter=document.getElementById("statusFilter").value;const kundentypFilter=document.getElementById("kundentypFilter").value;const leadquelleFilter=document.getElementById("leadquelleFilter").value;const region=document.getElementById("regionFilter").value.toLowerCase().trim();let arr=contacts.filter(c=>{if(dueFilterActive){if(!hasFutureNextContact(c)||c.naechsterkontakt!==todayStr())return false}const noteTexts=(c.notes_history||[]).map(n=>`${n.type||""} ${n.text||""} ${n.appointment_date||""}`).join(" ");const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.kundenstatus,c.leadquelle,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.website,c.kategorie,c.strasse,c.plz,c.ort,c.chancenbewertung,noteTexts].join(" ").toLowerCase();const sOk=search===""||hay.includes(search);const visibleStatus=getVisibleStatus(c);const stOk=statusFilter==="Alle"?!c.archived:statusFilter==="Lead"?c.kundenstatus==="Lead"&&!c.archived:statusFilter==="Ohne Status"?!c.archived&&!isInWeclapp(c)&&String(c.status||"")!=="Kein Interesse"&&!hasFutureNextContact(c):statusFilter==="Archiviert"?!!c.archived:statusFilter==="In weclapp"?isInWeclapp(c)&&!c.archived:visibleStatus===statusFilter&&!c.archived;const ktOk=kundentypFilter==="Alle"||c.kundentyp===kundentypFilter;const lqOk=leadquelleFilter==="Alle"||c.leadquelle===leadquelleFilter;const rOk=region===""||[c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region);return sOk&&stOk&&ktOk&&lqOk&&rOk});if(currentSort)arr.sort((a,b)=>String(a[currentSort]||"").localeCompare(String(b[currentSort]||""),"de"));return arr}
-function renderList(){showDueTodayBanner();const list=document.getElementById("contactList");const arr=filteredContacts();const search=document.getElementById("search").value.trim();const statusFilter=document.getElementById("statusFilter").value;const kundentypFilter=document.getElementById("kundentypFilter").value;const leadquelleFilter=document.getElementById("leadquelleFilter").value;const region=document.getElementById("regionFilter").value.trim();const showRecent=document.getElementById("showRecent").checked;const selectionInfo=document.getElementById("selectionInfo");if(selectionInfo)selectionInfo.textContent=selectedIds.size+" markiert";const hasFilter=search!==""||statusFilter!=="Alle"||kundentypFilter!=="Alle"||leadquelleFilter!=="Alle"||region!==""||dueFilterActive;if(!hasFilter&&!showRecent){list.innerHTML='<div class="empty">Die Kontaktliste ist ausgeblendet.</div>';return}let visible=arr;if(!hasFilter&&showRecent)visible=[...arr].slice(0,8);if(!visible.length){list.innerHTML='<div class="empty">Keine Kontakte gefunden.</div>';return}list.innerHTML=visible.map(c=>{const name=[c.vorname,c.nachname].filter(Boolean).join(" ");const visibleStatus=getVisibleStatus(c);return`<div class="contact-item ${selectedId===c.id?'active':''}" onclick="selectContact('${c.id}')"><div class="contact-item-top"><input class="contact-select" type="checkbox" ${selectedIds.has(c.id)?'checked':''} onclick="event.stopPropagation();" onchange="toggleSelectContact('${c.id}')"><div><div class="contact-row"><div><div style="font-weight:900">${esc(c.firma||"(ohne Firma)")}</div>${name?`<div class="meta">${esc(name)}</div>`:""}${c.website?`<div class="meta">${webLink(c.website)}</div>`:""}</div><div><div>${esc(c.kundentyp||"")}</div><div class="meta">${esc(c.bundesland||"")}</div><span class="badge ${kundenstatusBadgeClass(c.kundenstatus)}">${esc(c.kundenstatus||"")}</span></div><div><div>${esc(c.bezirk||"")}</div><div class="meta">${esc(c.ort||"")}</div></div><div><div>${phoneLink(c.mobil||c.telefon)||""}</div><div class="meta">${mailLink(c.email)||""}</div></div><div>${visibleStatus?`<span class="badge ${statusBadgeClass(visibleStatus)}">${esc(visibleStatus)}</span>`:""}</div></div></div></div></div>`}).join("")}
-function selectContact(id){
-  syncFormToSelected();
-  selectedId = id;
 
-  document.getElementById("search").value = "";
-  document.getElementById("regionFilter").value = "";
-  document.getElementById("kundentypFilter").value = "Alle";
-  document.getElementById("statusFilter").value = "Alle";
-  document.getElementById("leadquelleFilter").value = "Alle";
 
-  dueFilterActive = false;
+<script type="module">
 
-  fillForm();
+/* -------------------------------------------------------
+   KONFIGURATION
+--------------------------------------------------------- */
+const OPENAI_API_KEY = "DEIN_OPENAI_API_KEY_HIER";
+const SUPABASE_URL = "DEINE_SUPABASE_URL";
+const SUPABASE_KEY = "DEIN_SUPABASE_ANON_KEY";
+
+import { createClient } from "[cdn.jsdelivr.net](https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm)";
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* -------------------------------------------------------
+   GLOBALER STATE
+--------------------------------------------------------- */
+let contacts = [];
+let activeContact = null;
+
+/* -------------------------------------------------------
+   OpenAI KI-FUNKTIONEN
+--------------------------------------------------------- */
+async function aiAnalyzeActivity(text) {
+  const prompt = `
+Analysiere diese Vertriebsaktivität und extrahiere:
+
+1) Type (Telefon, Mail, Besuch, Unterlagen, Angebot, Sonstiges)
+2) Kurze Zusammenfassung
+3) Nächster sinnvoller Schritt
+4) Datum für Wiedervorlage (falls erkennbar)
+5) Statusänderung (falls sinnvoll)
+
+Text: "${text}"
+Erwarte JSON.
+  `;
+
+  const r = await fetch("[api.openai.com](https://api.openai.com/v1/chat/completions)", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + OPENAI_API_KEY },
+    body: JSON.stringify({
+      model: "gpt-4.1-mini",
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  const data = await r.json();
+  try {
+    return JSON.parse(data.choices[0].message.content);
+  } catch {
+    return null;
+  }
+}
+
+/* -------------------------------------------------------
+   SUPABASE LADEN
+--------------------------------------------------------- */
+async function loadContacts() {
+  const { data } = await db.from("contacts").select("*").order("updated_at", { ascending: false });
+  contacts = data || [];
   renderList();
 }
-function clearSearch(){document.getElementById("search").value="";document.getElementById("statusFilter").value="Alle";document.getElementById("kundentypFilter").value="Alle";document.getElementById("leadquelleFilter").value="Alle";document.getElementById("regionFilter").value="";dueFilterActive=false;renderList()}
-function resetNoteInputs(){document.getElementById("noteDate").value=todayStr();document.getElementById("noteTime").value="";document.getElementById("noteType").value="📞 Telefonat geführt";document.getElementById("appointmentDate").value="";document.getElementById("appointmentTime").value="";document.getElementById("appointmentType").value="";document.getElementById("activityText").value="";document.getElementById("appointmentText").value=""}
-function fillForm(){isLoading=true;const c=getSelected();if(!c){document.getElementById("pageTitle").textContent="Mini CRM Vertrieb v3";document.getElementById("pageStatus").textContent="Kein Kontakt";document.getElementById("pageStatus").className="badge badge-orange";document.getElementById("pageStatus").style.display="inline-block";FORM_IDS.forEach(id=>{const el=document.getElementById(id);if(!el)return;if(el.tagName==="SELECT")el.selectedIndex=0;else el.value=""});document.getElementById("attachmentList").innerHTML="";resetNoteInputs();renderNoteHistory();renderSubContacts();updateCustomerSummary();isLoading=false;return}const visibleStatus=getVisibleStatus(c);document.getElementById("pageTitle").textContent=c.firma||"Mini CRM Vertrieb v3";document.getElementById("pageStatus").textContent=visibleStatus||c.kundenstatus||"";document.getElementById("pageStatus").className="badge "+(visibleStatus?statusBadgeClass(visibleStatus):kundenstatusBadgeClass(c.kundenstatus));document.getElementById("pageStatus").style.display=(visibleStatus||c.kundenstatus)?"inline-block":"none";FORM_IDS.forEach(id=>{const el=document.getElementById(id);if(el)el.value=c[id]??""});resetNoteInputs();renderAttachments();renderNoteHistory();renderSubContacts();updateCustomerSummary();isLoading=false}
-function renderSubContacts(){const c=getSelected(),box=document.getElementById("subContactList");if(!box)return;if(!c){box.innerHTML="";return}const list=Array.isArray(c.weitere_kontakte)?c.weitere_kontakte:[];if(!list.length){box.innerHTML='<div class="empty">Noch keine weiteren Ansprechpartner vorhanden.</div>';return}box.innerHTML="";list.forEach((p,i)=>{const card=document.createElement("div");card.className="summary-card";card.style.marginTop="8px";card.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:8px"><strong>Ansprechpartner ${i+1}</strong><button type="button" class="delete" data-idx="${i}">Löschen</button></div><div class="grid3"><div><label>Vorname</label><input data-field="vorname" data-idx="${i}"></div><div><label>Nachname</label><input data-field="nachname" data-idx="${i}"></div><div><label>Rolle / Position</label><input data-field="position" data-idx="${i}"></div><div><label>Telefon</label><input data-field="telefon" data-idx="${i}"></div><div><label>Mobil</label><input data-field="mobil" data-idx="${i}"></div><div><label>E-Mail</label><input data-field="email" data-idx="${i}"></div><div class="full"><label>Notiz</label><input data-field="notiz" data-idx="${i}"></div></div>`;card.querySelectorAll("input[data-field]").forEach(input=>{const field=input.dataset.field;input.value=p[field]||"";input.addEventListener("input",function(){updateSubContact(parseInt(this.dataset.idx),this.dataset.field,this.value)})});card.querySelector("button[data-idx]").addEventListener("click",function(){removeSubContact(parseInt(this.dataset.idx))});box.appendChild(card)})}
-function addSubContact(){const c=getSelected();if(!c){alert("Bitte zuerst einen Kontakt auswählen.");return}contacts=contacts.map(x=>x.id===selectedId?{...x,weitere_kontakte:[...(x.weitere_kontakte||[]),{vorname:"",nachname:"",telefon:"",mobil:"",email:"",position:"",notiz:""}]}:x);fillForm();renderList();scheduleAutosave()}function updateSubContact(index,field,value){contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const weitere=[...(x.weitere_kontakte||[])];weitere[index]={...(weitere[index]||{}),[field]:value};return{...x,weitere_kontakte:weitere}});updateCustomerSummary();scheduleAutosave()}function removeSubContact(index){contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const weitere=[...(x.weitere_kontakte||[])];weitere.splice(index,1);return{...x,weitere_kontakte:weitere}});fillForm();renderList();scheduleAutosave()}
-function updateCustomerSummary(){const c=getSelected(),box=document.getElementById("customerSummary"),attBox=document.getElementById("customerAttachmentsSummary"),actBox=document.getElementById("customerActivitySummary");if(!box)return;if(!c){box.innerHTML="Kein Kontakt ausgewählt.";if(attBox)attBox.innerHTML="Keine Anhänge vorhanden.";if(actBox)actBox.innerHTML="Keine Aktivitäten vorhanden.";return}const contactCards=[];if([c.vorname,c.nachname,c.rolle,c.telefon,c.mobil,c.email].some(v=>String(v||"").trim()!=="")){contactCards.push(`<div class="summary-card"><strong>Hauptkontakt</strong>${safeJoin([c.vorname,c.nachname])?`<div class="hint">${esc(safeJoin([c.vorname,c.nachname]))}</div>`:""}${c.rolle?`<div class="hint">${esc(c.rolle)}</div>`:""}${c.telefon?`<div class="hint">Telefon: ${phoneLink(c.telefon)}</div>`:""}${c.mobil?`<div class="hint">Mobil: ${phoneLink(c.mobil)}</div>`:""}${c.email?`<div class="hint">E-Mail: ${mailLink(c.email)}</div>`:""}</div>`)}(c.weitere_kontakte||[]).forEach((p,i)=>{contactCards.push(`<div class="summary-card"><strong>Kontakt ${i+2}</strong>${safeJoin([p.vorname,p.nachname])?`<div class="hint">${esc(safeJoin([p.vorname,p.nachname]))}</div>`:""}${p.position?`<div class="hint">${esc(p.position)}</div>`:""}${p.telefon?`<div class="hint">Telefon: ${phoneLink(p.telefon)}</div>`:""}${p.mobil?`<div class="hint">Mobil: ${phoneLink(p.mobil)}</div>`:""}${p.email?`<div class="hint">E-Mail: ${mailLink(p.email)}</div>`:""}</div>`)});const futureStep=hasFutureNextContact(c);box.innerHTML=`<div><strong style="font-size:18px">${esc(c.firma||"-")}</strong> ${isInWeclapp(c)?`<span class="badge badge-blue" style="margin-left:8px">In weclapp</span>`:""}</div><div class="hint">${esc(c.strasse||"")}<br>${esc(safeJoin([c.plz,c.ort]))}<br>${esc(safeJoin([c.bezirk,c.bundesland]," / "))}</div><div class="quick-actions">${c.telefon||c.mobil?`<button class="btn-phone" onclick="location.href='tel:${cleanPhone(c.mobil||c.telefon)}'">📞 Anrufen</button>`:""}${c.email?`<button class="btn-mail" onclick="location.href='mailto:${esc(c.email)}'">📧 Mail</button>`:""}${c.website?`<button class="btn-web" onclick="window.open('${esc(/^https?:\/\//i.test(c.website)?c.website:'https://'+c.website)}','_blank')">🌐 Website</button>`:""}</div><hr><div class="summary-grid"><div class="summary-card"><strong>Kundendaten</strong><div class="hint">Kundentyp: ${esc(c.kundentyp||"-")}</div><div class="hint">Kundenstatus: <span class="badge ${kundenstatusBadgeClass(c.kundenstatus)}">${esc(c.kundenstatus||"-")}</span></div><div class="hint">Leadquelle: ${esc(c.leadquelle||"-")}</div><div class="hint">Potenzial: ${esc(c.potenzial||"-")}</div><div class="hint">Chance: <span class="badge ${chanceClass(c.chancenbewertung)}">${esc(chanceLabel(c.chancenbewertung))}</span></div><div class="hint">MP Score: ${esc(c.mp_score||"-")}</div><div class="hint">Website: ${c.website?webLink(c.website):"-"}</div><div class="hint">In weclapp übernommen: ${esc(c.weclapp||"Nein")}</div></div><div class="summary-card"><strong>Nächster Schritt</strong>${futureStep?`<div class="hint">${esc(formatDateDisplay(c.naechsterkontakt||""))}</div><div class="hint">${esc(c.naechsterkontakt_zeit||"")}</div><div class="hint">${esc(c.kontaktart||"-")}</div><div class="hint">Status: ${esc(c.status||"-")}</div>`:(isInWeclapp(c)?`<div class="hint">Kontakt wurde in weclapp übernommen.</div>`:(String(c.status||"")==="Kein Interesse"?`<div class="hint">Kontakt ist als Kein Interesse markiert.</div>`:`<div class="hint">Keine zukünftige Wiedervorlage.</div>`))}</div></div>${c.kategorie?`<hr><strong>Importinfo / Kategorie</strong><div style="
-  margin-top:10px;
-  padding:10px;
-  background:#f8fafc;
-  border:1px solid #dbe4ee;
-  border-radius:10px;
-  font-size:13px;
-  line-height:1.45;
-  white-space:pre-wrap;
-">
-  ${esc(c.kategorie)}
-</div>`:""}<hr><strong>Kontakte</strong><div class="summary-grid">${contactCards.length?contactCards.join(""):'<div class="hint">Keine Kontakte hinterlegt.</div>'}</div>`;const attachments=c.attachments||[];if(attBox)attBox.innerHTML=attachments.length?attachments.map(a=>`<div class="hint"><strong>${esc(a.filename||a.name||"Datei")}</strong><br>${esc(a.filetype||a.type||"Datei")} · ${esc(humanSize(a.filesize||a.size||0))}</div>`).join("<hr>"):"Keine Anhänge vorhanden.";const notes=[...(c.notes_history||[])].reverse().slice(0,5);if(actBox)actBox.innerHTML=notes.length?notes.map(n=>`<div class="note-entry" style="margin-top:0;margin-bottom:8px"><div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div><div class="note-entry-meta">${esc(n.type||"Aktivität")}</div><div class="note-entry-text">${esc(n.text||"")}</div></div>`).join(""):"Keine Aktivitäten vorhanden."}
-function renderNoteHistory(){const c=getSelected(),box=document.getElementById("noteHistory");if(!box)return;if(!c||!(c.notes_history||[]).length){box.innerHTML='<div class="empty">Noch keine Aktivitäten vorhanden.</div>';return}box.innerHTML=[...(c.notes_history||[])].map((n,i)=>{const appointmentInfo=n.appointment_date?`Termin: ${formatDateDisplay(n.appointment_date)}${n.appointment_time?" · "+n.appointment_time:""}`:"";return`<div class="note-entry"><div class="note-entry-head"><div><div class="note-entry-date">${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</div><div class="note-entry-meta">${esc(n.type||"Aktivität")}</div>${appointmentInfo?`<div class="note-entry-meta">${esc(appointmentInfo)}</div>`:""}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${n.appointment_date?`<button class="btn-light" type="button" onclick="cancelAppointmentFromNote(${i})">Termin abgesagt</button>`:""}<button class="delete" type="button" onclick="removeNoteEntry(${i})">Löschen</button></div></div><div class="note-entry-text">${esc(n.text||"")}</div></div>`}).reverse().join("")}
-function isFutureDateTime(dateValue,timeValue){if(!dateValue)return false;return new Date(dateValue+"T"+(timeValue||"23:59"))>=new Date()}function applyTimelineLogic(noteType,activityDate,activityTime,appointmentDate,appointmentTime,appointmentType){const selected=getSelected();if(isInWeclapp(selected))return;const type=String(noteType||"").toLowerCase(),appointment=String(appointmentType||"").toLowerCase();const statusEl=document.getElementById("status"),nextDateEl=document.getElementById("naechsterkontakt"),nextTimeEl=document.getElementById("naechsterkontakt_zeit"),kontaktartEl=document.getElementById("kontaktart"),erstkontaktEl=document.getElementById("erstkontakt");const future=isFutureDateTime(appointmentDate,appointmentTime);if(type.includes("erstkontakt")&&erstkontaktEl&&!erstkontaktEl.value)erstkontaktEl.value=activityDate||todayStr();if(type.includes("termin vereinbart")||appointment.includes("termin vereinbart")||appointment.includes("persönlicher termin")||appointment.includes("online-termin")){statusEl.value="Termin vereinbart";kontaktartEl.value=appointmentType?appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,""):"Persönlicher Termin";if(future){nextDateEl.value=appointmentDate||"";nextTimeEl.value=appointmentTime||""}return}if(type.includes("rückruf")||appointment.includes("rückruf")||appointment.includes("anruf")||appointment.includes("mail nachfassen")){statusEl.value="Telefonat ausgemacht";kontaktartEl.value=appointmentType?appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,""):"Rückruf";if(future){nextDateEl.value=appointmentDate||"";nextTimeEl.value=appointmentTime||""}return}if(type.includes("mail")||type.includes("unterlagen")||type.includes("angebot")){statusEl.value="Unterlagen versendet";kontaktartEl.value="Unterlagen";return}statusEl.value="Sonstiges";kontaktartEl.value=type.includes("teams")?"Teams Call":type.includes("telefonat")?"Telefonat":"Sonstiges"}
-async function markNoInterest(){const c=getSelected();if(!c){alert("Bitte zuerst einen Kontakt auswählen.");return}if(!confirm(`"${c.firma||"diesen Kontakt"}" wirklich als "Kein Interesse" markieren?`))return;const date=document.getElementById("noteDate").value||todayStr(),time=document.getElementById("noteTime").value||"",noteText=document.getElementById("activityText").value.trim()||document.getElementById("appointmentText").value.trim(),text=noteText||"Kein Interesse vermerkt.";contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const notes_history=Array.isArray(x.notes_history)?[...x.notes_history]:[];notes_history.push({date,time,type:"Kein Interesse",text,appointment_date:"",appointment_time:"",auto_status:"Kein Interesse",auto_naechsterkontakt:"",auto_naechsterkontakt_zeit:"",auto_kontaktart:"Kein Interesse"});return{...x,status:"Kein Interesse",kundenstatus:"Kein Interesse",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"Kein Interesse",notes_history}});resetNoteInputs();fillForm();renderList();await autosaveSelectedToSupabase()}
-async function markDocumentsSent(){const c=getSelected();if(!c){alert("Bitte zuerst einen Kontakt auswählen.");return}const date=document.getElementById("noteDate").value||todayStr(),time=document.getElementById("noteTime").value||"";let appointmentDate=document.getElementById("appointmentDate").value||"",appointmentTime=document.getElementById("appointmentTime").value||"",appointmentType=document.getElementById("appointmentType").value||"";const activityText=document.getElementById("activityText").value.trim(),appointmentText=document.getElementById("appointmentText").value.trim();if(!appointmentDate){appointmentDate=addDays(date,14);appointmentType="📞 Anruf"}const text=`Aktivität: ${activityText||"Unterlagen wurden versendet."}\nTermin/Rückruf: Art: Nachfassen Unterlagen • Datum: ${formatDateDisplay(appointmentDate)}${appointmentTime?" • Zeit: "+appointmentTime:""}${appointmentText?" • Notiz: "+appointmentText:" • Automatische Wiedervorlage 14 Tage nach Versand der Unterlagen."}`;contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const notes_history=Array.isArray(x.notes_history)?[...x.notes_history]:[];notes_history.push({date,time,type:"📄 Unterlagen gesendet",text,appointment_date:appointmentDate,appointment_time:appointmentTime,appointment_type:"Nachfassen Unterlagen",auto_status:"Unterlagen versendet",auto_naechsterkontakt:appointmentDate,auto_naechsterkontakt_zeit:appointmentTime,auto_kontaktart:"Nachfassen Unterlagen"});return{...x,status:"Unterlagen versendet",naechsterkontakt:appointmentDate,naechsterkontakt_zeit:appointmentTime,kontaktart:"Nachfassen Unterlagen",notes_history}});resetNoteInputs();fillForm();renderList();await autosaveSelectedToSupabase()}
-async function addNoteEntry(){const c=getSelected();if(!c){alert("Bitte zuerst einen Kontakt auswählen.");return}const date=document.getElementById("noteDate").value||todayStr(),time=document.getElementById("noteTime").value||"",type=document.getElementById("noteType").value||"Sonstiges",appointmentDate=document.getElementById("appointmentDate").value||"",appointmentTime=document.getElementById("appointmentTime").value||"",appointmentType=document.getElementById("appointmentType").value||"",activityText=document.getElementById("activityText").value.trim(),appointmentText=document.getElementById("appointmentText").value.trim();const parts=[];if(activityText)parts.push("Aktivität: "+activityText);if(appointmentDate||appointmentTime||appointmentType||appointmentText){parts.push("Termin/Rückruf: "+[appointmentType?"Art: "+appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,""):"",appointmentDate?"Datum: "+formatDateDisplay(appointmentDate):"",appointmentTime?"Zeit: "+appointmentTime:"",appointmentText?"Notiz: "+appointmentText:""].filter(Boolean).join(" • "))}const text=parts.join("\n");if(!text){alert("Bitte eine Aktivitätsnotiz oder Termininformation eingeben.");return}applyTimelineLogic(type,date,time,appointmentDate,appointmentTime,appointmentType);const currentStatus=document.getElementById("status").value,currentNextDate=document.getElementById("naechsterkontakt").value,currentNextTime=document.getElementById("naechsterkontakt_zeit").value,currentKontaktart=document.getElementById("kontaktart").value,currentErstkontakt=document.getElementById("erstkontakt").value;contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const notes_history=Array.isArray(x.notes_history)?[...x.notes_history]:[];notes_history.push({date,time,type,text,appointment_date:appointmentDate,appointment_time:appointmentTime,appointment_type:appointmentType,auto_status:currentStatus,auto_naechsterkontakt:currentNextDate,auto_naechsterkontakt_zeit:currentNextTime,auto_kontaktart:currentKontaktart});return{...x,status:currentStatus,erstkontakt:currentErstkontakt,naechsterkontakt:currentNextDate,naechsterkontakt_zeit:currentNextTime,kontaktart:currentKontaktart,notes_history}});resetNoteInputs();fillForm();renderList();await autosaveSelectedToSupabase()}
-async function removeNoteEntry(index){const c=getSelected();if(!c)return;contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const notes_history=[...(x.notes_history||[])];notes_history.splice(index,1);return{...x,notes_history}});fillForm();renderList();await autosaveSelectedToSupabase()}
-async function cancelAppointmentFromNote(index){const c=getSelected();if(!c)return;const notes=Array.isArray(c.notes_history)?[...c.notes_history]:[],note=notes[index];if(!note)return;if(!confirm("Diesen Termin wirklich als abgesagt markieren?"))return;notes[index]={...note,type:"Termin abgesagt",text:(note.text||"")+"\n\nTermin wurde abgesagt.",auto_status:"Termin abgesagt",auto_naechsterkontakt:"",auto_naechsterkontakt_zeit:"",auto_kontaktart:"Termin abgesagt"};contacts=contacts.map(x=>x.id!==selectedId?x:{...x,status:"Termin abgesagt",naechsterkontakt:x.naechsterkontakt===note.appointment_date?"":x.naechsterkontakt,naechsterkontakt_zeit:x.naechsterkontakt===note.appointment_date?"":x.naechsterkontakt_zeit,kontaktart:x.naechsterkontakt===note.appointment_date?"Termin abgesagt":x.kontaktart,notes_history:notes});fillForm();renderList();await autosaveSelectedToSupabase()}
-function newContact(){const newId=Date.now().toString();contacts.unshift({id:newId,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Lead",leadquelle:"Telefonakquise",bundesland:"Oberösterreich",bezirk:"",telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Sonstiges",erstkontakt:"",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"",weclapp:"Nein",potenzial:"mittel",chancenbewertung:"",website:"",kategorie:"",mp_score:"",notes_history:[],attachments:[],weitere_kontakte:[],archived:false});selectedId=newId;fillForm();renderList();scheduleAutosave()}async function deleteCurrent(){if(selectedId===null){alert("Kein Kontakt ausgewählt.");return}await deleteSingle(selectedId)}function duplicateContact(){const c=getSelected();if(!c){alert("Bitte zuerst einen Kontakt auswählen.");return}const copy=JSON.parse(JSON.stringify(c));copy.id=Date.now().toString();copy.firma=(copy.firma||"")+" Kopie";copy.attachments=[];contacts.unshift(copy);selectedId=copy.id;fillForm();renderList();scheduleAutosave()}
-function buildBackupPayload(){syncFormToSelected();return{app:"Mini CRM Vertrieb v3",version:3,exportedAt:new Date().toISOString(),contactCount:contacts.length,selectedId,contacts}}function exportJSONBackup(){const payload=buildBackupPayload();downloadJSON(`mini_crm_v3_backup_${new Date().toISOString().replace(/[:.]/g,"-")}.json`,payload);setSaveState("JSON Backup exportiert")}function importJSONBackupFile(file){if(!file)return;const reader=new FileReader();reader.onload=function(evt){try{const parsed=JSON.parse(evt.target.result);if(!parsed||!Array.isArray(parsed.contacts))throw new Error("Ungültige Backup-Datei");contacts=sanitizeContacts(parsed.contacts);selectedId=contacts.find(c=>c.id===parsed.selectedId)?.id||(contacts.length?contacts[0].id:null);fillForm();renderList();persistLocalBackup();alert("Backup erfolgreich geladen. Bitte anschließend 'Alles in Supabase speichern' drücken.")}catch(e){alert("JSON-Backup konnte nicht geladen werden.")}};reader.readAsText(file,"UTF-8")}
-function csvEscape(v){return`"${String(v??"").replace(/"/g,'""')}"`}function exportCSV(){syncFormToSelected();const headers=["Firma","Nachname","Vorname","Rolle","Kundentyp","Kundenstatus","Leadquelle","Bundesland","Bezirk","Telefon","Mobil","E-Mail","Website","Kategorie","MP Score","Straße","PLZ","Ort","Status","Erstkontakt","Nächster Kontakt","Uhrzeit","Art nächster Kontakt","In weclapp übernommen","Potenzial","Chancenbewertung","Anzahl Aktivitäten","Anzahl Anhänge"];const rows=contacts.map(c=>[c.firma,c.nachname,c.vorname,c.rolle,c.kundentyp,c.kundenstatus,c.leadquelle,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.website,c.kategorie,c.mp_score,c.strasse,c.plz,c.ort,c.status,c.erstkontakt,c.naechsterkontakt,c.naechsterkontakt_zeit,c.kontaktart,c.weclapp,c.potenzial,c.chancenbewertung,(c.notes_history||[]).length,(c.attachments||[]).length]);downloadCSV("mini_crm_v3_export.csv",[headers,...rows])}function exportLeadsCSV(){syncFormToSelected();const headers=["Firma","Ansprechpartner","Telefon","Mobil","E-Mail","Website","Ort","Bundesland","Leadquelle","Kundenstatus","MP Score"];const rows=contacts.filter(c=>c.kundenstatus==="Lead"&&!c.archived).map(c=>[c.firma,safeJoin([c.vorname,c.nachname]),c.telefon,c.mobil,c.email,c.website,c.ort,c.bundesland,c.leadquelle,c.kundenstatus,c.mp_score]);downloadCSV("mini_crm_v3_leads_export.csv",[headers,...rows])}function downloadCSV(filename,rows){const csv=rows.map(r=>r.map(csvEscape).join(";")).join("\n");const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url)}function downloadJSON(filename,payload){const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url)}
-document.getElementById("fileInput").addEventListener("change",function(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(evt){const text=evt.target.result;const lines=text.split(/\r?\n/).filter(l=>l.trim()!=="");if(lines.length<2){alert("CSV enthält keine Daten.");return}const headers=parseCsvLine(lines[0]).map(normalizeHeader);function idx(names){for(const n of names){const i=headers.indexOf(n);if(i>=0)return i}return-1}const col={firma:idx(["firma","name"]),nachname:idx(["nachname"]),vorname:idx(["vorname"]),rolle:idx(["rolle","position"]),kundentyp:idx(["kundentyp","typ"]),kundenstatus:idx(["kundenstatus"]),leadquelle:idx(["leadquelle","lead quelle"]),bundesland:idx(["bundesland"]),bezirk:idx(["bezirk"]),telefon:idx(["telefon"]),mobil:idx(["mobil","handy"]),email:idx(["e-mail","email","mail"]),website:idx(["website","webseite","url"]),kategorie:idx(["kategorie","category","beschreibung","notizen","notiz"]),mp_score:idx(["mp score","mpscore","score"]),strasse:idx(["strasse","straße"]),plz:idx(["plz","postleitzahl"]),ort:idx(["ort"]),status:idx(["status"]),erstkontakt:idx(["erstkontakt"]),naechsterkontakt:idx(["naechster kontakt","nächster kontakt","naechsterkontakt","nächsterkontakt"]),zeit:idx(["uhrzeit","zeit"]),kontaktart:idx(["art nächster kontakt","art naechster kontakt","kontaktart"]),weclapp:idx(["in weclapp uebernommen","in weclapp übernommen","weclapp"]),potenzial:idx(["potenzial"]),chancenbewertung:idx(["chancenbewertung","chance","chancen bewertung"])};contacts=[];for(let i=1;i<lines.length;i++){const row=parseCsvLine(lines[i]);let kategorie=col.kategorie>=0?(row[col.kategorie]||""):"";let website=col.website>=0?(row[col.website]||""):extractWebsite(kategorie);let mp=col.mp_score>=0?(row[col.mp_score]||""):extractMpScore(kategorie);if(website||mp)kategorie=cleanKategorie(kategorie);contacts.push({id:String(Date.now()+i),firma:col.firma>=0?(row[col.firma]||""):"",nachname:col.nachname>=0?(row[col.nachname]||""):"",vorname:col.vorname>=0?(row[col.vorname]||""):"",rolle:col.rolle>=0?(row[col.rolle]||""):"",kundentyp:col.kundentyp>=0?(row[col.kundentyp]||"Fachpartner"):"Fachpartner",kundenstatus:col.kundenstatus>=0?(row[col.kundenstatus]||"Lead"):"Lead",leadquelle:col.leadquelle>=0?(row[col.leadquelle]||"MP Liste"):"MP Liste",bundesland:col.bundesland>=0?(row[col.bundesland]||"Oberösterreich"):"Oberösterreich",bezirk:col.bezirk>=0?(row[col.bezirk]||""):"",telefon:col.telefon>=0?(row[col.telefon]||""):"",mobil:col.mobil>=0?(row[col.mobil]||""):"",email:col.email>=0?(row[col.email]||""):"",website,kategorie,mp_score:mp,strasse:col.strasse>=0?(row[col.strasse]||""):"",plz:col.plz>=0?(row[col.plz]||""):"",ort:col.ort>=0?(row[col.ort]||""):"",status:col.status>=0?(row[col.status]||"Sonstiges"):"Sonstiges",erstkontakt:col.erstkontakt>=0?(row[col.erstkontakt]||""):"",naechsterkontakt:col.naechsterkontakt>=0?(row[col.naechsterkontakt]||""):"",naechsterkontakt_zeit:col.zeit>=0?(row[col.zeit]||""):"",kontaktart:col.kontaktart>=0?(row[col.kontaktart]||""):"",weclapp:col.weclapp>=0?(row[col.weclapp]||"Nein"):"Nein",potenzial:col.potenzial>=0?(row[col.potenzial]||"mittel"):"mittel",chancenbewertung:col.chancenbewertung>=0?(row[col.chancenbewertung]||""):"",notes_history:[],attachments:[],weitere_kontakte:[],archived:false})}contacts=sanitizeContacts(contacts);selectedId=contacts.length?contacts[0].id:null;fillForm();renderList();persistLocalBackup();alert("Import abgeschlossen: "+contacts.length+" Kontakte geladen. Bitte 'Alles in Supabase speichern' drücken.");document.getElementById("fileInput").value=""};reader.readAsText(file,"UTF-8")});
-FORM_IDS.forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener("input",scheduleAutosave);el.addEventListener("change",scheduleAutosave)});document.getElementById("jsonFileInput").addEventListener("change",function(e){importJSONBackupFile(e.target.files[0]);e.target.value=""});
-function renderAttachments(){const c=getSelected(),list=document.getElementById("attachmentList");if(!c||!(c.attachments||[]).length){list.innerHTML='<div class="empty">Noch keine Anhänge für diesen Kunden.</div>';return}list.innerHTML=c.attachments.map((a,i)=>`<div class="attachment-item"><div><div class="attachment-name">${esc(a.filename||a.name||"Datei")}</div><div class="attachment-sub">${esc(a.filetype||a.type||"Datei")} • ${esc(humanSize(a.filesize||a.size||0))}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button onclick="openAttachment(${i});event.stopPropagation();">Öffnen</button><button class="delete" onclick="removeAttachment(${i});event.stopPropagation();">Löschen</button></div></div>`).join("")}
-async function ensureSelectedHasSupabaseId(){syncFormToSelected();let c=getSelected();if(!c)throw new Error("Kein Kontakt ausgewählt");if(!isUuid(c.id)){setSaveState("Speichere Kontakt zuerst...");await saveOneContactToSupabase(c);c=getSelected();fillForm();renderList()}return c.id}
-async function addAttachmentsToCurrent(files){const c=getSelected();if(!c){alert("Bitte zuerst einen Kontakt auswählen.");return}if(!files||!files.length)return;try{const firmaId=await ensureSelectedHasSupabaseId();for(const file of Array.from(files)){setSaveState("Lade Datei hoch: "+file.name);const safeName=file.name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9.\-_]/g,"_").replace(/_+/g,"_");const filePath=firmaId+"/"+Date.now()+"_"+safeName;const{error:uploadError}=await supabaseClient.storage.from("crm-attachments").upload(filePath,file,{upsert:false});if(uploadError)throw uploadError;const{error:dbError}=await supabaseClient.from("crm_anhaenge").insert({firma_id:firmaId,filename:file.name,filepath:filePath,filetype:file.type||"Datei",filesize:file.size||0});if(dbError)throw dbError}await loadAttachmentsForCurrent();setSaveState("Datei(en) in Supabase gespeichert")}catch(e){console.error(e);setSaveState("Upload fehlgeschlagen",true);alert("Fehler beim Upload: "+(e.message||""))}}function handleAttachmentInput(event){addAttachmentsToCurrent(event.target.files);event.target.value=""}
-async function loadAttachmentsForCurrent(){const c=getSelected();if(!c||!isUuid(c.id))return;const{data,error}=await supabaseClient.from("crm_anhaenge").select("*").eq("firma_id",c.id).order("created_at",{ascending:false});if(error){console.error(error);return}contacts=contacts.map(x=>x.id===c.id?{...x,attachments:data||[]}:x);renderAttachments();updateCustomerSummary();persistLocalBackup()}async function openAttachment(index){const c=getSelected();if(!c)return;const a=(c.attachments||[])[index];if(!a)return;if(a.data){const link=document.createElement("a");link.href=a.data;link.download=a.name||"anhang";link.click();return}const{data,error}=await supabaseClient.storage.from("crm-attachments").createSignedUrl(a.filepath,60);if(error){console.error(error);alert("Datei konnte nicht geöffnet werden.");return}window.open(data.signedUrl,"_blank")}async function removeAttachment(index){const c=getSelected();if(!c)return;const a=(c.attachments||[])[index];if(!a)return;if(!confirm("Anhang wirklich löschen?"))return;try{if(a.filepath){await supabaseClient.storage.from("crm-attachments").remove([a.filepath]);const{error}=await supabaseClient.from("crm_anhaenge").delete().eq("id",a.id);if(error)throw error;await loadAttachmentsForCurrent()}else{contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const attachments=[...(x.attachments||[])];attachments.splice(index,1);return{...x,attachments}});renderAttachments();updateCustomerSummary()}setSaveState("Anhang gelöscht")}catch(e){console.error(e);alert("Anhang konnte nicht gelöscht werden: "+(e.message||""))}}
-const dropzone=document.getElementById("dropzone");dropzone.addEventListener("dragover",e=>{e.preventDefault();dropzone.classList.add("dragover")});dropzone.addEventListener("dragleave",()=>dropzone.classList.remove("dragover"));dropzone.addEventListener("drop",e=>{e.preventDefault();dropzone.classList.remove("dragover");if(e.dataTransfer?.files?.length)addAttachmentsToCurrent(e.dataTransfer.files)});
-function createDeletionBackup(scopeLabel,ids){const idSet=new Set(ids||[]),backupContacts=contacts.filter(c=>idSet.has(c.id));downloadJSON(`mini_crm_loeschbackup_${scopeLabel}_${new Date().toISOString().replace(/[:.]/g,"-")}.json`,{app:"Mini CRM Vertrieb v3",version:3,type:"deletion-backup",scope:scopeLabel,exportedAt:new Date().toISOString(),contactCount:backupContacts.length,contacts:backupContacts})}function toggleSelectContact(id){selectedIds.has(id)?selectedIds.delete(id):selectedIds.add(id);renderList()}function toggleSelectAllVisible(){const visibleIds=filteredContacts().map(c=>c.id),allSelected=visibleIds.length&&visibleIds.every(id=>selectedIds.has(id));visibleIds.forEach(id=>allSelected?selectedIds.delete(id):selectedIds.add(id));renderList()}
-async function deleteSingle(id){const item=contacts.find(c=>c.id===id);if(!item)return;createDeletionBackup("einzeln",[id]);if(!confirm(`Kontakt "${item.firma||id}" wirklich löschen?`))return;try{if(isUuid(id)){const{error}=await supabaseClient.from("crm_firmen").delete().eq("id",id);if(error)throw error}contacts=contacts.filter(c=>c.id!==id);selectedIds.delete(id);if(selectedId===id)selectedId=contacts.length?contacts[0].id:null;fillForm();renderList();persistLocalBackup();setSaveState("Kontakt gelöscht")}catch(e){console.error(e);alert("Löschen fehlgeschlagen: "+(e.message||""))}}async function archiveSelected(){const ids=Array.from(selectedIds);if(!ids.length){alert("Bitte zuerst Kontakte markieren.");return}for(const id of ids){contacts=contacts.map(c=>c.id===id?{...c,archived:true}:c);const c=contacts.find(x=>x.id===id);if(c)await saveOneContactToSupabase(c)}selectedIds.clear();fillForm();renderList();alert(ids.length+" Kontakte archiviert.")}async function deleteSelected(){const ids=Array.from(selectedIds);if(!ids.length){alert("Bitte zuerst Kontakte markieren.");return}createDeletionBackup("auswahl",ids);if(!confirm(ids.length+" markierte Kontakte wirklich löschen?"))return;for(const id of ids){if(isUuid(id)){const{error}=await supabaseClient.from("crm_firmen").delete().eq("id",id);if(error)console.error(error)}}contacts=contacts.filter(c=>!selectedIds.has(c.id));if(selectedId!==null&&!contacts.find(c=>c.id===selectedId))selectedId=contacts.length?contacts[0].id:null;selectedIds.clear();fillForm();renderList();persistLocalBackup();alert("Ausgewählte Kontakte wurden gelöscht.")}function showArchivedOnly(){document.getElementById("statusFilter").value="Archiviert";dueFilterActive=false;renderList()}function hideArchivedFilter(){document.getElementById("statusFilter").value="Alle";dueFilterActive=false;renderList()}
-function getISOWeekNumber(date){const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));const dayNum=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dayNum);const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil((((d-yearStart)/86400000)+1)/7)}function getISOWeekYear(date){const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));const dayNum=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dayNum);return d.getUTCFullYear()}function isDateInCurrentWeek(dateStr){if(!dateStr)return false;const date=new Date(dateStr+"T12:00:00");if(isNaN(date.getTime()))return false;const today=new Date();return getISOWeekNumber(date)===getISOWeekNumber(today)&&getISOWeekYear(date)===getISOWeekYear(today)}function getLatestNoteText(contact){const notes=Array.isArray(contact.notes_history)?contact.notes_history:[];if(!notes.length)return"";const latest=[...notes].sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0]||{};return[latest.type||"",latest.text||""].filter(Boolean).join(": ")}function buildDailyReportContacts(){const today=todayStr();return contacts.filter(c=>!isInWeclapp(c)&&((hasFutureNextContact(c)&&c.naechsterkontakt===today)||(c.notes_history||[]).some(n=>(n.date||"")===today)))}function generateDailyReport(){const today=todayStr(),reportContacts=buildDailyReportContacts();if(!reportContacts.length){alert("Für heute wurden keine Kontakte gefunden.");return}const rows=reportContacts.map(c=>`<tr><td>${esc(c.firma||"-")}</td><td>${esc(safeJoin([c.plz,c.ort]))}</td><td>${esc(safeJoin([c.vorname,c.nachname]))}</td><td>${esc(c.kundenstatus||"-")}</td><td>${esc(getVisibleStatus(c)||"-")}</td><td>${hasFutureNextContact(c)?esc(formatDateDisplay(c.naechsterkontakt||""))+" "+esc(c.naechsterkontakt_zeit||""):"-"}</td><td>${esc(getLatestNoteText(c)||"-")}</td></tr>`).join("");openReport(`Tagesbericht Vertrieb ${today}`,`<h1>Tagesbericht Vertrieb</h1><p><strong>Datum:</strong> ${esc(today)} · <strong>Anzahl Kontakte:</strong> ${reportContacts.length}</p><table><thead><tr><th>Kunde</th><th>Ort</th><th>Ansprechpartner</th><th>Kundenstatus</th><th>Status</th><th>Nächster Kontakt</th><th>Letzte Notiz</th></tr></thead><tbody>${rows}</tbody></table>`)}function buildWeeklyReportContacts(){return contacts.filter(c=>{const notes=Array.isArray(c.notes_history)?c.notes_history:[];return notes.some(n=>isDateInCurrentWeek(n.date)||isDateInCurrentWeek(n.appointment_date))||(!isInWeclapp(c)&&isDateInCurrentWeek(c.naechsterkontakt))})}function generateWeeklyReport(){const today=new Date(),kw=getISOWeekNumber(today),reportContacts=buildWeeklyReportContacts();if(!reportContacts.length){alert("Für diese Woche wurden keine Kontakte gefunden.");return}const rows=reportContacts.map(c=>`<tr><td>${esc(c.firma||"-")}</td><td>${esc(safeJoin([c.plz,c.ort]))}</td><td>${esc(safeJoin([c.vorname,c.nachname]))}</td><td>${esc(c.kundenstatus||"-")}</td><td>${esc(getVisibleStatus(c)||c.status||"-")}</td><td>${isInWeclapp(c)?"Ja":"Nein"}</td><td>${hasFutureNextContact(c)?esc(formatDateDisplay(c.naechsterkontakt||""))+" "+esc(c.naechsterkontakt_zeit||""):"-"}</td><td>${esc(getLatestNoteText(c)||"-")}</td></tr>`).join("");openReport(`Wochenbericht KW ${kw}`,`<h1>Wochenbericht KW ${kw} Hochreiter Günther</h1><p><strong>Datum:</strong> ${today.toLocaleDateString("de-AT")} · <strong>Anzahl Kontakte:</strong> ${reportContacts.length}</p><table><thead><tr><th>Kunde</th><th>Ort</th><th>Ansprechpartner</th><th>Kundenstatus</th><th>Status</th><th>In weclapp</th><th>Termin</th><th>Letzte Notiz</th></tr></thead><tbody>${rows}</tbody></table>`)}function openReport(title,body){const html=`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>${esc(title)}</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Arial;margin:12px;color:#111827}h1{margin:0 0 8px 0;font-size:20px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #cfd8e3;padding:5px;text-align:left;font-size:10px;vertical-align:top;word-wrap:break-word}th{background:#eef2f6}button{background:#5f7897;color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;font-weight:700;margin-bottom:10px}@media print{button{display:none}body{margin:0}}</style></head><body><button onclick="window.print()">Drucken / als PDF speichern</button>${body}</body></html>`;const win=window.open("","_blank");if(!win){alert("Popup wurde blockiert.");return}win.document.open();win.document.write(html);win.document.close()}
-function getTodayDueContacts(){return contacts.filter(c=>hasFutureNextContact(c)&&c.naechsterkontakt===todayStr())}function showDueTodayBanner(){const banner=document.getElementById("dueBanner");if(!banner)return;const due=getTodayDueContacts();if(!due.length){banner.className="due-banner";banner.innerHTML="";return}banner.innerHTML=`<strong>Heute fällige Kontakte: ${due.length}</strong><ul>${due.slice(0,8).map(c=>`<li><strong>${esc(c.firma||"-")}</strong>${c.kontaktart?" ("+esc(c.kontaktart)+")":""}</li>`).join("")}</ul><button onclick="filterDueToday()">Heute fällige anzeigen</button> <button onclick="document.getElementById('dueBanner').className='due-banner'">Hinweis schließen</button>`;banner.className="due-banner show"}function filterDueToday(){document.getElementById("search").value="";document.getElementById("statusFilter").value="Alle";document.getElementById("kundentypFilter").value="Alle";document.getElementById("leadquelleFilter").value="Alle";document.getElementById("regionFilter").value="";document.getElementById("showRecent").checked=true;dueFilterActive=true;renderList()}
-async function clearAllData(){if(!contacts.length){alert("Keine Kontakte vorhanden.");return}createDeletionBackup("alle",contacts.map(c=>c.id));if(!confirm("ACHTUNG: Wirklich alle Kontakte löschen?"))return;try{const uuidIds=contacts.map(c=>c.id).filter(isUuid);if(uuidIds.length){const{error}=await supabaseClient.from("crm_firmen").delete().in("id",uuidIds);if(error)throw error}contacts=[];selectedIds.clear();selectedId=null;fillForm();renderList();persistLocalBackup();setSaveState("Alle Kontakte gelöscht");alert("Alle Kontakte wurden gelöscht.")}catch(e){console.error(e);alert("Komplettes Löschen in Supabase fehlgeschlagen: "+(e.message||""))}}
-async function initApp(){try{setSaveState("Lade Daten aus Supabase ...");await loadAllFromSupabase()}catch(e){console.warn("Supabase nicht erreichbar – lade lokale Sicherung",e);try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");contacts=sanitizeContacts(saved.contacts||[]);selectedId=contacts.length?contacts[0].id:null;fillForm();renderList();showDueTodayBanner();setSaveState("Lokale Sicherung geladen",true)}catch(_){contacts=[];selectedId=null;fillForm();renderList();setSaveState("Keine Daten vorhanden",true)}}}
-initApp();
+
+/* -------------------------------------------------------
+   RENDER LISTE
+--------------------------------------------------------- */
+function renderList() {
+  const box = document.getElementById("contactList");
+  box.innerHTML = contacts
+    .map(c => `
+      <div class="contact-item ${activeContact?.id === c.id ? "active" : ""}" onclick="selectContact('${c.id}')">
+        <strong>${c.firma || "(ohne Firma)"}</strong><br>
+        <span style="font-size:13px;color:#64748b;">${c.ort || ""}</span>
+      </div>
+    `).join("");
+}
+
+/* -------------------------------------------------------
+   KONTAKT AUSWÄHLEN
+--------------------------------------------------------- */
+window.selectContact = function(id) {
+  activeContact = contacts.find(c => c.id === id);
+  renderContactView();
+};
+
+/* -------------------------------------------------------
+   RENDER KONTAKTDETAILS
+--------------------------------------------------------- */
+async function renderContactView() {
+  if (!activeContact) return;
+
+  const html = `
+    <div class="card">
+      <h2>${activeContact.firma}</h2>
+      <div>${activeContact.name || ""}</div>
+      <div>${activeContact.telefon || ""}</div>
+      <div>${activeContact.email || ""}</div>
+      <div style="margin-top:10px;color:#64748b;">
+        Status: ${activeContact.status || "-"}
+      </div>
+    </div>
+
+    <h3>Aktivitäten</h3>
+    <div id="timeline"></div>
+
+    <textarea id="activityInput" placeholder="Neue Aktivität eingeben..."></textarea>
+    <button class="btn btn-primary" style="margin-top:10px;" onclick="addActivity()">Eintragen</button>
+  `;
+
+  document.getElementById("contactView").innerHTML = html;
+
+  const { data: activities } = await db.from("activities")
+    .select("*")
+    .eq("contact_id", activeContact.id)
+    .order("created_at", { ascending: false });
+
+  const tl = document.getElementById("timeline");
+  tl.innerHTML = activities
+    .map(a => `<div class="timeline-item">${a.text}</div>`)
+    .join("");
+
+  // KI-Zusammenfassung mitladen
+  updateAISummary();
+}
+
+/* -------------------------------------------------------
+   NEUE AKTIVITÄT (mit KI)
+--------------------------------------------------------- */
+window.addActivity = async function() {
+  const text = document.getElementById("activityInput").value.trim();
+  if (!text) return;
+
+  const ai = await aiAnalyzeActivity(text);
+
+  await db.from("activities").insert({
+    contact_id: activeContact.id,
+    text: text,
+    ai_summary: ai?.summary || "",
+    ai_next_step: ai?.next_step || "",
+    ai_followup: ai?.followup_date || "",
+    ai_status: ai?.status || ""
+  });
+
+  // ggf. Status aktualisieren
+  if (ai && ai.status) {
+    await db.from("contacts").update({ status: ai.status }).eq("id", activeContact.id);
+  }
+
+  document.getElementById("activityInput").value = "";
+
+  loadContacts();
+  renderContactView();
+};
+
+/* -------------------------------------------------------
+   KI PANEL UPDATEN
+--------------------------------------------------------- */
+async function updateAISummary() {
+  if (!activeContact) return;
+
+  const prompt = `
+Fasse den Kontakt kurz zusammen:
+
+Firma: ${activeContact.firma}
+Letzte Aktivitäten: kurz in 1-2 Sätzen, priorisiert für Vertrieb.
+`;
+
+  const r = await fetch("[api.openai.com](https://api.openai.com/v1/chat/completions)", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + OPENAI_API_KEY },
+    body: JSON.stringify({
+      model: "gpt-4.1-mini",
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  const data = await r.json();
+  const summary = data.choices?.[0]?.message?.content || "Keine Daten.";
+
+  document.getElementById("aiSummary").innerText = summary;
+}
+
+/* -------------------------------------------------------
+   SUCHE
+--------------------------------------------------------- */
+window.filterContacts = function() {
+  const s = document.getElementById("search").value.toLowerCase();
+  const filtered = contacts.filter(c =>
+    (c.firma || "").toLowerCase().includes(s) ||
+    (c.ort || "").toLowerCase().includes(s)
+  );
+  const box = document.getElementById("contactList");
+  box.innerHTML = filtered
+    .map(c => `
+      <div class="contact-item" onclick="selectContact('${c.id}')">
+        <strong>${c.firma}</strong><br>
+        <span style="font-size:13px;color:#64748b;">${c.ort}</span>
+      </div>
+    `).join("");
+};
+
+/* INITIAL LOAD */
+loadContacts();
+
 </script>
 </body>
 </html>
