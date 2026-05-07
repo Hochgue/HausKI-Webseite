@@ -155,6 +155,7 @@ button.light{background:#e2e8f0;color:#1e293b}
   color:#94a3b8;
   margin-top:4px;
 }
+/* ===================================================== BLOCK 3 – KONTAKTLISTE ===================================================== */ #contactList{ margin-top:14px; } .contact-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; } .contact-bottom{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; } .contact-item.active{ background:rgba(96,165,250,.18); border:1px solid rgba(96,165,250,.45); } .status-badge{ padding:5px 9px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; } .status-badge.orange{ background:#ffedd5; color:#9a3412; } .status-badge.red{ background:#fee2e2; color:#991b1b; } .status-badge.blue{ background:#dbeafe; color:#1e3a8a; } .status-badge.green{ background:#dcfce7; color:#166534; } .chance-badge{ padding:4px 8px; border-radius:999px; font-size:11px; font-weight:700; } .chance-badge.high{ background:#dcfce7; color:#166534; } .chance-badge.medium{ background:#fef9c3; color:#854d0e; } .chance-badge.low{ background:#fee2e2; color:#991b1b; } .last-contact{ font-size:11px; color:#94a3b8; }
 
 .grid3{
   display:grid;
@@ -257,10 +258,8 @@ button.light{background:#e2e8f0;color:#1e293b}
 
     <h1>CRM v4</h1>
 
-    <div class="sidebar-section">
-      <div class="sidebar-title">Suche</div>
-      <input type="text" placeholder="Firma, Ort, Ansprechpartner...">
-    </div>
+    
+      <!-- ===================================================== BLOCK 3 – PROFESSIONELLE KONTAKTLISTE ===================================================== --> <div class="sidebar-section"> <div class="sidebar-title"> Kontakte </div> <!-- SUCHFELD --> <input type="text" id="searchInput" placeholder="Firma, Ort, Ansprechpartner..." > <!-- FILTER --> <select id="statusFilter"> <option> Alle Kontakte </option> <option> Termin vereinbart </option> <option> Unterlagen versendet </option> <option> Nachfassen </option> <option> Kein Interesse </option> <option> In weclapp </option> </select> <!-- KONTAKTLISTE --> <div id="contactList"> <div class="contact-item active"> <div class="contact-top"> <div class="contact-name"> Musterkunde GmbH </div> <div class="status-badge orange"> Termin </div> </div> <div class="contact-meta"> Linz · Fachpartner </div> <div class="contact-meta"> Max Mustermann </div> <div class="contact-bottom"> <div class="chance-badge high"> Hoch </div> <div class="last-contact"> vor 2 Tagen </div> </div> </div> </div> </div>
 
     <div class="sidebar-section">
       <div class="sidebar-title">Kontakte</div>
