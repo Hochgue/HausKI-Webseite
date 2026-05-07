@@ -26,11 +26,37 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-wei
 .toolbar{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .9fr auto auto auto;gap:10px;align-items:end;margin-bottom:12px}.toggle-row{display:flex;align-items:center;gap:8px;margin-top:8px}.toggle-row input{width:auto}
 .badge{display:inline-block;padding:7px 11px;border-radius:999px;font-weight:900;font-size:12px;color:#111827}.badge-blue{background:#bfdbfe;color:#1e3a8a;border:1px solid #93c5fd}.badge-yellow{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}.badge-green{background:#dcfce7;color:#166534;border:1px solid #86efac}.badge-red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}.badge-gray{background:#e2e8f0;color:#475569;border:1px solid #cbd5e1}.badge-violet{background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd}.badge-orange{background:#ffedd5;color:#9a3412;border:1px solid #fdba74}
 .empty{padding:14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);background:#fafcff}.hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}.mini-box{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
-.contact-list{display:flex;flex-direction:column;gap:10px}.contact-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:white;cursor:pointer;transition:.15s ease}.contact-item:hover{background:#f8fbff;transform:translateY(-1px)}.contact-item.active{border-color:#93c5fd;background:#eff6ff}.contact-item-top{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:12px}.contact-select{width:auto;margin:0}.contact-row{display:grid;grid-template-columns:minmax(220px,2fr) minmax(110px,.8fr) minmax(100px,.7fr) minmax(170px,1.1fr) minmax(110px,.7fr);gap:10px;align-items:center}.contact-row>div,.meta{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.meta{font-size:12px;color:var(--muted);margin-top:3px}
+.contact-list{display:flex;flex-direction:column;gap:10px}.contact-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:white;cursor:pointer;transition:.15s ease}.contact-item:hover{background:#f8fbff;transform:translateY(-1px)}.contact-item.active{border-color:#93c5fd;background:#eff6ff}.contact-item-top{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:12px}.contact-select{width:auto;margin:0}contact-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  margin-top:10px;
+}
+
+.contact-row > div{
+  background:#f8fafc;
+  border:1px solid #dbe4ee;
+  border-radius:12px;
+  padding:10px;
+  min-width:0;
+}
+
+.contact-row > div div:first-child{
+  font-weight:800;
+  margin-bottom:4px;
+}
+
+.meta{
+  font-size:12px;
+  color:var(--muted);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}.meta{font-size:12px;color:var(--muted);margin-top:3px}
 a{color:#2563eb;font-weight:800;text-decoration:none}a:hover{text-decoration:underline}.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-card{background:white;border:1px solid var(--line);border-radius:12px;padding:14px}.summary-card strong{display:block;margin-bottom:4px}.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.note-entry{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fbfcfd;margin-top:8px}.note-entry-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px}.note-entry-date{font-weight:900;color:#334155}.note-entry-meta{font-size:12px;color:var(--muted)}.note-entry-text{white-space:pre-wrap;line-height:1.4}
 .dropzone{border:2px dashed #a8b6c6;border-radius:12px;padding:16px;background:#f8fbff;text-align:center;color:#455468}.dropzone.dragover{border-color:#5f7897;background:#edf4fb}.dropzone input[type=file]{display:none}.attachment-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}.attachment-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fbfcfd}.attachment-name{font-weight:900;word-break:break-all}.attachment-sub{font-size:12px;color:var(--muted);margin-top:2px}
 .activity-box{border:1px solid var(--line);border-radius:12px;background:#fbfcfd;padding:12px;margin-bottom:12px}.activity-title{font-size:15px;font-weight:900;color:#334155;margin-bottom:10px}.activity-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.savebar{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}.list-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.due-banner{display:none;margin:12px 14px 0 14px;padding:12px 14px;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;color:#9a3412;box-shadow:var(--shadow)}.due-banner.show{display:block}
-@media(max-width:1550px){
+@media(max-width:1100px){
   .layout{grid-template-columns:1fr}
   .side-card{position:static;max-height:none}
   .toolbar{grid-template-columns:1fr 1fr 1fr}
@@ -163,16 +189,15 @@ async function saveData(){try{syncFormToSelected();setSaveState("Speichere alle 
 async function loadData(){try{await loadAllFromSupabase();alert("Daten aus Supabase geladen.")}catch(e){console.error(e);setSaveState("Supabase-Laden fehlgeschlagen",true);alert("Laden aus Supabase fehlgeschlagen: "+(e.message||""))}}
 function filteredContacts(){const search=document.getElementById("search").value.toLowerCase().trim();const statusFilter=document.getElementById("statusFilter").value;const kundentypFilter=document.getElementById("kundentypFilter").value;const leadquelleFilter=document.getElementById("leadquelleFilter").value;const region=document.getElementById("regionFilter").value.toLowerCase().trim();let arr=contacts.filter(c=>{if(dueFilterActive){if(!hasFutureNextContact(c)||c.naechsterkontakt!==todayStr())return false}const noteTexts=(c.notes_history||[]).map(n=>`${n.type||""} ${n.text||""} ${n.appointment_date||""}`).join(" ");const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.kundenstatus,c.leadquelle,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.website,c.kategorie,c.strasse,c.plz,c.ort,c.chancenbewertung,noteTexts].join(" ").toLowerCase();const sOk=search===""||hay.includes(search);const visibleStatus=getVisibleStatus(c);const stOk=statusFilter==="Alle"?!c.archived:statusFilter==="Lead"?c.kundenstatus==="Lead"&&!c.archived:statusFilter==="Ohne Status"?!c.archived&&!isInWeclapp(c)&&String(c.status||"")!=="Kein Interesse"&&!hasFutureNextContact(c):statusFilter==="Archiviert"?!!c.archived:statusFilter==="In weclapp"?isInWeclapp(c)&&!c.archived:visibleStatus===statusFilter&&!c.archived;const ktOk=kundentypFilter==="Alle"||c.kundentyp===kundentypFilter;const lqOk=leadquelleFilter==="Alle"||c.leadquelle===leadquelleFilter;const rOk=region===""||[c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region);return sOk&&stOk&&ktOk&&lqOk&&rOk});if(currentSort)arr.sort((a,b)=>String(a[currentSort]||"").localeCompare(String(b[currentSort]||""),"de"));return arr}
 function renderList(){showDueTodayBanner();const list=document.getElementById("contactList");const arr=filteredContacts();const search=document.getElementById("search").value.trim();const statusFilter=document.getElementById("statusFilter").value;const kundentypFilter=document.getElementById("kundentypFilter").value;const leadquelleFilter=document.getElementById("leadquelleFilter").value;const region=document.getElementById("regionFilter").value.trim();const showRecent=document.getElementById("showRecent").checked;const selectionInfo=document.getElementById("selectionInfo");if(selectionInfo)selectionInfo.textContent=selectedIds.size+" markiert";const hasFilter=search!==""||statusFilter!=="Alle"||kundentypFilter!=="Alle"||leadquelleFilter!=="Alle"||region!==""||dueFilterActive;if(!hasFilter&&!showRecent){list.innerHTML='<div class="empty">Die Kontaktliste ist ausgeblendet.</div>';return}let visible=arr;if(!hasFilter&&showRecent)visible=[...arr].slice(0,8);if(!visible.length){list.innerHTML='<div class="empty">Keine Kontakte gefunden.</div>';return}list.innerHTML=visible.map(c=>{const name=[c.vorname,c.nachname].filter(Boolean).join(" ");const visibleStatus=getVisibleStatus(c);return`<div class="contact-item ${selectedId===c.id?'active':''}" onclick="selectContact('${c.id}')"><div class="contact-item-top"><input class="contact-select" type="checkbox" ${selectedIds.has(c.id)?'checked':''} onclick="event.stopPropagation();" onchange="toggleSelectContact('${c.id}')"><div><div class="contact-row"><div><div style="font-weight:900">${esc(c.firma||"(ohne Firma)")}</div>${name?`<div class="meta">${esc(name)}</div>`:""}${c.website?`<div class="meta">${webLink(c.website)}</div>`:""}</div><div><div>${esc(c.kundentyp||"")}</div><div class="meta">${esc(c.bundesland||"")}</div><span class="badge ${kundenstatusBadgeClass(c.kundenstatus)}">${esc(c.kundenstatus||"")}</span></div><div><div>${esc(c.bezirk||"")}</div><div class="meta">${esc(c.ort||"")}</div></div><div><div>${phoneLink(c.mobil||c.telefon)||""}</div><div class="meta">${mailLink(c.email)||""}</div></div><div>${visibleStatus?`<span class="badge ${statusBadgeClass(visibleStatus)}">${esc(visibleStatus)}</span>`:""}</div></div></div></div></div>`}).join("")}
-ffunction selectContact(id){
+function selectContact(id){
   syncFormToSelected();
-
   selectedId = id;
 
-  // Filter nach Auswahl zurücksetzen
   document.getElementById("search").value = "";
   document.getElementById("regionFilter").value = "";
   document.getElementById("kundentypFilter").value = "Alle";
   document.getElementById("statusFilter").value = "Alle";
+  document.getElementById("leadquelleFilter").value = "Alle";
 
   dueFilterActive = false;
 
