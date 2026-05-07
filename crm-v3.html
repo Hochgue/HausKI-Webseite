@@ -209,37 +209,86 @@ async function loadAllFromSupabase(){
   renderAll();persistLocalBackup();setSaveState("v2-Daten in v3 geladen");
 }
 
-async function saveOneContactToSupabase(contact){
-  if(!contact)return;
-  let firmaId=isUuid(contact.id)?contact.id:null;
-  const payload=baseCompanyPayload(contact);
+aasync function saveOneContactToSupabase(contact){
+  if(!contact) return;
+
+  let firmaId = isUuid(contact.id) ? contact.id : null;
+  const payload = baseCompanyPayload(contact);
 
   if(firmaId){
-    const {error}=await supabaseClient.from("crm_firmen").update(payload).eq("id",firmaId);if(error)throw error;
+    const {error} = await supabaseClient
+      .from("crm_firmen")
+      .update(payload)
+      .eq("id", firmaId);
+
+    if(error) throw error;
   }else{
-    const {data,error}=await supabaseClient.from("crm_firmen").insert(payload).select().single();if(error)throw error;
-    const oldId=contact.id;firmaId=data.id;
-    contacts=contacts.map(x=>x.id===oldId?{...x,id:firmaId}:x);if(selectedId===oldId)selectedId=firmaId;contact={...contact,id:firmaId};
+    const {data,error} = await supabaseClient
+      .from("crm_firmen")
+      .insert(payload)
+      .select()
+      .single();
+
+    if(error) throw error;
+
+    const oldId = contact.id;
+    firmaId = data.id;
+
+    contacts = contacts.map(x =>
+      x.id === oldId ? {...x, id:firmaId} : x
+    );
+
+    if(selectedId === oldId) selectedId = firmaId;
+
+    contact = {...contact, id:firmaId};
   }
 
-  const {error:delAn}=await supabaseClient.from("crm_ansprechpartner").delete().eq("firma_id",firmaId);if(delAn)throw delAn;
-  const anRows=[];
-  if([contact.vorname,contact.nachname,contact.rolle,contact.telefon,contact.mobil,contact.email].some(v=>String(v||"").trim()!=="")){
-    anRows.push({firma_id:firmaId,vorname:contact.vorname||"",nachname:contact.nachname||"",rolle:contact.rolle||"",telefon:contact.telefon||"",mobil:contact.mobil||"",email:contact.email||"",hauptkontakt:true});
+  const {error:delAn} = await supabaseClient
+    .from("crm_ansprechpartner")
+    .delete()
+    .eq("firma_id", firmaId);
+
+  if(delAn) throw delAn;
+
+  const anRows = [];
+
+  if([contact.vorname, contact.nachname, contact.rolle, contact.telefon, contact.mobil, contact.email]
+    .some(v => String(v || "").trim() !== "")){
+    anRows.push({
+      firma_id:firmaId,
+      vorname:contact.vorname || "",
+      nachname:contact.nachname || "",
+      rolle:contact.rolle || "",
+      telefon:contact.telefon || "",
+      mobil:contact.mobil || "",
+      email:contact.email || "",
+      hauptkontakt:true
+    });
   }
-  (contact.weitere_kontakte||[]).forEach(p=>{
-    if(![p.vorname,p.nachname,p.position,p.telefon,p.mobil,p.email,p.notiz].some(v=>String(v||"").trim()!==""))return;
-    anRows.push({firma_id:firmaId,vorname:p.vorname||"",nachname:p.nachname||"",rolle:p.position||"",telefon:p.telefon||"",mobil:p.mobil||"",email:p.email||"",hauptkontakt:false});
+
+  (contact.weitere_kontakte || []).forEach(p => {
+    if(![p.vorname, p.nachname, p.position, p.telefon, p.mobil, p.email, p.notiz]
+      .some(v => String(v || "").trim() !== "")) return;
+
+    anRows.push({
+      firma_id:firmaId,
+      vorname:p.vorname || "",
+      nachname:p.nachname || "",
+      rolle:p.position || "",
+      telefon:p.telefon || "",
+      mobil:p.mobil || "",
+      email:p.email || "",
+      hauptkontakt:false
+    });
   });
-  if(anRows.length){const {error}=await supabaseClient.from("crm_ansprechpartner").insert(anRows);if(error)throw error}
 
-  const {error:delHis}=await supabaseClient.from("crm_historie").delete().eq("firma_id",firmaId);if(delHis)throw delHis;
-  const hRows=(contact.notes_history||[]).filter(n=>String(n.text||"").trim()!==""||String(n.type||"").trim()!==""||String(n.date||"").trim()!=="").map(n=>({
-    firma_id:firmaId,datum:normalizeDate(n.date),uhrzeit:normalizeTime(n.time),art:n.type||"",notiz:n.text||"",
-    termin_datum:normalizeDate(n.appointment_date||n.auto_naechsterkontakt),termin_uhrzeit:normalizeTime(n.appointment_time||n.auto_naechsterkontakt_zeit),
-    auto_status:n.auto_status||"",auto_naechsterkontakt:normalizeDate(n.auto_naechsterkontakt),auto_kontaktart:n.auto_kontaktart||""
-  }));
-  if(hRows.length){const {error}=await supabaseClient.from("crm_historie").insert(hRows);if(error)throw error}
+  if(anRows.length){
+    const {error} = await supabaseClient
+      .from("crm_ansprechpartner")
+      .insert(anRows);
+
+    if(error) throw error;
+  }
 }
 
 async function saveCurrentContact(){
@@ -271,7 +320,6 @@ async function autosaveSelectedToSupabase(){
     console.error(e);
     setSaveState("Autosave fehlgeschlagen", true);
   }
-}
 }
 function scheduleAutosave(){if(isLoading)return;syncFormToSelected();renderPanels();clearTimeout(autosaveTimer);setSaveState("Änderungen vorgemerkt ...");autosaveTimer=setTimeout(()=>autosaveSelectedToSupabase(),900)}
 async function loadData(){try{await loadAllFromSupabase();alert("Daten aus Supabase geladen.")}catch(e){console.error(e);setSaveState("Laden fehlgeschlagen",true);alert("Laden fehlgeschlagen: "+(e.message||""))}}
