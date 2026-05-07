@@ -163,8 +163,11 @@ function sanitizeContacts(list){
 
 function mapDbToContact(firma,ansprechpartnerRows,historieRows,anhaengeRows){
   const rows=(ansprechpartnerRows||[]).filter(r=>r.firma_id===firma.id);
-  const historie=(historieRows||[]).filter(r=>r.firma_id===firma.id).sort((a,b)=>String(a.datum||"").localeCompare(String(b.datum||"")));
-  const anhaenge=(anhaengeRows||[]).filter(r=>r.firma_id===firma.id);
+  const historie=(historieRows||[])
+  .filter(r=>String(r.firma_id)===String(firma.id))
+  .sort((a,b)=>String(a.datum||"").localeCompare(String(b.datum||"")));
+  const anhaenge=(anhaengeRows||[])
+  .filter(r=>String(r.firma_id)===String(firma.id));
   const haupt=rows.find(r=>r.hauptkontakt)||rows[0]||{};
   const weitere=rows.filter(r=>!r.hauptkontakt).map(r=>({vorname:r.vorname||"",nachname:r.nachname||"",telefon:r.telefon||"",mobil:r.mobil||"",email:r.email||"",position:r.rolle||"",notiz:""}));
 
