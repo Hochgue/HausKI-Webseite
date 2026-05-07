@@ -284,7 +284,7 @@ button.light{background:#e2e8f0;color:#1e293b}
       </select>
 
       <div id="contactList">
-        <div class="contact-item active">
+        <div class="contact-item active" onclick="openCustomer(1)">
           <div class="contact-top">
             <div class="contact-name">Musterkunde GmbH</div>
             <div class="status-badge orange">Termin</div>
@@ -297,7 +297,7 @@ button.light{background:#e2e8f0;color:#1e293b}
           </div>
         </div>
 
-        <div class="contact-item">
+        <div class="contact-item" onclick="openCustomer(2)">
           <div class="contact-top">
             <div class="contact-name">Elektro Beispiel</div>
             <div class="status-badge blue">weclapp</div>
@@ -565,6 +565,10 @@ Rückruf nächste Woche.
   </aside>
 
 </div>
-
+<script>
+function openCustomer(id){
+  window.location.href = "kunde.html?id=" + id;
+}
+</script>
 </body>
 </html>
