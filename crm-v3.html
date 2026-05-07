@@ -106,7 +106,7 @@ input,select,textarea{width:100%;padding:10px 11px;border:1px solid #cbd5e1;bord
    SUPABASE KONFIGURATION – bestehende v2 Datenstruktur
 ========================================================= */
 const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const STORAGE_KEY = "mini_crm_v3_pro_active_v2_backup";
@@ -525,14 +525,35 @@ document.getElementById("csvInput").addEventListener("change", function(e){
     selectedId = contacts[0]?.id || null;
 
     renderAll();
-    persistLocalBackup();
+persistLocalBackup();
 
-    alert(imported.length + " Kontakte aus CSV geladen. Danach speichern.");
+if(confirm(imported.length + " Kontakte aus CSV geladen. Jetzt alle in Supabase speichern?")){
+  saveImportedContacts(imported);
+} else {
+  alert("CSV wurde lokal geladen. Nicht vergessen später zu speichern.");
+}
   };
 
   reader.readAsText(file, "UTF-8");
   e.target.value = "";
 });
+async function saveImportedContacts(imported){
+  try{
+    setSaveState("Speichere CSV Kontakte in Supabase ...");
+
+    for(const contact of imported){
+      await saveOneContactToSupabase(contact);
+    }
+
+    await loadAllFromSupabase();
+    setSaveState("CSV Import in Supabase gespeichert");
+    alert(imported.length + " Kontakte wurden in Supabase gespeichert.");
+  }catch(e){
+    console.error(e);
+    setSaveState("CSV Speichern fehlgeschlagen", true);
+    alert("CSV Kontakte konnten nicht vollständig gespeichert werden: " + (e.message || ""));
+  }
+}
 initApp();
 </script>
 </body>
