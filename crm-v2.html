@@ -138,7 +138,7 @@ button:hover{transform:translateY(-1px)}
         <div class="sub-title">Suche / Übersicht</div>
         <div class="toolbar">
           <div><label>Suchen</label><input id="search" placeholder="Firma, Name, Bezirk, Bundesland, Notiz ..." oninput="renderList()"></div>
-          <div><label>Status</label><select id="statusFilter" onchange="renderList()"><option>Alle</option><option>Ohne Status</option><option>Termin vereinbart</option><option>Unterlagen versendet</option><option>Telefonat ausgemacht</option><option>Sonstiges</option><option>Kein Interesse</option><option>Archiviert</option><option>In weclapp</option></select></div>
+          <div><label>Status</label><select id="statusFilter" onchange="renderList()"><option>Alle</option><option>Lead</option><option>Ohne Status</option><option>Termin vereinbart</option><option>Unterlagen versendet</option><option>Telefonat ausgemacht</option><option>Sonstiges</option><option>Kein Interesse</option><option>Archiviert</option><option>In weclapp</option></select></div>
           <div><label>Kundentyp</label><select id="kundentypFilter" onchange="renderList()"><option>Alle</option><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option></select></div>
           <div><label>Region</label><input id="regionFilter" placeholder="Ort, Bezirk, Bundesland, PLZ" oninput="renderList()"></div>
           <button onclick="sortBy('firma')">Nach Firma</button>
@@ -711,15 +711,20 @@ function filteredContacts(){
     const sOk=search===""||hay.includes(search);
     const visibleStatus=getVisibleStatus(c);
     const stOk =
-      statusFilter==="Alle"
-        ? !c.archived
-        : statusFilter==="Ohne Status"
-          ? !c.archived && !isInWeclapp(c) && String(c.status||"")!=="Kein Interesse" && !hasFutureNextContact(c)
-          : statusFilter==="Archiviert"
-            ? !!c.archived
-            : statusFilter==="In weclapp"
-              ? isInWeclapp(c)&&!c.archived
-              : visibleStatus===statusFilter&&!c.archived;
+  statusFilter === "Alle"
+    ? !c.archived
+    : statusFilter === "Lead"
+      ? c.kundenstatus === "Lead" && !c.archived
+      : statusFilter === "Ohne Status"
+        ? !c.archived &&
+          !isInWeclapp(c) &&
+          String(c.status || "") !== "Kein Interesse" &&
+          !hasFutureNextContact(c)
+        : statusFilter === "Archiviert"
+          ? !!c.archived
+          : statusFilter === "In weclapp"
+            ? isInWeclapp(c) && !c.archived
+            : visibleStatus === statusFilter && !c.archived;
     const ktOk=kundentypFilter==="Alle"||c.kundentyp===kundentypFilter;
     const rOk=region===""||[c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region);
     return sOk&&stOk&&ktOk&&rOk;
