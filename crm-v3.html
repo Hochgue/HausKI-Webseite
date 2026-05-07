@@ -390,6 +390,96 @@ button.light{background:#e2e8f0;color:#1e293b}
     grid-template-columns:1fr;
   }
 }
+
+/* =====================================================
+   SALES CHART V2
+===================================================== */
+
+.sales-chart{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  height:320px;
+  margin-top:30px;
+}
+
+.week-group{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.week-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  height:260px;
+}
+
+.bar{
+  width:24px;
+  border-radius:10px 10px 0 0;
+  transition:.2s;
+}
+
+.bar:hover{
+  opacity:.8;
+  transform:translateY(-2px);
+}
+
+.bar.calls{
+  background:#4f6b8a;
+}
+
+.bar.fpv{
+  background:#f59e0b;
+}
+
+.bar.partner{
+  background:#16a34a;
+}
+
+.week-label{
+  margin-top:12px;
+  font-size:13px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+.chart-legend{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.legend-color{
+  width:14px;
+  height:14px;
+  border-radius:4px;
+}
+
+.legend-color.calls{
+  background:#4f6b8a;
+}
+
+.legend-color.fpv{
+  background:#f59e0b;
+}
+
+.legend-color.partner{
+  background:#16a34a;
+}
 </style>
 </head>
 
@@ -490,42 +580,136 @@ button.light{background:#e2e8f0;color:#1e293b}
 
 </div>
 
-<div class="chart-card">
+<div class="card">
 
-  <div class="chart-title">
+  <div class="card-title">
     Vertriebsverlauf
   </div>
 
-  <div class="chart-bars">
+  <div class="sales-chart">
 
-    <div class="chart-bar-wrap">
-      <div class="chart-bar" style="height:90px;"></div>
-      <div class="chart-label">KW18</div>
+    <!-- KW18 -->
+    <div class="week-group">
+
+      <div class="week-bars">
+
+        <div
+          class="bar calls"
+          style="height:180px;"
+          title="28 Erstkontakte"
+        ></div>
+
+        <div
+          class="bar fpv"
+          style="height:110px;"
+          title="12 FPV"
+        ></div>
+
+        <div
+          class="bar partner"
+          style="height:40px;"
+          title="2 Partner"
+        ></div>
+
+      </div>
+
+      <div class="week-label">
+        KW18
+      </div>
+
     </div>
 
-    <div class="chart-bar-wrap">
-      <div class="chart-bar" style="height:150px;"></div>
-      <div class="chart-label">KW19</div>
+    <!-- KW19 -->
+    <div class="week-group">
+
+      <div class="week-bars">
+
+        <div class="bar calls" style="height:220px;"></div>
+        <div class="bar fpv" style="height:140px;"></div>
+        <div class="bar partner" style="height:60px;"></div>
+
+      </div>
+
+      <div class="week-label">
+        KW19
+      </div>
+
     </div>
 
-    <div class="chart-bar-wrap">
-      <div class="chart-bar" style="height:210px;"></div>
-      <div class="chart-label">KW20</div>
+    <!-- KW20 -->
+    <div class="week-group">
+
+      <div class="week-bars">
+
+        <div class="bar calls" style="height:250px;"></div>
+        <div class="bar fpv" style="height:180px;"></div>
+        <div class="bar partner" style="height:80px;"></div>
+
+      </div>
+
+      <div class="week-label">
+        KW20
+      </div>
+
     </div>
 
-    <div class="chart-bar-wrap">
-      <div class="chart-bar" style="height:170px;"></div>
-      <div class="chart-label">KW21</div>
+    <!-- KW21 -->
+    <div class="week-group">
+
+      <div class="week-bars">
+
+        <div class="bar calls" style="height:160px;"></div>
+        <div class="bar fpv" style="height:120px;"></div>
+        <div class="bar partner" style="height:30px;"></div>
+
+      </div>
+
+      <div class="week-label">
+        KW21
+      </div>
+
     </div>
 
-    <div class="chart-bar-wrap">
-      <div class="chart-bar" style="height:230px;"></div>
-      <div class="chart-label">KW22</div>
+    <!-- KW22 -->
+    <div class="week-group">
+
+      <div class="week-bars">
+
+        <div class="bar calls" style="height:280px;"></div>
+        <div class="bar fpv" style="height:190px;"></div>
+        <div class="bar partner" style="height:100px;"></div>
+
+      </div>
+
+      <div class="week-label">
+        KW22
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="chart-legend">
+
+    <div class="legend-item">
+      <div class="legend-color calls"></div>
+      Erstkontakte
+    </div>
+
+    <div class="legend-item">
+      <div class="legend-color fpv"></div>
+      FPV / Unterlagen
+    </div>
+
+    <div class="legend-item">
+      <div class="legend-color partner"></div>
+      Neue Fachpartner
     </div>
 
   </div>
 
 </div>
+
 
 <div class="dashboard-row">
 
