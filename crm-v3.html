@@ -2,358 +2,472 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Mini CRM Pro Active — v1.1</title>
+<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini CRM Vertrieb – v3 Pro Active mit v2 Daten</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: system-ui, Arial;
-  background: #f5f7fa;
-  color: #1e293b;
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
+:root{
+  --bg:#edf2f7;--panel:#ffffff;--line:#d9e2ec;--text:#1e293b;--muted:#64748b;
+  --blue:#4f6b8a;--blue2:#5d7b9d;--green:#16a34a;--red:#dc2626;--yellow:#facc15;--orange:#fb923c;--violet:#7c3aed;
+  --shadow:0 10px 25px rgba(15,23,42,.08);--radius:14px;
 }
-
-#app {
-  display: grid;
-  grid-template-columns: 300px 1fr 350px;
-  height: 100%;
-  width: 100%;
-}
-
-/* Sidebar */
-.sidebar {
-  background: white;
-  padding: 14px;
-  border-right: 1px solid #dce2ea;
-  overflow-y: auto;
-}
-
-.contact-item {
-  padding: 10px;
-  border: 1px solid #dbe2ec;
-  border-radius: 10px;
-  margin-bottom: 8px;
-  cursor: pointer;
-}
-.contact-item:hover { background: #eef3ff; }
-.contact-item.active {
-  background: #e4edff;
-  border-color: #90b4ff;
-}
-
-/* Content */
-.content {
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.card {
-  background: white;
-  border-radius: 14px;
-  padding: 16px;
-  border: 1px solid #dde3ec;
-  margin-bottom: 20px;
-}
-
-/* Timeline */
-.timeline-item {
-  background: #f1f5f9;
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-}
-
-/* Eingabe */
-#activityInput {
-  width: 100%;
-  padding: 12px;
-  font-size: 15px;
-  border-radius: 10px;
-  border: 1px solid #cdd4df;
-  margin-top: 10px;
-}
-
-/* Buttons */
-.btn {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-.btn-primary { background: #2563eb; color: white; }
-.btn-light { background: #e2e8f0; color: #1e293b; }
-
-/* Right panel */
-.panel {
-  background: white;
-  border-left: 1px solid #dce2ea;
-  padding: 20px;
-  overflow-y: auto;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+button{background:var(--blue);color:white;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700;font-size:13px;transition:.15s ease}
+button:hover{background:var(--blue2);transform:translateY(-1px)}
+button.primary{background:var(--green)}button.delete{background:var(--red)!important}button.light{background:#e2e8f0;color:#111827}.hidden{display:none!important}
+#app{display:grid;grid-template-columns:330px 1fr 380px;height:100vh;width:100vw}
+.sidebar,.panel{background:var(--panel);padding:16px;overflow-y:auto}.sidebar{border-right:1px solid var(--line)}.panel{border-left:1px solid var(--line)}.content{padding:20px;overflow-y:auto}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.top-actions button{flex:1;min-width:120px}
+h1,h2,h3,h4{margin-top:0}.muted{color:var(--muted)}.small{font-size:12px}.hint{font-size:12px;color:var(--muted);line-height:1.35}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.mt{margin-top:14px}.mt-small{margin-top:8px}
+.card{background:white;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}.mini-card{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+input,select,textarea{width:100%;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:white;color:var(--text);font-size:14px;margin-bottom:10px}textarea{min-height:90px;resize:vertical;line-height:1.45}label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}.full{grid-column:1/-1}
+.contact-list{display:flex;flex-direction:column;gap:9px}.contact-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:.15s ease}.contact-item:hover{background:#f8fbff;transform:translateY(-1px)}.contact-item.active{background:#eaf1ff;border-color:#8bb3ff}.contact-item.in-weclapp{background:#eff6ff;border-color:#93c5fd}.contact-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.contact-meta{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#111827}.badge.orange{background:var(--orange)}.badge.yellow{background:var(--yellow)}.badge.green{background:#bbf7d0;color:#14532d}.badge.blue{background:#bfdbfe;color:#1e3a8a}.badge.red{background:#fee2e2;color:#991b1b}.badge.violet{background:#ede9fe;color:#5b21b6}.badge.gray{background:#e2e8f0;color:#475569}
+.chance-badge{display:inline-block;padding:5px 9px;border-radius:999px;font-weight:800;font-size:11px;margin-top:6px}.chance-sehr-hoch{background:#bbf7d0;color:#14532d;border:1px solid #86efac}.chance-hoch{background:#dcfce7;color:#166534;border:1px solid #86efac}.chance-mittel{background:#fef9c3;color:#854d0e;border:1px solid #fde68a}.chance-gering{background:#ffedd5;color:#9a3412;border:1px solid #fdba74}.chance-sehr-gering{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}.chance-none{background:#e2e8f0;color:#475569;border:1px solid #cbd5e1}
+.timeline-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px}.timeline-head{display:flex;justify-content:space-between;gap:10px}.timeline-text{white-space:pre-wrap;line-height:1.45}.ai-box{background:#eef6ff;border-left:4px solid #2563eb;border-radius:8px;padding:10px}.due-box{background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:12px;padding:12px;margin-bottom:12px}.empty{padding:14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);background:#fafcff}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions.right{justify-content:flex-end}.link{color:#2563eb;font-weight:700;text-decoration:none}.section-title{font-size:22px;font-weight:800;margin-bottom:12px}
+.subcontact-card,.attachment-item{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfcfd;margin-bottom:10px}.dropzone{border:2px dashed #a8b6c6;border-radius:12px;padding:16px;background:#f8fbff;text-align:center;color:#455468}.dropzone.dragover{border-color:#5f7897;background:#edf4fb}.dropzone input[type=file]{display:none}.save-state{font-size:12px;font-weight:700;color:#475569}.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-left:6px}.dot-red{background:#dc2626}.dot-green{background:#16a34a}.dot-orange{background:#f97316}.dot-blue{background:#2563eb}.dot-gray{background:#94a3b8}
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;z-index:99}.modal{background:white;border-radius:18px;padding:20px;width:min(720px,94vw);max-height:90vh;overflow:auto;box-shadow:var(--shadow)}
+@media(max-width:1250px){#app{grid-template-columns:320px 1fr}.panel{display:none}.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:800px){body{height:auto;overflow:auto}#app{display:block;height:auto}.sidebar,.content,.panel{display:block;border:none}.panel{display:block}.grid2,.grid3,.grid4{grid-template-columns:1fr}}
 </style>
 </head>
-
 <body>
 
 <div id="app">
+  <aside class="sidebar">
+    <h2>CRM v3</h2>
+    <div class="save-state" id="saveState">Bereit</div>
 
-  <!-- LINKS: Kontaktliste -->
-  <div class="sidebar">
-    <h2>Kontakte</h2>
-
-    <input id="search" placeholder="Suchen..." style="width:100%;padding:10px;margin-bottom:10px;" oninput="filterContacts()">
-
-    <div id="contactList"></div>
-  </div>
-
-  <!-- MITTE: Kontaktkarte + Timeline -->
-  <div class="content">
-    <div id="contactView">Bitte Kontakt auswählen.</div>
-  </div>
-
-  <!-- RECHTS: KI Panel -->
-  <div class="panel">
-    <h3>KI Analyse</h3>
-    <div id="aiSummary" class="card">
-      Kein Kontakt ausgewählt.
+    <div class="top-actions mt">
+      <button onclick="newContact()">+ Neuer Kontakt</button>
+      <button class="light" onclick="loadData()">Neu laden</button>
     </div>
-  </div>
 
+    <div id="dueBox"></div>
+
+    <input id="search" placeholder="Suchen: Firma, Ort, Name, Notiz ..." oninput="renderList()">
+    <select id="statusFilter" onchange="renderList()">
+      <option>Alle</option>
+      <option>Lead</option>
+      <option>Ohne Status</option>
+      <option>Termin vereinbart</option>
+      <option>Unterlagen versendet</option>
+      <option>Telefonat ausgemacht</option>
+      <option>Termin abgesagt</option>
+      <option>Sonstiges</option>
+      <option>Kein Interesse</option>
+      <option>Archiviert</option>
+      <option>In weclapp</option>
+    </select>
+    <select id="kundentypFilter" onchange="renderList()">
+      <option>Alle</option><option>Fachpartner</option><option>B2B</option><option>Privat</option><option>Sonstiges</option>
+    </select>
+    <input id="regionFilter" placeholder="Region / Bezirk / Bundesland" oninput="renderList()">
+
+    <div class="top-actions">
+      <button class="light" onclick="sortBy('firma')">Firma</button>
+      <button class="light" onclick="sortBy('ort')">Ort</button>
+      <button class="light" onclick="clearSearch()">Leeren</button>
+    </div>
+
+    <label class="row" style="justify-content:flex-start;gap:8px;margin-bottom:10px;font-size:13px;">
+      <input type="checkbox" id="showRecent" checked onchange="renderList()" style="width:auto;margin:0;"> Letzte 12 ohne Suche anzeigen
+    </label>
+
+    <div id="contactList" class="contact-list"></div>
+  </aside>
+
+  <main class="content">
+    <div id="contactView"><div class="empty">Bitte Kontakt auswählen.</div></div>
+  </main>
+
+  <aside class="panel">
+    <h3>Aktive Analyse</h3>
+    <div id="aiPanel" class="card">Kein Kontakt ausgewählt.</div>
+    <h3>Anhänge</h3>
+    <div id="attachmentPanel" class="card">Keine Anhänge.</div>
+    <h3>Letzte Aktivitäten</h3>
+    <div id="activityPanel" class="card">Keine Aktivitäten.</div>
+  </aside>
 </div>
 
+<input type="file" id="attachmentInput" multiple class="hidden" onchange="handleAttachmentInput(event)">
+<input type="file" id="csvInput" accept=".csv" class="hidden">
+<input type="file" id="jsonInput" accept=".json" class="hidden">
+<div id="modal"></div>
 
-<!-- JAVASCRIPT -->
-<script type="module">
+<script>
+/* =========================================================
+   SUPABASE KONFIGURATION – bestehende v2 Datenstruktur
+========================================================= */
+const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Ind1aXpjc2hna2RvbGtuZ3FvdXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODE5OTgsImV4cCI6MjA4OTI1Nzk5OH0.C5SuBH9h1UQAUqOyZ7BYLqoRNR1QPOr0SXadeQJR1HM";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* -------------------------------------------------------
-   KONFIGURATION
---------------------------------------------------------- */
-const OPENAI_API_KEY = "DEIN_OPENAI_KEY";
-const SUPABASE_URL = "DEINE_URL";
-const SUPABASE_KEY = "DEIN_SUPABASE_ANON";
-
-/* Supabase Client */
-import { createClient } from "[cdn.jsdelivr.net](https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm)";
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-/* GLOBALER STATE */
+const STORAGE_KEY = "mini_crm_v3_pro_active_v2_backup";
 let contacts = [];
-let activeContact = null;
+let selectedId = null;
+let currentSort = "";
+let dueFilterActive = false;
+let isLoading = false;
+let autosaveTimer = null;
 
-/* -------------------------------------------------------
-   KI AKTIVITÄTS-ANALYSE
---------------------------------------------------------- */
-async function aiAnalyzeActivity(text) {
-  const prompt = `
-Analysiere die folgende Vertriebsaktivität:
+/* =========================================================
+   HELPER
+========================================================= */
+function $(id){return document.getElementById(id)}
+function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function normalizeDate(v){v=String(v||"").trim();return v===""?null:v}
+function normalizeTime(v){v=String(v||"").trim();return v===""?null:v}
+function formatDateDisplay(v){if(!v)return"-";if(/^\d{4}-\d{2}-\d{2}$/.test(v)){const[y,m,d]=v.split("-");return `${d}.${m}.${y}`}return v}
+function addDays(dateStr,days){if(!dateStr)return"";const d=new Date(dateStr+"T12:00:00");d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
+function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i.test(String(v||""))}
+function cleanPhone(v){return String(v||"").replace(/[^+\d]/g,"")}
+function phoneLink(v){const raw=String(v||"").trim();return raw?`<a class="link" href="tel:${cleanPhone(raw)}" onclick="event.stopPropagation()">${esc(raw)}</a>`:""}
+function mailLink(v){const raw=String(v||"").trim();return raw?`<a class="link" href="mailto:${esc(raw)}" onclick="event.stopPropagation()">${esc(raw)}</a>`:""}
+function humanSize(bytes){if(!bytes&&bytes!==0)return"";if(bytes<1024)return bytes+" B";if(bytes<1024*1024)return(bytes/1024).toFixed(1)+" KB";return(bytes/(1024*1024)).toFixed(1)+" MB"}
+function setSaveState(msg,isError=false){$("saveState").textContent=msg;$("saveState").style.color=isError?"#b91c1c":"#475569"}
+function getSelected(){return contacts.find(c=>c.id===selectedId)||null}
+function isInWeclapp(c){return String(c?.weclapp||"").toLowerCase()==="ja"}
+function getContactDateTime(c){if(!c||!c.naechsterkontakt)return null;return new Date(c.naechsterkontakt+"T"+(c.naechsterkontakt_zeit||"00:00"))}
+function hasFutureNextContact(c){if(isInWeclapp(c))return false;const dt=getContactDateTime(c);return !!dt&&dt>=new Date()}
+function getVisibleStatus(c){if(c.archived)return"Archiviert";if(isInWeclapp(c))return"In weclapp";if(String(c.status||"")==="Kein Interesse")return"Kein Interesse";if(String(c.status||"")==="Termin abgesagt")return"Termin abgesagt";if(hasFutureNextContact(c))return c.status||"";return""}
+function badgeClass(status){if(status==="In weclapp")return"blue";if(status==="Kein Interesse"||status==="Termin abgesagt")return"red";if(status==="Termin vereinbart")return"yellow";if(status==="Unterlagen versendet")return"violet";if(status==="Telefonat ausgemacht")return"orange";if(status==="Sonstiges")return"green";if(status==="Archiviert")return"violet";return"gray"}
+function chanceClass(v){v=String(v||"").toLowerCase().trim();if(v==="sehr hoch")return"chance-sehr-hoch";if(v==="hoch")return"chance-hoch";if(v==="mittel")return"chance-mittel";if(v==="gering")return"chance-gering";if(v==="sehr gering")return"chance-sehr-gering";return"chance-none"}
+function chanceLabel(v){return String(v||"").trim()||"Noch nicht bewertet"}
+function persistLocalBackup(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({saved_at:new Date().toISOString(),contacts}))}catch(e){}}
 
-"${text}"
+/* =========================================================
+   DATEN-MAPPING v2 Tabellen
+========================================================= */
+function sanitizeContacts(list){
+  return (Array.isArray(list)?list:[]).map(c=>({
+    id:c.id||String(Date.now()+Math.random()),
+    firma:c.firma||"",strasse:c.strasse||"",plz:c.plz||"",ort:c.ort||"",bezirk:c.bezirk||"",bundesland:c.bundesland||"Oberösterreich",
+    kundentyp:c.kundentyp||"Fachpartner",kundenstatus:c.kundenstatus||"Interessent",status:c.status||"Sonstiges",
+    erstkontakt:c.erstkontakt||"",naechsterkontakt:c.naechsterkontakt||"",naechsterkontakt_zeit:c.naechsterkontakt_zeit||"",kontaktart:c.kontaktart||"",
+    weclapp:c.weclapp||"Nein",leadquelle:c.leadquelle||"",potenzial:c.potenzial||"mittel",chancenbewertung:c.chancenbewertung||"",
+    nachname:c.nachname||"",vorname:c.vorname||"",rolle:c.rolle||"",telefon:c.telefon||"",mobil:c.mobil||"",email:c.email||"",
+    notes_history:Array.isArray(c.notes_history)?c.notes_history:[],
+    weitere_kontakte:Array.isArray(c.weitere_kontakte)?c.weitere_kontakte:[],
+    attachments:Array.isArray(c.attachments)?c.attachments:[],
+    archived:!!c.archived
+  }))
+}
 
-Extrahiere:
-- Aktivitätstyp
-- Kurz-Zusammenfassung
-- sinnvollen nächsten Schritt
-- Wiedervorlage-Datum (falls erkennbar)
-- passenden Status
+function mapDbToContact(firma,ansprechpartnerRows,historieRows,anhaengeRows){
+  const rows=(ansprechpartnerRows||[]).filter(r=>r.firma_id===firma.id);
+  const historie=(historieRows||[]).filter(r=>r.firma_id===firma.id).sort((a,b)=>String(a.datum||"").localeCompare(String(b.datum||"")));
+  const anhaenge=(anhaengeRows||[]).filter(r=>r.firma_id===firma.id);
+  const haupt=rows.find(r=>r.hauptkontakt)||rows[0]||{};
+  const weitere=rows.filter(r=>!r.hauptkontakt).map(r=>({vorname:r.vorname||"",nachname:r.nachname||"",telefon:r.telefon||"",mobil:r.mobil||"",email:r.email||"",position:r.rolle||"",notiz:""}));
 
-Antwort als JSON.
-`;
+  return sanitizeContacts([{
+    id:firma.id,
+    firma:firma.firma||"",strasse:firma.strasse||"",plz:firma.plz||"",ort:firma.ort||"",bezirk:firma.bezirk||"",bundesland:firma.bundesland||"Oberösterreich",
+    kundentyp:firma.kundentyp||"Fachpartner",kundenstatus:firma.kundenstatus||"Interessent",status:firma.status||"Sonstiges",
+    erstkontakt:firma.erstkontakt||"",naechsterkontakt:firma.naechsterkontakt||"",naechsterkontakt_zeit:firma.naechsterkontakt_zeit||"",kontaktart:firma.kontaktart||"",
+    weclapp:firma.weclapp||"Nein",leadquelle:firma.leadquelle||"",potenzial:firma.potenzial||"mittel",chancenbewertung:firma.chancenbewertung||"",
+    nachname:haupt.nachname||"",vorname:haupt.vorname||"",rolle:haupt.rolle||"",telefon:haupt.telefon||"",mobil:haupt.mobil||"",email:haupt.email||"",
+    notes_history:historie.map(h=>({
+      id:h.id,date:h.datum||"",time:h.uhrzeit||"",type:h.art||"",text:h.notiz||"",
+      appointment_date:h.termin_datum||"",appointment_time:h.termin_uhrzeit||"",appointment_type:h.auto_kontaktart||"",
+      auto_status:h.auto_status||"",auto_naechsterkontakt:h.auto_naechsterkontakt||"",auto_naechsterkontakt_zeit:h.termin_uhrzeit||"",auto_kontaktart:h.auto_kontaktart||""
+    })),
+    weitere_kontakte:weitere,attachments:anhaenge,archived:!!firma.archived
+  }])[0]
+}
 
-  try {
-    const r = await fetch("[api.openai.com](https://api.openai.com/v1/chat/completions)", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + OPENAI_API_KEY
-      },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-
-    const data = await r.json();
-    return JSON.parse(data.choices[0].message.content);
-
-  } catch (err) {
-    console.error("AI Fehler:", err);
-    return null;
+function baseCompanyPayload(contact){
+  return {
+    firma:contact.firma||"",strasse:contact.strasse||"",plz:contact.plz||"",ort:contact.ort||"",bezirk:contact.bezirk||"",bundesland:contact.bundesland||"",
+    kundentyp:contact.kundentyp||"",kundenstatus:contact.kundenstatus||"",status:contact.status||"",
+    erstkontakt:normalizeDate(contact.erstkontakt),naechsterkontakt:normalizeDate(contact.naechsterkontakt),naechsterkontakt_zeit:contact.naechsterkontakt_zeit||"",kontaktart:contact.kontaktart||"",
+    weclapp:contact.weclapp||"Nein",leadquelle:contact.leadquelle||"",potenzial:contact.potenzial||"",chancenbewertung:contact.chancenbewertung||"",
+    archived:!!contact.archived,updated_at:new Date().toISOString()
   }
 }
 
-/* -------------------------------------------------------
-   KONTAKTE LADEN
---------------------------------------------------------- */
-async function loadContacts() {
-  const { data } = await db.from("contacts").select("*").order("updated_at", { ascending: false });
-  contacts = data || [];
-  renderList();
+async function loadAllFromSupabase(){
+  isLoading=true;setSaveState("Lade v2-Daten aus Supabase ...");
+  const [{data:firmen,error:fe},{data:ansprechpartner,error:ae},{data:historie,error:he},{data:anhaenge,error:ane}]=await Promise.all([
+    supabaseClient.from("crm_firmen").select("*").order("updated_at",{ascending:false}),
+    supabaseClient.from("crm_ansprechpartner").select("*").order("created_at",{ascending:true}),
+    supabaseClient.from("crm_historie").select("*").order("datum",{ascending:true}),
+    supabaseClient.from("crm_anhaenge").select("*").order("created_at",{ascending:false})
+  ]);
+  if(fe)throw fe;if(ae)throw ae;if(he)throw he;if(ane)throw ane;
+  contacts=(firmen||[]).map(f=>mapDbToContact(f,ansprechpartner||[],historie||[],anhaenge||[]));
+  selectedId=contacts.length?contacts[0].id:null;
+  isLoading=false;
+  renderAll();persistLocalBackup();setSaveState("v2-Daten in v3 geladen");
 }
 
-/* -------------------------------------------------------
-   KONTAKTLISTE RENDERN
---------------------------------------------------------- */
-function renderList() {
-  const box = document.getElementById("contactList");
+async function saveOneContactToSupabase(contact){
+  if(!contact)return;
+  let firmaId=isUuid(contact.id)?contact.id:null;
+  const payload=baseCompanyPayload(contact);
 
-  box.innerHTML = contacts.map(c => `
-    <div class="contact-item ${activeContact?.id === c.id ? "active" : ""}"
-         onclick="selectContact('${c.id}')">
-      <strong>${c.firma || "(ohne Firma)"}</strong><br>
-      <span style="font-size:13px;color:#64748b;">${c.ort || ""}</span>
-    </div>
-  `).join("");
-}
-
-/* -------------------------------------------------------
-   KONTAKT AUSWÄHLEN (GLOBAL)
---------------------------------------------------------- */
-window.selectContact = async function(id) {
-  activeContact = contacts.find(c => c.id === id);
-  renderContactView();
-  updateAISummary();
-};
-
-/* -------------------------------------------------------
-   KONTAKT-DETAILS MITTE
---------------------------------------------------------- */
-async function renderContactView() {
-  if (!activeContact) {
-    document.getElementById("contactView").innerHTML = "Bitte Kontakt auswählen.";
-    return;
+  if(firmaId){
+    const {error}=await supabaseClient.from("crm_firmen").update(payload).eq("id",firmaId);if(error)throw error;
+  }else{
+    const {data,error}=await supabaseClient.from("crm_firmen").insert(payload).select().single();if(error)throw error;
+    const oldId=contact.id;firmaId=data.id;
+    contacts=contacts.map(x=>x.id===oldId?{...x,id:firmaId}:x);if(selectedId===oldId)selectedId=firmaId;contact={...contact,id:firmaId};
   }
 
-  const c = activeContact;
-
-  const html = `
-    <div class="card">
-      <h2>${c.firma || "(ohne Firma)"}</h2>
-      <div>${c.name || "–"}</div>
-      <div>${c.telefon || "–"}</div>
-      <div>${c.email || "–"}</div>
-      <div>${c.ort || "–"}</div>
-      <div style="margin-top:10px;">Status: ${c.status || "Neu"}</div>
-    </div>
-
-    <h3>Aktivitäten</h3>
-    <div id="timeline"></div>
-
-    <textarea id="activityInput" placeholder="Neue Aktivität eingeben..."></textarea>
-    <button class="btn btn-primary" style="margin-top:10px;" onclick="addActivity()">Eintragen</button>
-  `;
-
-  document.getElementById("contactView").innerHTML = html;
-
-  // Timeline laden
-  const { data: activities } = await db.from("activities")
-    .select("*")
-    .eq("contact_id", c.id)
-    .order("created_at", { ascending: false });
-
-  const tl = document.getElementById("timeline");
-  tl.innerHTML = (activities?.length)
-    ? activities.map(a => `<div class="timeline-item">${a.text}</div>`).join("")
-    : "<div class='timeline-item'>Noch keine Aktivitäten</div>";
-}
-
-/* -------------------------------------------------------
-   AKTIVITÄT HINZUFÜGEN
---------------------------------------------------------- */
-window.addActivity = async function() {
-  const text = document.getElementById("activityInput").value.trim();
-  if (!text) return;
-
-  const ai = await aiAnalyzeActivity(text);
-
-  await db.from("activities").insert({
-    contact_id: activeContact.id,
-    text,
-    ai_summary: ai?.summary || "",
-    ai_next_step: ai?.next_step || "",
-    ai_followup: ai?.followup || null,
-    ai_status: ai?.status || ""
+  const {error:delAn}=await supabaseClient.from("crm_ansprechpartner").delete().eq("firma_id",firmaId);if(delAn)throw delAn;
+  const anRows=[];
+  if([contact.vorname,contact.nachname,contact.rolle,contact.telefon,contact.mobil,contact.email].some(v=>String(v||"").trim()!=="")){
+    anRows.push({firma_id:firmaId,vorname:contact.vorname||"",nachname:contact.nachname||"",rolle:contact.rolle||"",telefon:contact.telefon||"",mobil:contact.mobil||"",email:contact.email||"",hauptkontakt:true});
+  }
+  (contact.weitere_kontakte||[]).forEach(p=>{
+    if(![p.vorname,p.nachname,p.position,p.telefon,p.mobil,p.email,p.notiz].some(v=>String(v||"").trim()!==""))return;
+    anRows.push({firma_id:firmaId,vorname:p.vorname||"",nachname:p.nachname||"",rolle:p.position||"",telefon:p.telefon||"",mobil:p.mobil||"",email:p.email||"",hauptkontakt:false});
   });
+  if(anRows.length){const {error}=await supabaseClient.from("crm_ansprechpartner").insert(anRows);if(error)throw error}
 
-  // Kontaktstatus updaten
-  if (ai?.status) {
-    await db.from("contacts").update({ status: ai.status }).eq("id", activeContact.id);
-  }
-
-  document.getElementById("activityInput").value = "";
-
-  loadContacts();
-  renderContactView();
-  updateAISummary();
-};
-
-/* -------------------------------------------------------
-   KI-ZUSAMMENFASSUNG (RIGHT PANEL)
---------------------------------------------------------- */
-async function updateAISummary() {
-  if (!activeContact) {
-    document.getElementById("aiSummary").innerText = "Kein Kontakt ausgewählt.";
-    return;
-  }
-
-  const prompt = `
-Erstelle eine kurze, präzise Zusammenfassung für den Vertrieb:
-
-Firma: ${activeContact.firma}
-Ort: ${activeContact.ort}
-Status: ${activeContact.status}
-
-Schreibe 1–2 Sätze.
-`;
-
-  try {
-    const r = await fetch("[api.openai.com](https://api.openai.com/v1/chat/completions)", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + OPENAI_API_KEY
-      },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-
-    const data = await r.json();
-    document.getElementById("aiSummary").innerText = data.choices[0].message.content;
-
-  } catch {
-    document.getElementById("aiSummary").innerText = "Zusammenfassung nicht verfügbar.";
-  }
+  const {error:delHis}=await supabaseClient.from("crm_historie").delete().eq("firma_id",firmaId);if(delHis)throw delHis;
+  const hRows=(contact.notes_history||[]).filter(n=>String(n.text||"").trim()!==""||String(n.type||"").trim()!==""||String(n.date||"").trim()!=="").map(n=>({
+    firma_id:firmaId,datum:normalizeDate(n.date),uhrzeit:normalizeTime(n.time),art:n.type||"",notiz:n.text||"",
+    termin_datum:normalizeDate(n.appointment_date||n.auto_naechsterkontakt),termin_uhrzeit:normalizeTime(n.appointment_time||n.auto_naechsterkontakt_zeit),
+    auto_status:n.auto_status||"",auto_naechsterkontakt:normalizeDate(n.auto_naechsterkontakt),auto_kontaktart:n.auto_kontaktart||""
+  }));
+  if(hRows.length){const {error}=await supabaseClient.from("crm_historie").insert(hRows);if(error)throw error}
 }
 
-/* -------------------------------------------------------
-   FILTER
---------------------------------------------------------- */
-window.filterContacts = function() {
-  const s = document.getElementById("search").value.toLowerCase();
+async function saveCurrentContact(){
+  const c=getSelected();if(!c){alert("Bitte Kontakt auswählen.");return}
+  try{syncFormToSelected();setSaveState("Speichere Kontakt ...");await saveOneContactToSupabase(getSelected());persistLocalBackup();renderAll();setSaveState("Gespeichert")}catch(e){console.error(e);setSaveState("Speichern fehlgeschlagen",true);alert("Speichern fehlgeschlagen: "+(e.message||""))}
+}
 
-  const filtered = contacts.filter(c =>
-    (c.firma || "").toLowerCase().includes(s) ||
-    (c.ort || "").toLowerCase().includes(s) ||
-    (c.name || "").toLowerCase().includes(s)
-  );
+async function autosaveSelectedToSupabase(){
+  const c=getSelected();if(!c||isLoading)return;
+  try{syncFormToSelected();setSaveState("Autosave ...");await saveOneContactToSupabase(getSelected());persistLocalBackup();setSaveState("Automatisch gespeichert");renderList();renderPanels()}catch(e){console.error(e);setSaveState("Autosave fehlgeschlagen",true)}
+}
+function scheduleAutosave(){if(isLoading)return;syncFormToSelected();renderPanels();clearTimeout(autosaveTimer);setSaveState("Änderungen vorgemerkt ...");autosaveTimer=setTimeout(()=>autosaveSelectedToSupabase(),900)}
+async function loadData(){try{await loadAllFromSupabase();alert("Daten aus Supabase geladen.")}catch(e){console.error(e);setSaveState("Laden fehlgeschlagen",true);alert("Laden fehlgeschlagen: "+(e.message||""))}}
 
-  const box = document.getElementById("contactList");
-  box.innerHTML = filtered.map(c => `
-    <div class="contact-item" onclick="selectContact('${c.id}')">
-      <strong>${c.firma}</strong><br>
-      <span style="font-size:13px;color:#64748b;">${c.ort || ""}</span>
+/* =========================================================
+   LISTE / FILTER
+========================================================= */
+function filteredContacts(){
+  const search=$("search").value.toLowerCase().trim();const statusFilter=$("statusFilter").value;const kt=$("kundentypFilter").value;const region=$("regionFilter").value.toLowerCase().trim();
+  let arr=contacts.filter(c=>{
+    if(dueFilterActive&&(!hasFutureNextContact(c)||c.naechsterkontakt!==todayStr()))return false;
+    const noteTexts=(c.notes_history||[]).map(n=>`${n.type||""} ${n.text||""} ${n.appointment_date||""}`).join(" ");
+    const hay=[c.firma,c.nachname,c.vorname,c.kundentyp,c.bundesland,c.bezirk,c.telefon,c.mobil,c.email,c.strasse,c.plz,c.ort,c.chancenbewertung,noteTexts].join(" ").toLowerCase();
+    const sOk=search===""||hay.includes(search);
+    const visibleStatus=getVisibleStatus(c);
+    const stOk=statusFilter==="Alle"?!c.archived:statusFilter==="Lead"?c.kundenstatus==="Lead"&&!c.archived:statusFilter==="Ohne Status"?!c.archived&&!isInWeclapp(c)&&String(c.status||"")!=="Kein Interesse"&&!hasFutureNextContact(c):statusFilter==="Archiviert"?!!c.archived:statusFilter==="In weclapp"?isInWeclapp(c)&&!c.archived:visibleStatus===statusFilter&&!c.archived;
+    const ktOk=kt==="Alle"||c.kundentyp===kt;
+    const rOk=region===""||[c.plz,c.ort,c.bezirk,c.bundesland].join(" ").toLowerCase().includes(region);
+    return sOk&&stOk&&ktOk&&rOk;
+  });
+  if(currentSort)arr.sort((a,b)=>String(a[currentSort]||"").localeCompare(String(b[currentSort]||""),"de"));
+  return arr;
+}
+function renderList(){
+  renderDueBox();
+  const arr=filteredContacts();const search=$("search").value.trim();const hasFilter=search!==""||$("statusFilter").value!=="Alle"||$("kundentypFilter").value!=="Alle"||$("regionFilter").value.trim()!==""||dueFilterActive;
+  let visible=arr;if(!hasFilter&&$("showRecent").checked)visible=[...arr].slice(0,12);
+  if(!visible.length){$("contactList").innerHTML='<div class="empty">Keine Kontakte gefunden.</div>';return}
+  $("contactList").innerHTML=visible.map(c=>{
+    const name=[c.vorname,c.nachname].filter(Boolean).join(" ");const st=getVisibleStatus(c);
+    return `<div class="contact-item ${selectedId===c.id?'active':''} ${isInWeclapp(c)?'in-weclapp':''}" onclick="selectContact('${c.id}')">
+      <div class="row"><div class="contact-title">${esc(c.firma||"(ohne Firma)")}</div>${st?`<span class="badge ${badgeClass(st)}">${esc(st)}</span>`:""}</div>
+      ${name?`<div class="contact-meta">${esc(name)}</div>`:""}
+      <div class="contact-meta">${esc([c.plz,c.ort].filter(Boolean).join(" "))} ${c.bezirk?"· "+esc(c.bezirk):""}</div>
+      <div class="contact-meta">${phoneLink(c.mobil||c.telefon)||""} ${c.email?" · "+mailLink(c.email):""}</div>
+      <span class="chance-badge ${chanceClass(c.chancenbewertung)}">${esc(chanceLabel(c.chancenbewertung))}</span>
+    </div>`
+  }).join("");
+}
+window.selectContact=function(id){syncFormToSelected();selectedId=id;renderAll()}
+function sortBy(field){currentSort=field;renderList()}
+function clearSearch(){$("search").value="";$("statusFilter").value="Alle";$("kundentypFilter").value="Alle";$("regionFilter").value="";dueFilterActive=false;renderList()}
+function renderDueBox(){
+  const due=contacts.filter(c=>hasFutureNextContact(c)&&c.naechsterkontakt===todayStr());
+  $("dueBox").innerHTML=due.length?`<div class="due-box"><strong>Heute fällig: ${due.length}</strong>${due.slice(0,5).map(c=>`<div class="mt-small" onclick="selectContact('${c.id}')" style="cursor:pointer">${esc(c.firma||"-")} · ${esc(c.kontaktart||"")}</div>`).join("")}<div class="actions"><button class="light" onclick="filterDueToday()">anzeigen</button></div></div>`:"";
+}
+function filterDueToday(){dueFilterActive=true;$("search").value="";$("statusFilter").value="Alle";$("kundentypFilter").value="Alle";$("regionFilter").value="";renderList()}
+
+/* =========================================================
+   DETAILANSICHT
+========================================================= */
+function renderContactView(){
+  const c=getSelected();
+  if(!c){$("contactView").innerHTML='<div class="empty">Bitte Kontakt auswählen.</div>';return}
+  const st=getVisibleStatus(c);
+  $("contactView").innerHTML=`
+    <div class="card">
+      <div class="row">
+        <div><h1 style="margin-bottom:4px">${esc(c.firma||"(ohne Firma)")}</h1><div class="muted">${esc([c.plz,c.ort,c.bezirk].filter(Boolean).join(" · "))}</div></div>
+        ${st?`<span class="badge ${badgeClass(st)}">${esc(st)}</span>`:""}
+      </div>
+      <div class="actions">
+        <button class="primary" onclick="saveCurrentContact()">Speichern</button>
+        <button class="light" onclick="duplicateContact()">Duplizieren</button>
+        <button class="light" onclick="markFollowupToday()">Heute nachfassen</button>
+        <button class="delete" onclick="deleteCurrent()">Löschen</button>
+      </div>
     </div>
-  `).join("");
-};
 
-/* INITIAL LADEN */
-loadContacts();
+    <div class="card">
+      <div class="section-title">Stammdaten</div>
+      <div class="grid4">
+        <div class="full"><label>Firma</label><input id="firma" value="${esc(c.firma)}"></div>
+        <div><label>Straße</label><input id="strasse" value="${esc(c.strasse)}"></div>
+        <div><label>PLZ</label><input id="plz" value="${esc(c.plz)}"></div>
+        <div><label>Ort</label><input id="ort" value="${esc(c.ort)}"></div>
+        <div><label>Bezirk</label><input id="bezirk" value="${esc(c.bezirk)}"></div>
+        <div><label>Bundesland</label><select id="bundesland">${["Burgenland","Kärnten","Niederösterreich","Oberösterreich","Salzburg","Steiermark","Tirol","Vorarlberg","Wien"].map(x=>`<option ${c.bundesland===x?'selected':''}>${x}</option>`).join("")}</select></div>
+        <div><label>Kundentyp</label><select id="kundentyp">${["Fachpartner","B2B","Privat","Sonstiges"].map(x=>`<option ${c.kundentyp===x?'selected':''}>${x}</option>`).join("")}</select></div>
+        <div><label>Kundenstatus</label><select id="kundenstatus">${["Lead","Interessent","Termin vereinbart","Angebot","Kunde","Kein Interesse","Archiviert","Sonstiges"].map(x=>`<option ${c.kundenstatus===x?'selected':''}>${x}</option>`).join("")}</select></div>
+        <div><label>Leadquelle</label><select id="leadquelle">${["","MP Liste","Telefonakquise","Solar Solutions","Empfehlung","Website","Bestandskunde","Sonstiges"].map(x=>`<option ${c.leadquelle===x?'selected':''}>${x||"Bitte wählen"}</option>`).join("")}</select></div>
+        <div><label>In weclapp übernommen</label><select id="weclapp">${["Nein","Ja"].map(x=>`<option ${c.weclapp===x?'selected':''}>${x}</option>`).join("")}</select></div>
+        <div><label>Potenzial</label><select id="potenzial">${["klein","mittel","groß"].map(x=>`<option ${c.potenzial===x?'selected':''}>${x}</option>`).join("")}</select></div>
+        <div><label>Chancenbewertung</label><select id="chancenbewertung">${["","Sehr hoch","Hoch","Mittel","Gering","Sehr gering"].map(x=>`<option value="${x}" ${c.chancenbewertung===x?'selected':''}>${x||"Noch nicht bewertet"}</option>`).join("")}</select></div>
+      </div>
+    </div>
 
+    <div class="card">
+      <div class="row"><div class="section-title" style="margin:0">Ansprechpartner</div><button onclick="addSubContact()">+ Ansprechpartner</button></div>
+      <div class="grid3 mt">
+        <div><label>Nachname</label><input id="nachname" value="${esc(c.nachname)}"></div>
+        <div><label>Vorname</label><input id="vorname" value="${esc(c.vorname)}"></div>
+        <div><label>Rolle / Position</label><input id="rolle" value="${esc(c.rolle)}"></div>
+        <div><label>Telefon</label><input id="telefon" value="${esc(c.telefon)}"></div>
+        <div><label>Mobil</label><input id="mobil" value="${esc(c.mobil)}"></div>
+        <div><label>E-Mail</label><input id="email" value="${esc(c.email)}"></div>
+      </div>
+      <div id="subContactList" class="mt"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Neue Aktivität</div>
+      <input id="status" type="hidden" value="${esc(c.status)}"><input id="erstkontakt" type="hidden" value="${esc(c.erstkontakt)}"><input id="naechsterkontakt" type="hidden" value="${esc(c.naechsterkontakt)}"><input id="naechsterkontakt_zeit" type="hidden" value="${esc(c.naechsterkontakt_zeit)}"><input id="kontaktart" type="hidden" value="${esc(c.kontaktart)}">
+      <div class="grid3">
+        <div><label>Aktivitätsdatum</label><input id="noteDate" type="date" value="${todayStr()}"></div>
+        <div><label>Aktivitätszeit</label><input id="noteTime" type="time"></div>
+        <div><label>Art der Aktivität</label><select id="noteType"><option>📞 Telefonat geführt</option><option>📧 Mail gesendet</option><option>👤 Persönlicher Besuch</option><option>💻 Teams Call</option><option>📄 Unterlagen gesendet</option><option>📄 Angebot erstellt</option><option>⭐ Erstkontakt</option><option>Sonstiges</option></select></div>
+      </div>
+      <label>Was wurde besprochen / Ergebnis</label><textarea id="activityText" placeholder="z.B. Kunde interessiert sich für FENECON, Preise senden, nächste Woche nachfassen ..."></textarea>
+      <div class="grid3">
+        <div><label>Termindatum / Rückruf</label><input id="appointmentDate" type="date"></div>
+        <div><label>Terminzeit</label><input id="appointmentTime" type="time"></div>
+        <div><label>Art des Termins</label><select id="appointmentType"><option value="">Kein Termin / Rückruf</option><option>📅 Termin vereinbart</option><option>📞 Anruf</option><option>⏰ Rückruf vereinbart</option><option>👤 Persönlicher Termin</option><option>💻 Online-Termin</option><option>📧 Mail nachfassen</option><option>Sonstiges</option></select></div>
+      </div>
+      <label>Notiz zum Termin / Rückruf</label><textarea id="appointmentText" placeholder="z.B. Rückruf wegen Angebot, Vor-Ort-Termin, Unterlagen nachfassen ..."></textarea>
+      <div class="actions right">
+        <button class="light" onclick="markDocumentsSent()">📄 Unterlagen versendet</button>
+        <button class="delete" onclick="markNoInterest()">Kein Interesse</button>
+        <button class="primary" onclick="addNoteEntry()">Eintrag hinzufügen</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Aktivitäten / Timeline</div>
+      <div id="noteHistory"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Anhänge / Unterlagen</div>
+      <div id="dropzone" class="dropzone"><strong>Dateien hier auf den Kunden ziehen</strong><div class="hint">PDF, Screenshot, Angebot, Outlook-Datei usw. werden in Supabase Storage gespeichert.</div><div class="mt"><button onclick="$('attachmentInput').click()">Dateien auswählen</button></div></div>
+      <div id="attachmentList" class="mt"></div>
+    </div>
+  `;
+  attachFormListeners();renderSubContacts();renderNoteHistory();renderAttachments();setupDropzone();
+}
+
+function attachFormListeners(){["firma","nachname","vorname","rolle","kundentyp","kundenstatus","leadquelle","bundesland","bezirk","telefon","mobil","email","strasse","plz","ort","weclapp","potenzial","chancenbewertung"].forEach(id=>{const el=$(id);if(el){el.addEventListener("input",scheduleAutosave);el.addEventListener("change",scheduleAutosave)}})}
+function syncFormToSelected(){
+  const c=getSelected();if(!c||isLoading||!$("firma"))return;
+  const get=id=>$(id)?$(id).value:"";
+  contacts=contacts.map(x=>x.id===selectedId?{...x,
+    firma:get("firma").trim(),nachname:get("nachname").trim(),vorname:get("vorname").trim(),rolle:get("rolle").trim(),kundentyp:get("kundentyp"),kundenstatus:get("kundenstatus"),leadquelle:get("leadquelle"),bundesland:get("bundesland"),bezirk:get("bezirk").trim(),telefon:get("telefon").trim(),mobil:get("mobil").trim(),email:get("email").trim(),strasse:get("strasse").trim(),plz:get("plz").trim(),ort:get("ort").trim(),weclapp:get("weclapp"),potenzial:get("potenzial"),chancenbewertung:get("chancenbewertung"),status:get("status")||x.status,erstkontakt:get("erstkontakt")||x.erstkontakt,naechsterkontakt:get("naechsterkontakt")||x.naechsterkontakt,naechsterkontakt_zeit:get("naechsterkontakt_zeit")||x.naechsterkontakt_zeit,kontaktart:get("kontaktart")||x.kontaktart
+  }:x)
+}
+
+/* =========================================================
+   PANELS
+========================================================= */
+function renderPanels(){
+  const c=getSelected();
+  if(!c){$("aiPanel").innerHTML="Kein Kontakt ausgewählt.";$("attachmentPanel").innerHTML="Keine Anhänge.";$("activityPanel").innerHTML="Keine Aktivitäten.";return}
+  const last=(c.notes_history||[]).slice(-1)[0];
+  const recommendation=getRecommendation(c,last);
+  $("aiPanel").innerHTML=`<h4>${esc(c.firma||"(ohne Firma)")}</h4><p><strong>Status:</strong> ${esc(getVisibleStatus(c)||c.status||"-")}</p><p><strong>Potenzial:</strong> ${esc(c.potenzial||"-")}</p><p><strong>Chance:</strong> <span class="chance-badge ${chanceClass(c.chancenbewertung)}">${esc(chanceLabel(c.chancenbewertung))}</span></p><p><strong>Nächster Kontakt:</strong><br>${hasFutureNextContact(c)?`${formatDateDisplay(c.naechsterkontakt)} ${esc(c.naechsterkontakt_zeit||"")}<br>${esc(c.kontaktart||"")}`:"Keine zukünftige Wiedervorlage"}</p><div class="ai-box"><strong>Empfehlung:</strong><br>${recommendation}</div>`;
+  const atts=c.attachments||[];$("attachmentPanel").innerHTML=atts.length?atts.map((a,i)=>`<div class="mini-card"><strong>${esc(a.filename||a.name||"Datei")}</strong><div class="hint">${esc(a.filetype||a.type||"Datei")} · ${esc(humanSize(a.filesize||a.size||0))}</div><button class="light mt-small" onclick="openAttachment(${i})">Öffnen</button></div>`).join(""):"Keine Anhänge vorhanden.";
+  const notes=[...(c.notes_history||[])].reverse().slice(0,5);$("activityPanel").innerHTML=notes.length?notes.map(n=>`<div class="mini-card"><strong>${esc(formatDateDisplay(n.date||""))}</strong><div class="hint">${esc(n.type||"Aktivität")}</div><div class="small">${esc(n.text||"").slice(0,220)}</div></div>`).join(""):"Keine Aktivitäten vorhanden.";
+}
+function getRecommendation(c,last){if(isInWeclapp(c))return"Kontakt wurde in weclapp übernommen. Weiterführung dort.";if(c.status==="Kein Interesse")return"Nicht weiter aktiv bearbeiten, außer später bewusst reaktivieren.";if(hasFutureNextContact(c)&&c.naechsterkontakt<=todayStr())return"Heute aktiv nachfassen.";if((c.status||"").includes("Unterlagen"))return"Unterlagen zeitnah nachtelefonieren, damit der Kontakt nicht kalt wird.";if((c.status||"").includes("Termin"))return"Termin vorbereiten und letzten Gesprächsstand prüfen.";if(!last)return"Erstkontakt oder nächsten Schritt dokumentieren.";return"Kontakt warm halten und klare nächste Wiedervorlage setzen."}
+
+/* =========================================================
+   SUBCONTACTS / NOTES / ATTACHMENTS
+========================================================= */
+function renderSubContacts(){const c=getSelected(),box=$("subContactList");if(!box||!c)return;const list=c.weitere_kontakte||[];if(!list.length){box.innerHTML='<div class="empty">Keine weiteren Ansprechpartner.</div>';return}box.innerHTML=list.map((p,i)=>`<div class="subcontact-card"><div class="row"><strong>Ansprechpartner ${i+2}</strong><button class="delete" onclick="removeSubContact(${i})">Löschen</button></div><div class="grid3 mt-small"><div><label>Vorname</label><input value="${esc(p.vorname)}" oninput="updateSubContact(${i},'vorname',this.value)"></div><div><label>Nachname</label><input value="${esc(p.nachname)}" oninput="updateSubContact(${i},'nachname',this.value)"></div><div><label>Position</label><input value="${esc(p.position)}" oninput="updateSubContact(${i},'position',this.value)"></div><div><label>Telefon</label><input value="${esc(p.telefon)}" oninput="updateSubContact(${i},'telefon',this.value)"></div><div><label>Mobil</label><input value="${esc(p.mobil)}" oninput="updateSubContact(${i},'mobil',this.value)"></div><div><label>E-Mail</label><input value="${esc(p.email)}" oninput="updateSubContact(${i},'email',this.value)"></div></div></div>`).join("")}
+function addSubContact(){const c=getSelected();if(!c)return;contacts=contacts.map(x=>x.id===selectedId?{...x,weitere_kontakte:[...(x.weitere_kontakte||[]),{vorname:"",nachname:"",telefon:"",mobil:"",email:"",position:"",notiz:""}]}:x);renderContactView();scheduleAutosave()}
+function updateSubContact(i,field,value){contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const w=[...(x.weitere_kontakte||[])];w[i]={...(w[i]||{}),[field]:value};return{...x,weitere_kontakte:w}});scheduleAutosave()}
+function removeSubContact(i){contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const w=[...(x.weitere_kontakte||[])];w.splice(i,1);return{...x,weitere_kontakte:w}});renderContactView();scheduleAutosave()}
+
+function applyTimelineLogic(noteType,activityDate,appointmentDate,appointmentTime,appointmentType){
+  const selected=getSelected();if(isInWeclapp(selected))return;const type=String(noteType||"").toLowerCase();const appointment=String(appointmentType||"").toLowerCase();const future=appointmentDate&&new Date(appointmentDate+"T"+(appointmentTime||"23:59"))>=new Date();
+  if(type.includes("erstkontakt")&&!$("erstkontakt").value)$("erstkontakt").value=activityDate||todayStr();
+  if(type.includes("termin vereinbart")||appointment.includes("termin vereinbart")||appointment.includes("persönlicher termin")||appointment.includes("online-termin")){$("status").value="Termin vereinbart";$("kontaktart").value=appointmentType?appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,""):"Persönlicher Termin";if(future){$("naechsterkontakt").value=appointmentDate;$("naechsterkontakt_zeit").value=appointmentTime||""}return}
+  if(appointment.includes("rückruf")||appointment.includes("anruf")){$("status").value="Telefonat ausgemacht";$("kontaktart").value=appointmentType?appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,""):"Rückruf";if(future){$("naechsterkontakt").value=appointmentDate;$("naechsterkontakt_zeit").value=appointmentTime||""}return}
+  if(appointment.includes("mail nachfassen")){$("status").value="Telefonat ausgemacht";$("kontaktart").value="Mail nachfassen";if(future){$("naechsterkontakt").value=appointmentDate;$("naechsterkontakt_zeit").value=appointmentTime||""}return}
+  if(type.includes("mail")||type.includes("unterlagen")||type.includes("angebot")){$("status").value="Unterlagen versendet";$("kontaktart").value="Unterlagen";return}
+  if(type.includes("telefonat")||type.includes("teams")){$("status").value="Sonstiges";$("kontaktart").value=type.includes("teams")?"Teams Call":"Telefonat";return}
+  $("status").value="Sonstiges";$("kontaktart").value="Sonstiges";
+}
+async function addNoteEntry(){
+  const c=getSelected();if(!c)return alert("Bitte Kontakt auswählen.");
+  const date=$("noteDate").value||todayStr(),time=$("noteTime").value||"",type=$("noteType").value||"Sonstiges",appointmentDate=$("appointmentDate").value||"",appointmentTime=$("appointmentTime").value||"",appointmentType=$("appointmentType").value||"",activityText=$("activityText").value.trim(),appointmentText=$("appointmentText").value.trim();
+  const parts=[];if(activityText)parts.push("Aktivität: "+activityText);if(appointmentDate||appointmentTime||appointmentType||appointmentText){parts.push("Termin/Rückruf: "+[appointmentType?"Art: "+appointmentType.replace(/^[^a-zA-ZÄÖÜäöüß]+\s*/,""):"",appointmentDate?"Datum: "+formatDateDisplay(appointmentDate):"",appointmentTime?"Zeit: "+appointmentTime:"",appointmentText?"Notiz: "+appointmentText:""].filter(Boolean).join(" • "))}
+  const text=parts.join("\n");if(!text)return alert("Bitte Aktivitätsnotiz oder Termin eingeben.");
+  applyTimelineLogic(type,date,appointmentDate,appointmentTime,appointmentType);
+  const note={date,time,type,text,appointment_date:appointmentDate,appointment_time:appointmentTime,appointment_type:appointmentType,activity_text:activityText,appointment_text:appointmentText,auto_status:$("status").value,auto_naechsterkontakt:$("naechsterkontakt").value,auto_naechsterkontakt_zeit:$("naechsterkontakt_zeit").value,auto_kontaktart:$("kontaktart").value};
+  contacts=contacts.map(x=>x.id===selectedId?{...x,status:$("status").value,erstkontakt:$("erstkontakt").value,naechsterkontakt:$("naechsterkontakt").value,naechsterkontakt_zeit:$("naechsterkontakt_zeit").value,kontaktart:$("kontaktart").value,notes_history:[...(x.notes_history||[]),note]}:x);
+  renderContactView();renderList();renderPanels();await autosaveSelectedToSupabase();
+}
+async function markNoInterest(){const c=getSelected();if(!c)return;if(!confirm(`"${c.firma||'Kontakt'}" wirklich als Kein Interesse markieren?`))return;const date=$("noteDate").value||todayStr(),time=$("noteTime").value||"",text=$("activityText").value.trim()||"Kein Interesse vermerkt.";contacts=contacts.map(x=>x.id===selectedId?{...x,status:"Kein Interesse",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"Kein Interesse",notes_history:[...(x.notes_history||[]),{date,time,type:"Kein Interesse",text,auto_status:"Kein Interesse",auto_naechsterkontakt:"",auto_naechsterkontakt_zeit:"",auto_kontaktart:"Kein Interesse"}]}:x);renderContactView();renderList();renderPanels();await autosaveSelectedToSupabase()}
+async function markDocumentsSent(){const c=getSelected();if(!c)return;const date=$("noteDate").value||todayStr(),time=$("noteTime").value||"";let appointmentDate=$("appointmentDate").value||addDays(date,14),appointmentTime=$("appointmentTime").value||"";const activityText=$("activityText").value.trim()||"Unterlagen wurden versendet.";const note={date,time,type:"📄 Unterlagen gesendet",text:"Aktivität: "+activityText+"\nTermin/Rückruf: Art: Nachfassen Unterlagen • Datum: "+formatDateDisplay(appointmentDate),appointment_date:appointmentDate,appointment_time:appointmentTime,appointment_type:"Nachfassen Unterlagen",auto_status:"Unterlagen versendet",auto_naechsterkontakt:appointmentDate,auto_naechsterkontakt_zeit:appointmentTime,auto_kontaktart:"Nachfassen Unterlagen"};contacts=contacts.map(x=>x.id===selectedId?{...x,status:"Unterlagen versendet",naechsterkontakt:appointmentDate,naechsterkontakt_zeit:appointmentTime,kontaktart:"Nachfassen Unterlagen",notes_history:[...(x.notes_history||[]),note]}:x);renderContactView();renderList();renderPanels();await autosaveSelectedToSupabase()}
+function renderNoteHistory(){const c=getSelected(),box=$("noteHistory");if(!box||!c)return;if(!(c.notes_history||[]).length){box.innerHTML='<div class="empty">Noch keine Aktivitäten vorhanden.</div>';return}box.innerHTML=[...(c.notes_history||[])].map((n,i)=>`<div class="timeline-item"><div class="timeline-head"><div><strong>${esc(formatDateDisplay(n.date||""))}${n.time?" · "+esc(n.time):""}</strong><div class="hint">${esc(n.type||"Aktivität")}</div>${n.appointment_date?`<div class="hint">Termin: ${esc(formatDateDisplay(n.appointment_date))} ${esc(n.appointment_time||"")}</div>`:""}</div><div class="actions"><button class="light" onclick="cancelAppointmentFromNote(${i})">Termin abgesagt</button><button class="delete" onclick="removeNoteEntry(${i})">Löschen</button></div></div><div class="timeline-text mt-small">${esc(n.text||"")}</div>${n.auto_status?`<div class="ai-box mt-small">Status: ${esc(n.auto_status)} ${n.auto_naechsterkontakt?"· WV: "+esc(formatDateDisplay(n.auto_naechsterkontakt)):""}</div>`:""}</div>`).reverse().join("")}
+async function removeNoteEntry(index){contacts=contacts.map(x=>{if(x.id!==selectedId)return x;const n=[...(x.notes_history||[])];n.splice(index,1);return{...x,notes_history:n}});renderContactView();renderPanels();await autosaveSelectedToSupabase()}
+async function cancelAppointmentFromNote(index){const c=getSelected();if(!c)return;const notes=[...(c.notes_history||[])],note=notes[index];if(!note)return;if(!confirm("Termin wirklich als abgesagt markieren?"))return;notes[index]={...note,type:"Termin abgesagt",text:(note.text||"")+"\n\nTermin wurde abgesagt.",auto_status:"Termin abgesagt",auto_naechsterkontakt:"",auto_naechsterkontakt_zeit:"",auto_kontaktart:"Termin abgesagt"};contacts=contacts.map(x=>x.id===selectedId?{...x,status:"Termin abgesagt",naechsterkontakt:x.naechsterkontakt===note.appointment_date?"":x.naechsterkontakt,naechsterkontakt_zeit:x.naechsterkontakt===note.appointment_date?"":x.naechsterkontakt_zeit,kontaktart:"Termin abgesagt",notes_history:notes}:x);renderContactView();renderList();renderPanels();await autosaveSelectedToSupabase()}
+
+function renderAttachments(){const c=getSelected(),list=$("attachmentList");if(!list||!c)return;const atts=c.attachments||[];if(!atts.length){list.innerHTML='<div class="empty">Noch keine Anhänge.</div>';return}list.innerHTML=atts.map((a,i)=>`<div class="attachment-item"><div><strong>${esc(a.filename||a.name||"Datei")}</strong><div class="hint">${esc(a.filetype||a.type||"Datei")} · ${esc(humanSize(a.filesize||a.size||0))}</div></div><div class="actions"><button class="light" onclick="openAttachment(${i})">Öffnen</button><button class="delete" onclick="removeAttachment(${i})">Löschen</button></div></div>`).join("")}
+async function ensureSelectedHasSupabaseId(){syncFormToSelected();let c=getSelected();if(!c)throw new Error("Kein Kontakt ausgewählt");if(!isUuid(c.id)){await saveOneContactToSupabase(c);c=getSelected();renderAll()}return c.id}
+async function addAttachmentsToCurrent(files){const c=getSelected();if(!c)return alert("Bitte Kontakt auswählen.");if(!files||!files.length)return;try{const firmaId=await ensureSelectedHasSupabaseId();for(const file of Array.from(files)){setSaveState("Upload: "+file.name);const safeName=file.name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9.\-_]/g,"_").replace(/_+/g,"_");const filePath=firmaId+"/"+Date.now()+"_"+safeName;const {error:up}=await supabaseClient.storage.from("crm-attachments").upload(filePath,file,{upsert:false});if(up)throw up;const {error:db}=await supabaseClient.from("crm_anhaenge").insert({firma_id:firmaId,filename:file.name,filepath:filePath,filetype:file.type||"Datei",filesize:file.size||0});if(db)throw db}await loadAttachmentsForCurrent();setSaveState("Datei gespeichert")}catch(e){console.error(e);setSaveState("Upload fehlgeschlagen",true);alert("Upload fehlgeschlagen: "+(e.message||""))}}
+function handleAttachmentInput(e){addAttachmentsToCurrent(e.target.files);e.target.value=""}
+async function loadAttachmentsForCurrent(){const c=getSelected();if(!c||!isUuid(c.id))return;const {data,error}=await supabaseClient.from("crm_anhaenge").select("*").eq("firma_id",c.id).order("created_at",{ascending:false});if(error){console.error(error);return}contacts=contacts.map(x=>x.id===c.id?{...x,attachments:data||[]}:x);renderAttachments();renderPanels();persistLocalBackup()}
+async function openAttachment(i){const c=getSelected();if(!c)return;const a=(c.attachments||[])[i];if(!a)return;const {data,error}=await supabaseClient.storage.from("crm-attachments").createSignedUrl(a.filepath,60);if(error){alert("Datei konnte nicht geöffnet werden.");return}window.open(data.signedUrl,"_blank")}
+async function removeAttachment(i){const c=getSelected();if(!c)return;const a=(c.attachments||[])[i];if(!a||!confirm("Anhang wirklich löschen?"))return;try{if(a.filepath)await supabaseClient.storage.from("crm-attachments").remove([a.filepath]);if(a.id){const {error}=await supabaseClient.from("crm_anhaenge").delete().eq("id",a.id);if(error)throw error}await loadAttachmentsForCurrent();setSaveState("Anhang gelöscht")}catch(e){alert("Löschen fehlgeschlagen: "+(e.message||""))}}
+function setupDropzone(){const dz=$("dropzone");if(!dz)return;dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("dragover")});dz.addEventListener("dragleave",()=>dz.classList.remove("dragover"));dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("dragover");if(e.dataTransfer?.files?.length)addAttachmentsToCurrent(e.dataTransfer.files)})}
+
+/* =========================================================
+   KONTAKTE / AKTIONEN
+========================================================= */
+function newContact(){syncFormToSelected();const id=Date.now().toString();contacts.unshift({id,firma:"",nachname:"",vorname:"",rolle:"",kundentyp:"Fachpartner",kundenstatus:"Lead",bundesland:"Oberösterreich",bezirk:"",telefon:"",mobil:"",email:"",strasse:"",plz:"",ort:"",status:"Sonstiges",erstkontakt:"",naechsterkontakt:"",naechsterkontakt_zeit:"",kontaktart:"",weclapp:"Nein",leadquelle:"",potenzial:"mittel",chancenbewertung:"",notes_history:[],attachments:[],weitere_kontakte:[],archived:false});selectedId=id;renderAll();scheduleAutosave()}
+function duplicateContact(){const c=getSelected();if(!c)return alert("Bitte Kontakt auswählen.");const copy=JSON.parse(JSON.stringify(c));copy.id=Date.now().toString();copy.firma=(copy.firma||"")+" Kopie";copy.attachments=[];contacts.unshift(copy);selectedId=copy.id;renderAll();scheduleAutosave()}
+async function deleteCurrent(){const c=getSelected();if(!c)return;if(!confirm(`Kontakt "${c.firma||c.id}" wirklich löschen?`))return;try{if(isUuid(c.id)){const {error}=await supabaseClient.from("crm_firmen").delete().eq("id",c.id);if(error)throw error}contacts=contacts.filter(x=>x.id!==c.id);selectedId=contacts.length?contacts[0].id:null;renderAll();persistLocalBackup();setSaveState("Kontakt gelöscht")}catch(e){alert("Löschen fehlgeschlagen: "+(e.message||""))}}
+async function markFollowupToday(){const c=getSelected();if(!c)return;contacts=contacts.map(x=>x.id===selectedId?{...x,naechsterkontakt:todayStr(),status:x.status||"Telefonat ausgemacht",kontaktart:x.kontaktart||"Nachfassen"}:x);renderAll();await autosaveSelectedToSupabase()}
+
+function renderAll(){renderList();renderContactView();renderPanels()}
+
+/* =========================================================
+   START
+========================================================= */
+async function initApp(){
+  try{await loadAllFromSupabase()}catch(e){console.warn(e);try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");contacts=sanitizeContacts(saved.contacts||[]);selectedId=contacts.length?contacts[0].id:null;renderAll();setSaveState("Lokale Sicherung geladen",true)}catch(_){contacts=[];selectedId=null;renderAll();setSaveState("Keine Daten vorhanden",true)}}
+}
+initApp();
 </script>
-
 </body>
 </html>
