@@ -246,10 +246,32 @@ async function saveCurrentContact(){
   const c=getSelected();if(!c){alert("Bitte Kontakt auswählen.");return}
   try{syncFormToSelected();setSaveState("Speichere Kontakt ...");await saveOneContactToSupabase(getSelected());persistLocalBackup();renderAll();setSaveState("Gespeichert")}catch(e){console.error(e);setSaveState("Speichern fehlgeschlagen",true);alert("Speichern fehlgeschlagen: "+(e.message||""))}
 }
-
 async function autosaveSelectedToSupabase(){
-  const c=getSelected();if(!c||isLoading)return;
-  try{syncFormToSelected();setSaveState("Autosave ...");await saveOneContactToSupabase(getSelected());persistLocalBackup();setSaveState("Automatisch gespeichert");renderList();renderPanels()}catch(e){console.error(e);setSaveState("Autosave fehlgeschlagen",true)}
+  const c = getSelected();
+
+  if(!c || isLoading) return;
+
+  try{
+    if($("firma")) {
+      syncFormToSelected();
+    }
+
+    setSaveState("Autosave ...");
+
+    await saveOneContactToSupabase(getSelected());
+
+    persistLocalBackup();
+
+    setSaveState("Automatisch gespeichert");
+
+    renderList();
+    renderPanels();
+
+  }catch(e){
+    console.error(e);
+    setSaveState("Autosave fehlgeschlagen", true);
+  }
+}
 }
 function scheduleAutosave(){if(isLoading)return;syncFormToSelected();renderPanels();clearTimeout(autosaveTimer);setSaveState("Änderungen vorgemerkt ...");autosaveTimer=setTimeout(()=>autosaveSelectedToSupabase(),900)}
 async function loadData(){try{await loadAllFromSupabase();alert("Daten aus Supabase geladen.")}catch(e){console.error(e);setSaveState("Laden fehlgeschlagen",true);alert("Laden fehlgeschlagen: "+(e.message||""))}}
