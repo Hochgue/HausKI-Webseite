@@ -259,6 +259,137 @@ button.light{background:#e2e8f0;color:#1e293b}
   #app{display:block;height:auto}
   .grid2,.grid3{grid-template-columns:1fr}
 }
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  margin-bottom:22px;
+}
+
+.kpi-card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.kpi-title{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:10px;
+  font-weight:700;
+}
+
+.kpi-value{
+  font-size:34px;
+  font-weight:800;
+}
+
+.chart-card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:24px;
+  box-shadow:var(--shadow);
+  margin-bottom:22px;
+}
+
+.chart-title{
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:20px;
+}
+
+.chart-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:18px;
+  height:240px;
+}
+
+.chart-bar-wrap{
+  flex:1;
+  text-align:center;
+}
+
+.chart-bar{
+  width:100%;
+  border-radius:12px 12px 0 0;
+  background:linear-gradient(
+    180deg,
+    var(--blue-hover),
+    var(--blue)
+  );
+}
+
+.chart-label{
+  margin-top:10px;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:700;
+}
+
+.dashboard-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
+}
+
+.dashboard-list{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.dashboard-list-title{
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:18px;
+}
+
+.dashboard-item{
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  margin-bottom:12px;
+  background:#f8fafc;
+}
+
+.dashboard-item-title{
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.dashboard-item-meta{
+  font-size:13px;
+  color:var(--muted);
+}
+
+@media(max-width:1200px){
+
+  .dashboard-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .dashboard-row{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:700px){
+
+  .dashboard-grid{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 
@@ -315,235 +446,146 @@ button.light{background:#e2e8f0;color:#1e293b}
 
   <main class="main">
 
-    <div class="card">
-      <div class="card-title">Kundenakte</div>
+    <div class="dashboard-grid">
 
-      <div class="grid2">
-        <div class="full">
-          <label>Firma</label>
-          <input placeholder="Firmenname">
-        </div>
+  <div class="kpi-card">
+    <div class="kpi-title">
+      Leads
+    </div>
 
-        <div>
-          <label>Straße</label>
-          <input placeholder="Straße + Nummer">
-        </div>
+    <div class="kpi-value">
+      42
+    </div>
+  </div>
 
-        <div>
-          <label>PLZ / Ort</label>
-          <input placeholder="PLZ + Ort">
-        </div>
+  <div class="kpi-card">
+    <div class="kpi-title">
+      Termine offen
+    </div>
 
-        <div>
-          <label>Bundesland</label>
-          <select>
-            <option>Oberösterreich</option>
-            <option>Niederösterreich</option>
-            <option>Wien</option>
-            <option>Steiermark</option>
-            <option>Salzburg</option>
-            <option>Tirol</option>
-            <option>Vorarlberg</option>
-            <option>Kärnten</option>
-            <option>Burgenland</option>
-          </select>
-        </div>
+    <div class="kpi-value">
+      8
+    </div>
+  </div>
 
-        <div>
-          <label>Kundentyp</label>
-          <select>
-            <option>Fachpartner</option>
-            <option>B2B</option>
-            <option>Privat</option>
-            <option>Sonstiges</option>
-          </select>
-        </div>
+  <div class="kpi-card">
+    <div class="kpi-title">
+      Angebote
+    </div>
 
-        <div>
-          <label>Kundenstatus</label>
-          <select>
-            <option>Lead</option>
-            <option>Interessent</option>
-            <option>Termin vereinbart</option>
-            <option>Kunde</option>
-            <option>Kein Interesse</option>
-          </select>
-        </div>
+    <div class="kpi-value">
+      5
+    </div>
+  </div>
 
-        <div>
-          <label>Potenzial</label>
-          <select>
-            <option>klein</option>
-            <option>mittel</option>
-            <option>groß</option>
-          </select>
-        </div>
+  <div class="kpi-card">
+    <div class="kpi-title">
+      Hohe Chancen
+    </div>
 
-        <div>
-          <label>Chancenbewertung</label>
-          <select>
-            <option>Sehr hoch</option>
-            <option>Hoch</option>
-            <option>Mittel</option>
-            <option>Gering</option>
-            <option>Sehr gering</option>
-          </select>
-        </div>
+    <div class="kpi-value">
+      12
+    </div>
+  </div>
+
+</div>
+
+<div class="chart-card">
+
+  <div class="chart-title">
+    Vertriebsverlauf
+  </div>
+
+  <div class="chart-bars">
+
+    <div class="chart-bar-wrap">
+      <div class="chart-bar" style="height:90px;"></div>
+      <div class="chart-label">KW18</div>
+    </div>
+
+    <div class="chart-bar-wrap">
+      <div class="chart-bar" style="height:150px;"></div>
+      <div class="chart-label">KW19</div>
+    </div>
+
+    <div class="chart-bar-wrap">
+      <div class="chart-bar" style="height:210px;"></div>
+      <div class="chart-label">KW20</div>
+    </div>
+
+    <div class="chart-bar-wrap">
+      <div class="chart-bar" style="height:170px;"></div>
+      <div class="chart-label">KW21</div>
+    </div>
+
+    <div class="chart-bar-wrap">
+      <div class="chart-bar" style="height:230px;"></div>
+      <div class="chart-label">KW22</div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="dashboard-row">
+
+  <div class="dashboard-list">
+
+    <div class="dashboard-list-title">
+      Heute fällig
+    </div>
+
+    <div class="dashboard-item">
+      <div class="dashboard-item-title">
+        Elektro Huber
       </div>
 
-      <div class="sub-block mt">
-        <div class="sub-block-title">Ansprechpartner</div>
-
-        <div class="grid2">
-          <div>
-            <label>Vorname</label>
-            <input>
-          </div>
-
-          <div>
-            <label>Nachname</label>
-            <input>
-          </div>
-
-          <div>
-            <label>Telefon</label>
-            <input>
-          </div>
-
-          <div>
-            <label>E-Mail</label>
-            <input type="email">
-          </div>
-
-          <div class="full">
-            <label>Position / Rolle</label>
-            <input>
-          </div>
-        </div>
-      </div>
-
-      <div class="actions right mt">
-        <button class="light">In weclapp</button>
-        <button>Speichern</button>
+      <div class="dashboard-item-meta">
+        Rückruf wegen Angebot
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Neue Aktivität</div>
-
-      <div class="hint" style="margin-bottom:18px;">
-        Aktivitätsdatum = wann du etwas gemacht hast.
-        Termindatum = wann der vereinbarte Termin/Rückruf stattfinden soll.
+    <div class="dashboard-item">
+      <div class="dashboard-item-title">
+        Solar Partner GmbH
       </div>
 
-      <div class="sub-block">
-        <div class="sub-block-title">📞 Aktivität</div>
-
-        <div class="grid3">
-          <div>
-            <label>Aktivitätsdatum</label>
-            <input type="date">
-          </div>
-
-          <div>
-            <label>Aktivitätszeit</label>
-            <input type="time">
-          </div>
-
-          <div>
-            <label>Art der Aktivität</label>
-            <select>
-              <option>📞 Telefonat geführt</option>
-              <option>📧 Mail gesendet</option>
-              <option>👤 Persönlicher Besuch</option>
-              <option>💻 Teams Call</option>
-              <option>📄 Unterlagen gesendet</option>
-              <option>📄 Angebot erstellt</option>
-              <option>⭐ Erstkontakt</option>
-              <option>Sonstiges</option>
-            </select>
-          </div>
-        </div>
-
-        <label>Was wurde besprochen / Ergebnis</label>
-        <textarea placeholder="Zum Beispiel: Kunde interessiert sich für FENECON, möchte Preise, Projekt grob besprochen ..."></textarea>
-      </div>
-
-      <div class="sub-block mt">
-        <div class="sub-block-title">📅 Termin / Rückruf optional</div>
-
-        <div class="grid3">
-          <div>
-            <label>Termindatum</label>
-            <input type="date">
-          </div>
-
-          <div>
-            <label>Terminzeit</label>
-            <input type="time">
-          </div>
-
-          <div>
-            <label>Art des Termins</label>
-            <select>
-              <option>Kein Termin / Rückruf</option>
-              <option>📅 Termin vereinbart</option>
-              <option>📞 Anruf</option>
-              <option>⏰ Rückruf vereinbart</option>
-              <option>👤 Persönlicher Termin</option>
-              <option>💻 Online-Termin</option>
-              <option>📧 Mail nachfassen</option>
-              <option>Sonstiges</option>
-            </select>
-          </div>
-        </div>
-
-        <label>Notiz zum Termin / Rückruf</label>
-        <textarea placeholder="Zum Beispiel: Rückruf wegen Angebot, Vor-Ort-Termin, Unterlagen nachfassen ..."></textarea>
-      </div>
-
-      <div class="actions right mt">
-        <button class="orange">📄 Unterlagen versendet</button>
-        <button class="red">Kein Interesse</button>
-        <button class="green">Eintrag hinzufügen</button>
+      <div class="dashboard-item-meta">
+        Termin vorbereiten
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Aktivitäten / Timeline</div>
+  </div>
 
-      <div class="timeline-item">
-        <strong>07.05.2026 · 10:30</strong>
-        <div class="muted small">📞 Telefonat geführt</div>
-        <div class="timeline-text">
-Kunde interessiert sich für FENECON Home.
-Preise senden.
-Rückruf nächste Woche.
-        </div>
+  <div class="dashboard-list">
+
+    <div class="dashboard-list-title">
+      Letzte Aktivitäten
+    </div>
+
+    <div class="dashboard-item">
+      <div class="dashboard-item-title">
+        FENECON Angebot gesendet
+      </div>
+
+      <div class="dashboard-item-meta">
+        vor 2 Stunden
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Anhänge / Unterlagen</div>
-
-      <div class="dropzone">
-        <strong>Dateien hier auf den Kunden ziehen</strong>
-        <div class="hint" style="margin-top:8px;">
-          Outlook-Mail als .msg, PDF, Angebot, Screenshot oder sonstige Unterlagen.
-        </div>
-        <div style="margin-top:16px;">
-          <button>Dateien auswählen</button>
-        </div>
+    <div class="dashboard-item">
+      <div class="dashboard-item-title">
+        Neuer Lead importiert
       </div>
 
-      <div class="file-row mt">
-        <div>
-          <strong>Angebot_Fenecon.pdf</strong>
-          <div class="small muted">PDF · 1.2 MB</div>
-        </div>
-        <button class="light">Öffnen</button>
+      <div class="dashboard-item-meta">
+        heute
       </div>
     </div>
+
+  </div>
+
+</div>
 
   </main>
 
