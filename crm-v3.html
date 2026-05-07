@@ -480,6 +480,67 @@ button.light{background:#e2e8f0;color:#1e293b}
 .legend-color.partner{
   background:#16a34a;
 }
+
+/* =====================================================
+   DASHBOARD DOUBLE CHARTS
+===================================================== */
+
+.dashboard-charts{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:22px;
+  margin-bottom:22px;
+}
+
+.state-chart{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-top:20px;
+}
+
+.state-row{
+  display:grid;
+  grid-template-columns:140px 1fr 40px;
+  gap:12px;
+  align-items:center;
+}
+
+.state-name{
+  font-size:13px;
+  font-weight:700;
+}
+
+.state-bar-wrap{
+  height:16px;
+  background:#e2e8f0;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.state-bar{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(
+    90deg,
+    #16a34a,
+    #22c55e
+  );
+}
+
+.state-value{
+  font-size:13px;
+  font-weight:800;
+  text-align:right;
+}
+
+@media(max-width:1200px){
+
+  .dashboard-charts{
+    grid-template-columns:1fr;
+  }
+
+}
 </style>
 </head>
 
@@ -712,6 +773,167 @@ button.light{background:#e2e8f0;color:#1e293b}
 
 
 <div class="dashboard-row">
+
+  <div class="dashboard-charts">
+
+  <!-- VERTRIEBSVERLAUF -->
+
+  <div class="card">
+
+    <div class="card-title">
+      Vertriebsverlauf
+    </div>
+
+    <div class="sales-chart">
+
+      <!-- KW18 -->
+      <div class="week-group">
+
+        <div class="week-bars">
+          <div class="bar calls" style="height:180px;"></div>
+          <div class="bar fpv" style="height:110px;"></div>
+          <div class="bar partner" style="height:40px;"></div>
+        </div>
+
+        <div class="week-label">
+          KW18
+        </div>
+
+      </div>
+
+      <!-- KW19 -->
+      <div class="week-group">
+
+        <div class="week-bars">
+          <div class="bar calls" style="height:220px;"></div>
+          <div class="bar fpv" style="height:140px;"></div>
+          <div class="bar partner" style="height:60px;"></div>
+        </div>
+
+        <div class="week-label">
+          KW19
+        </div>
+
+      </div>
+
+      <!-- KW20 -->
+      <div class="week-group">
+
+        <div class="week-bars">
+          <div class="bar calls" style="height:250px;"></div>
+          <div class="bar fpv" style="height:180px;"></div>
+          <div class="bar partner" style="height:80px;"></div>
+        </div>
+
+        <div class="week-label">
+          KW20
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BUNDESLÄNDER -->
+
+  <div class="card">
+
+    <div class="card-title">
+      Fachpartner nach Bundesland
+    </div>
+
+    <div class="state-chart">
+
+      <div class="state-row">
+
+        <div class="state-name">
+          Oberösterreich
+        </div>
+
+        <div class="state-bar-wrap">
+
+          <div
+            class="state-bar"
+            style="width:85%;"
+          ></div>
+
+        </div>
+
+        <div class="state-value">
+          12
+        </div>
+
+      </div>
+
+      <div class="state-row">
+
+        <div class="state-name">
+          Niederösterreich
+        </div>
+
+        <div class="state-bar-wrap">
+
+          <div
+            class="state-bar"
+            style="width:55%;"
+          ></div>
+
+        </div>
+
+        <div class="state-value">
+          7
+        </div>
+
+      </div>
+
+      <div class="state-row">
+
+        <div class="state-name">
+          Wien
+        </div>
+
+        <div class="state-bar-wrap">
+
+          <div
+            class="state-bar"
+            style="width:30%;"
+          ></div>
+
+        </div>
+
+        <div class="state-value">
+          3
+        </div>
+
+      </div>
+
+      <div class="state-row">
+
+        <div class="state-name">
+          Steiermark
+        </div>
+
+        <div class="state-bar-wrap">
+
+          <div
+            class="state-bar"
+            style="width:20%;"
+          ></div>
+
+        </div>
+
+        <div class="state-value">
+          2
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
   <div class="dashboard-list">
 
