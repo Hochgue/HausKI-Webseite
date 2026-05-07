@@ -209,7 +209,7 @@ async function loadAllFromSupabase(){
   renderAll();persistLocalBackup();setSaveState("v2-Daten in v3 geladen");
 }
 
-aasync function saveOneContactToSupabase(contact){
+async function saveOneContactToSupabase(contact){
   if(!contact) return;
 
   let firmaId = isUuid(contact.id) ? contact.id : null;
