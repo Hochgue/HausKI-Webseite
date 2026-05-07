@@ -393,6 +393,276 @@ button.red{
   </aside>
 
 </div>
+<!-- =====================================================
+     BLOCK 2 – AKTIVITÄTEN / TERMIN / ANHÄNGE
+===================================================== -->
 
+<div class="card">
+
+  <div class="card-title">
+    Neue Aktivität
+  </div>
+
+  <div class="hint" style="margin-bottom:18px;">
+    Aktivitätsdatum = wann du etwas gemacht hast.
+    Termindatum = wann der vereinbarte Termin/Rückruf stattfinden soll.
+  </div>
+
+  <!-- AKTIVITÄT -->
+  <div class="sub-block">
+
+    <div class="sub-block-title">
+      📞 Aktivität
+    </div>
+
+    <div class="grid3">
+
+      <div>
+        <label>Aktivitätsdatum</label>
+        <input
+          type="date"
+          id="noteDate"
+        >
+      </div>
+
+      <div>
+        <label>Aktivitätszeit</label>
+        <input
+          type="time"
+          id="noteTime"
+        >
+      </div>
+
+      <div>
+        <label>Art der Aktivität</label>
+
+        <select id="noteType">
+          <option>📞 Telefonat geführt</option>
+          <option>📧 Mail gesendet</option>
+          <option>👤 Persönlicher Besuch</option>
+          <option>💻 Teams Call</option>
+          <option>📄 Unterlagen gesendet</option>
+          <option>📄 Angebot erstellt</option>
+          <option>⭐ Erstkontakt</option>
+          <option>Sonstiges</option>
+        </select>
+
+      </div>
+
+    </div>
+
+    <label>
+      Was wurde besprochen / Ergebnis
+    </label>
+
+    <textarea
+      id="activityText"
+      placeholder="Zum Beispiel: Kunde interessiert sich für FENECON, möchte Preise, Projekt grob besprochen ..."
+    ></textarea>
+
+  </div>
+
+  <!-- TERMIN -->
+  <div class="sub-block mt">
+
+    <div class="sub-block-title">
+      📅 Termin / Rückruf optional
+    </div>
+
+    <div class="grid3">
+
+      <div>
+        <label>Termindatum</label>
+
+        <input
+          type="date"
+          id="appointmentDate"
+        >
+      </div>
+
+      <div>
+        <label>Terminzeit</label>
+
+        <input
+          type="time"
+          id="appointmentTime"
+        >
+      </div>
+
+      <div>
+        <label>Art des Termins</label>
+
+        <select id="appointmentType">
+          <option value="">
+            Kein Termin / Rückruf
+          </option>
+
+          <option>
+            📅 Termin vereinbart
+          </option>
+
+          <option>
+            📞 Anruf
+          </option>
+
+          <option>
+            ⏰ Rückruf vereinbart
+          </option>
+
+          <option>
+            👤 Persönlicher Termin
+          </option>
+
+          <option>
+            💻 Online-Termin
+          </option>
+
+          <option>
+            📧 Mail nachfassen
+          </option>
+
+          <option>
+            Sonstiges
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <label>
+      Notiz zum Termin / Rückruf
+    </label>
+
+    <textarea
+      id="appointmentText"
+      placeholder="Zum Beispiel: Rückruf wegen Angebot, Vor-Ort-Termin, Unterlagen nachfassen ..."
+    ></textarea>
+
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="actions right mt">
+
+    <button class="orange">
+      📄 Unterlagen versendet
+    </button>
+
+    <button class="red">
+      Kein Interesse
+    </button>
+
+    <button class="green">
+      Eintrag hinzufügen
+    </button>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     TIMELINE
+===================================================== -->
+
+<div class="card">
+
+  <div class="card-title">
+    Aktivitäten / Timeline
+  </div>
+
+  <div id="timelineContainer">
+
+    <div class="timeline-item">
+
+      <div class="timeline-top">
+
+        <div>
+          <strong>
+            07.05.2026 · 10:30
+          </strong>
+
+          <div class="muted small">
+            📞 Telefonat geführt
+          </div>
+        </div>
+
+      </div>
+
+      <div class="timeline-text">
+        Kunde interessiert sich für FENECON Home.
+        Preise senden.
+        Rückruf nächste Woche.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     ANHÄNGE
+===================================================== -->
+
+<div class="card">
+
+  <div class="card-title">
+    Anhänge / Unterlagen
+  </div>
+
+  <div
+    class="dropzone"
+    id="dropzone"
+  >
+
+    <strong>
+      Dateien hier auf den Kunden ziehen
+    </strong>
+
+    <div class="hint" style="margin-top:8px;">
+
+      Outlook-Mail als .msg,
+      PDF,
+      Angebot,
+      Screenshot
+      oder sonstige Unterlagen.
+
+    </div>
+
+    <div style="margin-top:16px;">
+
+      <button>
+        Dateien auswählen
+      </button>
+
+    </div>
+
+  </div>
+
+  <div style="margin-top:18px;">
+
+    <div class="file-row">
+
+      <div>
+        <strong>
+          Angebot_Fenecon.pdf
+        </strong>
+
+        <div class="small muted">
+          PDF · 1.2 MB
+        </div>
+      </div>
+
+      <button class="light">
+        Öffnen
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 </body>
 </html>
+
