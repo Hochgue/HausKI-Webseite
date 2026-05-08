@@ -935,9 +935,51 @@ function renderContacts(){
   const list =
     document.getElementById("contactList");
 
+  const search =
+    normalize(document.getElementById("searchInput").value);
+
+  const status =
+    document.getElementById("statusFilter").value;
+
   list.innerHTML = "";
 
-  crmContacts.forEach(contact => {
+  const filteredContacts =
+    crmContacts.filter(contact => {
+
+      const searchText = normalize(`
+        ${contact.firma}
+        ${contact.ansprechpartner}
+        ${contact.vorname}
+        ${contact.nachname}
+        ${contact.ort}
+        ${contact.bezirk}
+        ${contact.bundesland}
+        ${contact.email}
+        ${contact.telefon}
+        ${contact.mobil}
+        ${contact.leadquelle}
+        ${contact.status}
+        ${contact.kundentyp}
+      `);
+
+      const matchesSearch =
+        !search || searchText.includes(search);
+
+      const matchesStatus =
+        status === "Alle Kontakte" ||
+        normalize(contact.status).includes(normalize(status)) ||
+        normalize(contact.kundenstatus).includes(normalize(status));
+
+      return matchesSearch && matchesStatus;
+    });
+
+  if(filteredContacts.length === 0){
+    list.innerHTML =
+      "<div class='contact-meta'>Keine Kontakte gefunden.</div>";
+    return;
+  }
+
+  filteredContacts.forEach(contact => {
 
     const div =
       document.createElement("div");
@@ -951,11 +993,11 @@ function renderContacts(){
 
       <div class="contact-top">
         <div class="contact-name">
-          ${contact.firma}
+          ${contact.firma || "-"}
         </div>
 
         <div class="status-badge orange">
-          ${contact.status || "-"}
+          ${contact.status || contact.kundenstatus || "-"}
         </div>
       </div>
 
@@ -981,6 +1023,10 @@ function renderContacts(){
 
       </div>
     `;
+
+    list.appendChild(div);
+  });
+}
 
     list.appendChild(div);
 
@@ -1018,7 +1064,8 @@ function renderDashboard(){
     hoheChancen;
 
 }
-
+document.getElementById("searchInput").addEventListener("input", renderContacts);
+document.getElementById("statusFilter").addEventListener("change", renderContacts);
 renderContacts();
 renderDashboard();
 
