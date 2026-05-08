@@ -796,69 +796,89 @@ function importCSV(){
       });
 
       const contact = {
-        id: Date.now() + i,
+  id: Date.now() + i,
 
-        firma:
-          row["Firma"] || "",
+  firma:
+    row["Firma"] || "",
 
-        vorname:
-          row["Vorname"] || "",
+  vorname:
+    row["Vorname"] || "",
 
-        nachname:
-          row["Nachname"] || "",
+  nachname:
+    row["Nachname"] || "",
 
-        ansprechpartner:
-          (
-            (row["Vorname"] || "") +
-            " " +
-            (row["Nachname"] || "")
-          ).trim(),
+  ansprechpartner:
+    (
+      (row["Vorname"] || "") +
+      " " +
+      (row["Nachname"] || "")
+    ).trim(),
 
-        telefon:
-          row["Telefon"] || "",
+  telefon:
+    row["Telefon"] || "",
 
-        mobil:
-          row["Mobil"] || "",
+  mobil:
+    row["Mobil"] || "",
 
-        email:
-          row["E-Mail"] || "",
+  email:
+    row["E-Mail"] || "",
 
-        strasse:
-          row["Straße"] || "",
+  strasse:
+    row["Straße"] || "",
 
-        plz:
-          row["PLZ"] || "",
+  plz:
+    row["PLZ"] || "",
 
-        ort:
-          row["Ort"] || "",
+  ort:
+    row["Ort"] || "",
 
-        bundesland:
-          row["Bundesland"] || "",
+  bundesland:
+    row["Bundesland"] || "",
 
-        bezirk:
-          row["Bezirk"] || "",
+  bezirk:
+    row["Bezirk"] || "",
 
-        kundentyp:
-          row["Kundentyp"] || "",
+  kundentyp:
+    row["Kundentyp"] || "",
 
-        kundenstatus:
-          row["Kundenstatus"] || "",
+  kundenstatus:
+    row["Kundenstatus"] || "",
 
-        status:
-          row["Status"] || "",
+  status:
+    row["Status"] || "",
 
-        chance:
-          row["Chancenbewertung"] || "",
+  chance:
+    row["Chancenbewertung"] || "",
 
-        leadquelle:
-          row["Leadquelle"] || "",
+  leadquelle:
+    row["Leadquelle"] || "",
 
-        notiz:
-          row["Notiz"] || "",
+  notiz:
+    row["Notiz"] || "",
 
-        erstellt:
-          new Date().toISOString()
-      };
+  aktivitaeten_alt:
+    row["Aktivitäten"] ||
+    row["Aktivitaeten"] || "",
+
+  mails_alt:
+    row["Mails"] ||
+    row["Mailverlauf"] ||
+    row["E-Mails"] || "",
+
+  anhaenge_alt:
+    row["Anhänge"] ||
+    row["Anhaenge"] || "",
+
+  letzterKontakt:
+    row["Letzter Kontakt"] || "",
+
+  naechsterKontakt:
+    row["Nächster Kontakt"] ||
+    row["Naechster Kontakt"] || "",
+
+  erstellt:
+    new Date().toISOString()
+};
 
       const duplicate =
         isDuplicate(contact);
