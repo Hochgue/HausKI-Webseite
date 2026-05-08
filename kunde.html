@@ -205,14 +205,14 @@ textarea{
 
   <div class="header">
     <div>
-      <div class="customer-title">Musterkunde GmbH</div>
-      <div class="customer-meta">Linz · Fachpartner · Hohe Chance</div>
+      <div class="customer-title" id="headerFirma">Kunde</div>
+      <div class="customer-meta" id="headerMeta">-</div>
     </div>
 
     <div class="header-actions">
-      <button class="light" onclick="history.back()">Zurück</button>
+      <button class="light" onclick="window.location.href='index.html'">Zurück</button>
       <button class="orange">Termin</button>
-      <button class="green">Speichern</button>
+      <button class="green" onclick="saveCustomer()">Speichern</button>
     </div>
   </div>
 
@@ -230,56 +230,108 @@ textarea{
     <div class="grid2">
       <div class="full">
         <label>Firma</label>
-        <input value="Musterkunde GmbH">
+        <input id="firma">
+      </div>
+
+      <div>
+        <label>Ansprechpartner</label>
+        <input id="ansprechpartner">
+      </div>
+
+      <div>
+        <label>E-Mail</label>
+        <input id="email">
+      </div>
+
+      <div>
+        <label>Telefon</label>
+        <input id="telefon">
+      </div>
+
+      <div>
+        <label>Mobil</label>
+        <input id="mobil">
       </div>
 
       <div>
         <label>Straße</label>
-        <input value="Musterstraße 1">
+        <input id="strasse">
       </div>
 
       <div>
-        <label>PLZ / Ort</label>
-        <input value="4020 Linz">
+        <label>PLZ</label>
+        <input id="plz">
+      </div>
+
+      <div>
+        <label>Ort</label>
+        <input id="ort">
+      </div>
+
+      <div>
+        <label>Bezirk</label>
+        <input id="bezirk">
+      </div>
+
+      <div>
+        <label>Bundesland</label>
+        <input id="bundesland">
       </div>
 
       <div>
         <label>Kundentyp</label>
-        <select>
+        <select id="kundentyp">
+          <option></option>
           <option>Fachpartner</option>
           <option>B2B</option>
           <option>Privat</option>
+          <option>Sonstiges</option>
         </select>
       </div>
 
       <div>
         <label>Kundenstatus</label>
-        <select>
-          <option>Termin vereinbart</option>
+        <select id="kundenstatus">
+          <option></option>
           <option>Lead</option>
           <option>Interessent</option>
           <option>Kunde</option>
           <option>Kein Interesse</option>
+          <option>In weclapp</option>
         </select>
       </div>
 
       <div>
-        <label>Potenzial</label>
-        <select>
-          <option>groß</option>
-          <option>mittel</option>
-          <option>klein</option>
+        <label>Status</label>
+        <select id="status">
+          <option></option>
+          <option>Termin vereinbart</option>
+          <option>Unterlagen versendet</option>
+          <option>Nachfassen</option>
+          <option>Kein Interesse</option>
+          <option>In weclapp</option>
         </select>
       </div>
 
       <div>
         <label>Chance</label>
-        <select>
-          <option>Hoch</option>
+        <select id="chance">
+          <option></option>
           <option>Sehr hoch</option>
+          <option>Hoch</option>
           <option>Mittel</option>
           <option>Gering</option>
         </select>
+      </div>
+
+      <div>
+        <label>Leadquelle</label>
+        <input id="leadquelle">
+      </div>
+
+      <div class="full">
+        <label>Notiz</label>
+        <textarea id="notiz"></textarea>
       </div>
     </div>
   </div>
@@ -290,70 +342,221 @@ textarea{
     <div class="grid3">
       <div>
         <label>Datum</label>
-        <input type="date">
+        <input id="activityDate" type="date">
       </div>
 
       <div>
         <label>Uhrzeit</label>
-        <input type="time">
+        <input id="activityTime" type="time">
       </div>
 
       <div>
         <label>Typ</label>
-        <select>
-          <option>Telefonat</option>
-          <option>Mail</option>
-          <option>Termin</option>
+        <select id="activityType">
+          <option>Telefonat geführt</option>
+          <option>Mail gesendet</option>
+          <option>Persönlicher Besuch</option>
+          <option>Teams Call</option>
+          <option>Unterlagen gesendet</option>
+          <option>Angebot erstellt</option>
+          <option>Erstkontakt</option>
+          <option>Sonstiges</option>
         </select>
       </div>
     </div>
 
     <div style="margin-top:18px;">
       <label>Notiz</label>
-      <textarea placeholder="Aktivität eintragen..."></textarea>
+      <textarea id="activityNote" placeholder="Aktivität eintragen..."></textarea>
     </div>
 
     <div style="margin-top:20px;">
-      <button class="green">Aktivität speichern</button>
+      <button class="green" onclick="saveActivity()">Aktivität speichern</button>
     </div>
   </div>
 
   <div class="card tab-content" id="timeline" style="display:none;">
     <div class="card-title">Timeline</div>
-
-    <div class="timeline-item">
-      <div class="timeline-date">07.05.2026 · 10:30</div>
-      <div class="timeline-type">Telefonat geführt</div>
-      <div>Kunde interessiert sich für FENECON Home. Preise senden.</div>
-    </div>
+    <div id="timelineList"></div>
   </div>
 
   <div class="card tab-content" id="files" style="display:none;">
     <div class="card-title">Anhänge</div>
-
-    <div class="file-row">
-      <div>
-        <strong>Angebot.pdf</strong><br>
-        <small>1.2 MB</small>
-      </div>
-
-      <button class="light">Öffnen</button>
-    </div>
+    <p style="color:var(--muted);">Anhänge kommen im nächsten Schritt.</p>
   </div>
 
   <div class="card tab-content" id="ai" style="display:none;">
     <div class="card-title">KI Insights</div>
 
-    <div class="ai-box">
-      <strong>Empfehlung:</strong><br>
-      Dieser Kunde hat hohe Abschlusschance. Nach Angebotsversand innerhalb von 5–7 Tagen aktiv nachfassen.
+    <div class="ai-box" id="aiBox">
+      -
     </div>
   </div>
 
 </div>
 
 <script>
+let crmContacts =
+  JSON.parse(localStorage.getItem("crmContacts") || "[]");
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const customerId =
+  Number(params.get("id"));
+
+let customer =
+  crmContacts.find(c => Number(c.id) === customerId);
+
+if(!customer){
+  alert("Kunde nicht gefunden");
+  window.location.href = "index.html";
+}
+
+function setValue(id,value){
+  document.getElementById(id).value = value || "";
+}
+
+function getValue(id){
+  return document.getElementById(id).value.trim();
+}
+
+function loadCustomer(){
+
+  document.getElementById("headerFirma").innerText =
+    customer.firma || "Unbekannter Kunde";
+
+  document.getElementById("headerMeta").innerText =
+    `${customer.ort || "-"} · ${customer.kundentyp || "-"} · ${customer.chance || "-"}`;
+
+  setValue("firma", customer.firma);
+  setValue("ansprechpartner", customer.ansprechpartner);
+  setValue("email", customer.email);
+  setValue("telefon", customer.telefon);
+  setValue("mobil", customer.mobil);
+  setValue("strasse", customer.strasse);
+  setValue("plz", customer.plz);
+  setValue("ort", customer.ort);
+  setValue("bezirk", customer.bezirk);
+  setValue("bundesland", customer.bundesland);
+  setValue("kundentyp", customer.kundentyp);
+  setValue("kundenstatus", customer.kundenstatus);
+  setValue("status", customer.status);
+  setValue("chance", customer.chance);
+  setValue("leadquelle", customer.leadquelle);
+  setValue("notiz", customer.notiz);
+
+  renderTimeline();
+  renderAI();
+}
+
+function saveCustomer(){
+
+  customer.firma = getValue("firma");
+  customer.ansprechpartner = getValue("ansprechpartner");
+  customer.email = getValue("email");
+  customer.telefon = getValue("telefon");
+  customer.mobil = getValue("mobil");
+  customer.strasse = getValue("strasse");
+  customer.plz = getValue("plz");
+  customer.ort = getValue("ort");
+  customer.bezirk = getValue("bezirk");
+  customer.bundesland = getValue("bundesland");
+  customer.kundentyp = getValue("kundentyp");
+  customer.kundenstatus = getValue("kundenstatus");
+  customer.status = getValue("status");
+  customer.chance = getValue("chance");
+  customer.leadquelle = getValue("leadquelle");
+  customer.notiz = getValue("notiz");
+
+  localStorage.setItem("crmContacts", JSON.stringify(crmContacts));
+
+  alert("Kunde gespeichert");
+  loadCustomer();
+}
+
+function saveActivity(){
+
+  if(!customer.activities){
+    customer.activities = [];
+  }
+
+  const activity = {
+    date: getValue("activityDate"),
+    time: getValue("activityTime"),
+    type: getValue("activityType"),
+    note: getValue("activityNote"),
+    created: new Date().toISOString()
+  };
+
+  if(!activity.note){
+    alert("Bitte Notiz eintragen");
+    return;
+  }
+
+  customer.activities.unshift(activity);
+
+  localStorage.setItem("crmContacts", JSON.stringify(crmContacts));
+
+  document.getElementById("activityNote").value = "";
+
+  alert("Aktivität gespeichert");
+
+  renderTimeline();
+  showTab("timeline", document.querySelectorAll(".tab")[2]);
+}
+
+function renderTimeline(){
+
+  const list =
+    document.getElementById("timelineList");
+
+  list.innerHTML = "";
+
+  const activities =
+    customer.activities || [];
+
+  if(activities.length === 0){
+    list.innerHTML = "<p style='color:var(--muted);'>Noch keine Aktivitäten vorhanden.</p>";
+    return;
+  }
+
+  activities.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "timeline-item";
+
+    div.innerHTML = `
+      <div class="timeline-date">${a.date || "-"} · ${a.time || ""}</div>
+      <div class="timeline-type">${a.type || "-"}</div>
+      <div>${a.note || ""}</div>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+function renderAI(){
+
+  let text = "Keine Empfehlung vorhanden.";
+
+  if((customer.chance || "").toLowerCase().includes("hoch")){
+    text = "Hohe Abschlusschance. Innerhalb von 5–7 Tagen aktiv nachfassen.";
+  }
+
+  if((customer.status || "").toLowerCase().includes("termin")){
+    text = "Termin vorhanden. Gespräch vorbereiten, Bedarf klären und nächsten Schritt festlegen.";
+  }
+
+  if((customer.status || "").toLowerCase().includes("unterlagen")){
+    text = "Unterlagen wurden versendet. Nach 3–5 Tagen telefonisch nachfassen.";
+  }
+
+  document.getElementById("aiBox").innerHTML =
+    "<strong>Empfehlung:</strong><br>" + text;
+}
+
 function showTab(tabId, element){
+
   document.querySelectorAll(".tab-content").forEach(tab=>{
     tab.style.display = "none";
   });
@@ -365,6 +568,8 @@ function showTab(tabId, element){
   document.getElementById(tabId).style.display = "block";
   element.classList.add("active");
 }
+
+loadCustomer();
 </script>
 
 </body>
