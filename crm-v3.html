@@ -96,11 +96,6 @@ input,select,textarea{
   margin-bottom:12px;
 }
 
-textarea{
-  min-height:110px;
-  resize:vertical;
-}
-
 button{
   border:none;
   border-radius:12px;
@@ -113,8 +108,6 @@ button{
 
 button:hover{background:var(--blue-hover)}
 button.green{background:var(--green)}
-button.orange{background:var(--orange)}
-button.red{background:var(--red)}
 button.light{background:#e2e8f0;color:#1e293b}
 
 .contact-item{
@@ -126,9 +119,8 @@ button.light{background:#e2e8f0;color:#1e293b}
   cursor:pointer;
 }
 
-.contact-item.active{
-  background:rgba(96,165,250,.18);
-  border:1px solid rgba(96,165,250,.45);
+.contact-item:hover{
+  background:rgba(255,255,255,.10);
 }
 
 .contact-name{font-weight:700}
@@ -161,9 +153,6 @@ button.light{background:#e2e8f0;color:#1e293b}
 }
 
 .status-badge.orange{background:#ffedd5;color:#9a3412}
-.status-badge.blue{background:#dbeafe;color:#1e3a8a}
-.status-badge.red{background:#fee2e2;color:#991b1b}
-
 .chance-badge.high{background:#dcfce7;color:#166534}
 .chance-badge.medium{background:#fef9c3;color:#854d0e}
 .chance-badge.low{background:#fee2e2;color:#991b1b}
@@ -173,27 +162,11 @@ button.light{background:#e2e8f0;color:#1e293b}
   color:#94a3b8;
 }
 
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-.grid3{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:14px;
-}
-
-.full{grid-column:1/-1}
-
 .actions{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
 }
-
-.actions.right{justify-content:flex-end}
 
 .mt{margin-top:18px}
 
@@ -206,31 +179,6 @@ button.light{background:#e2e8f0;color:#1e293b}
 .small{font-size:12px}
 .muted{color:var(--muted)}
 
-.sub-block{
-  background:var(--panel-soft);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:16px;
-}
-
-.sub-block-title{
-  font-weight:800;
-  margin-bottom:14px;
-  font-size:18px;
-}
-
-.timeline-item{
-  background:var(--panel-soft);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px;
-}
-
-.timeline-text{
-  white-space:pre-wrap;
-  line-height:1.5;
-}
-
 .dropzone{
   border:2px dashed #b6c2d1;
   border-radius:16px;
@@ -238,31 +186,6 @@ button.light{background:#e2e8f0;color:#1e293b}
   text-align:center;
   background:#f8fbff;
 }
-
-.file-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:var(--panel-soft);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px;
-}
-
-@media(max-width:1200px){
-  #app{grid-template-columns:300px 1fr}
-  .panel{display:none}
-}
-
-@media(max-width:850px){
-  body{overflow:auto;height:auto}
-  #app{display:block;height:auto}
-  .grid2,.grid3{grid-template-columns:1fr}
-}
-
-/* =====================================================
-   DASHBOARD
-===================================================== */
 
 .dashboard-grid{
   display:grid;
@@ -291,48 +214,113 @@ button.light{background:#e2e8f0;color:#1e293b}
   font-weight:800;
 }
 
-.chart-card{
-  background:white;
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:24px;
-  box-shadow:var(--shadow);
+.dashboard-charts{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:22px;
   margin-bottom:22px;
 }
 
-.chart-title{
-  font-size:22px;
-  font-weight:800;
-  margin-bottom:20px;
-}
-
-.chart-bars{
+.sales-chart{
   display:flex;
   align-items:flex-end;
+  justify-content:space-between;
   gap:18px;
-  height:240px;
+  height:260px;
+  margin-top:20px;
 }
 
-.chart-bar-wrap{
+.week-group{
   flex:1;
-  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
-.chart-bar{
-  width:100%;
-  border-radius:12px 12px 0 0;
-  background:linear-gradient(
-    180deg,
-    var(--blue-hover),
-    var(--blue)
-  );
+.week-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  height:260px;
 }
 
-.chart-label{
-  margin-top:10px;
+.bar{
+  width:24px;
+  border-radius:10px 10px 0 0;
+}
+
+.bar.calls{background:#4f6b8a}
+.bar.fpv{background:#f59e0b}
+.bar.partner{background:#16a34a}
+
+.week-label{
+  margin-top:12px;
   font-size:13px;
-  color:var(--muted);
   font-weight:700;
+  color:var(--muted);
+}
+
+.chart-legend{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.legend-color{
+  width:14px;
+  height:14px;
+  border-radius:4px;
+}
+
+.legend-color.calls{background:#4f6b8a}
+.legend-color.fpv{background:#f59e0b}
+.legend-color.partner{background:#16a34a}
+
+.state-chart{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-top:20px;
+}
+
+.state-row{
+  display:grid;
+  grid-template-columns:140px 1fr 40px;
+  gap:12px;
+  align-items:center;
+}
+
+.state-name{
+  font-size:13px;
+  font-weight:700;
+}
+
+.state-bar-wrap{
+  height:16px;
+  background:#e2e8f0;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.state-bar{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#16a34a,#22c55e);
+}
+
+.state-value{
+  font-size:13px;
+  font-weight:800;
+  text-align:right;
 }
 
 .dashboard-row{
@@ -374,173 +362,17 @@ button.light{background:#e2e8f0;color:#1e293b}
 }
 
 @media(max-width:1200px){
-
-  .dashboard-grid{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .dashboard-row{
-    grid-template-columns:1fr;
-  }
+  #app{grid-template-columns:300px 1fr}
+  .panel{display:none}
+  .dashboard-grid{grid-template-columns:1fr 1fr}
+  .dashboard-charts{grid-template-columns:1fr}
+  .dashboard-row{grid-template-columns:1fr}
 }
 
-@media(max-width:700px){
-
-  .dashboard-grid{
-    grid-template-columns:1fr;
-  }
-}
-
-/* =====================================================
-   SALES CHART V2
-===================================================== */
-
-.sales-chart{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:18px;
-  height:260px;
-  margin-top:20px;
-}
-
-
-.week-group{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-.week-bars{
-  display:flex;
-  align-items:flex-end;
-  gap:8px;
-  height:260px;
-}
-
-.bar{
-  width:24px;
-  border-radius:10px 10px 0 0;
-  transition:.2s;
-}
-
-.bar:hover{
-  opacity:.8;
-  transform:translateY(-2px);
-}
-
-.bar.calls{
-  background:#4f6b8a;
-}
-
-.bar.fpv{
-  background:#f59e0b;
-}
-
-.bar.partner{
-  background:#16a34a;
-}
-
-.week-label{
-  margin-top:12px;
-  font-size:13px;
-  font-weight:700;
-  color:var(--muted);
-}
-
-.chart-legend{
-  display:flex;
-  gap:18px;
-  flex-wrap:wrap;
-  margin-top:20px;
-}
-
-.legend-item{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:13px;
-  font-weight:700;
-}
-
-.legend-color{
-  width:14px;
-  height:14px;
-  border-radius:4px;
-}
-
-.legend-color.calls{
-  background:#4f6b8a;
-}
-
-.legend-color.fpv{
-  background:#f59e0b;
-}
-
-.legend-color.partner{
-  background:#16a34a;
-}
-
-/* =====================================================
-   DASHBOARD DOUBLE CHARTS
-===================================================== */
-
-.dashboard-charts{
-  display:grid;
-  grid-template-columns:2fr 1fr;
-  gap:22px;
-  margin-bottom:22px;
-}
-
-.state-chart{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  margin-top:20px;
-}
-
-.state-row{
-  display:grid;
-  grid-template-columns:140px 1fr 40px;
-  gap:12px;
-  align-items:center;
-}
-
-.state-name{
-  font-size:13px;
-  font-weight:700;
-}
-
-.state-bar-wrap{
-  height:16px;
-  background:#e2e8f0;
-  border-radius:999px;
-  overflow:hidden;
-}
-
-.state-bar{
-  height:100%;
-  border-radius:999px;
-  background:linear-gradient(
-    90deg,
-    #16a34a,
-    #22c55e
-  );
-}
-
-.state-value{
-  font-size:13px;
-  font-weight:800;
-  text-align:right;
-}
-
-@media(max-width:1200px){
-
-  .dashboard-charts{
-    grid-template-columns:1fr;
-  }
-
+@media(max-width:850px){
+  body{overflow:auto;height:auto}
+  #app{display:block;height:auto}
+  .dashboard-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -566,154 +398,125 @@ button.light{background:#e2e8f0;color:#1e293b}
         <option>In weclapp</option>
       </select>
 
-      <div id="contactList">
-        <div class="contact-item active" onclick="openCustomer(1)">
-          <div class="contact-top">
-            <div class="contact-name">Musterkunde GmbH</div>
-            <div class="status-badge orange">Termin</div>
-          </div>
-          <div class="contact-meta">Linz · Fachpartner</div>
-          <div class="contact-meta">Max Mustermann</div>
-          <div class="contact-bottom">
-            <div class="chance-badge high">Hoch</div>
-            <div class="last-contact">vor 2 Tagen</div>
-          </div>
-        </div>
-
-        <div class="contact-item" onclick="openCustomer(2)">
-          <div class="contact-top">
-            <div class="contact-name">Elektro Beispiel</div>
-            <div class="status-badge blue">weclapp</div>
-          </div>
-          <div class="contact-meta">Wels · B2B</div>
-          <div class="contact-meta">Hans Huber</div>
-          <div class="contact-bottom">
-            <div class="chance-badge medium">Mittel</div>
-            <div class="last-contact">heute</div>
-          </div>
-        </div>
-      </div>
+      <div id="contactList"></div>
     </div>
   </aside>
 
   <main class="main">
 
-  <div class="actions" style="margin-bottom:22px;">
-    <button class="light" onclick="window.location.href='stats.html'">
-      📊 Statistiken öffnen
-    </button>
-  </div> 
-
-  <div class="dashboard-grid">
-    <div class="kpi-card"><div class="kpi-title">Leads</div><div class="kpi-value">42</div></div>
-    <div class="kpi-card"><div class="kpi-title">Termine offen</div><div class="kpi-value">8</div></div>
-    <div class="kpi-card"><div class="kpi-title">Angebote</div><div class="kpi-value">5</div></div>
-    <div class="kpi-card"><div class="kpi-title">Hohe Chancen</div><div class="kpi-value">12</div></div>
-  </div>
-
-  <div class="dashboard-charts">
-
-    <div class="card">
-      <div class="card-title">Vertriebsverlauf</div>
-
-      <div class="sales-chart compact">
-        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:180px;"></div><div class="bar fpv" style="height:110px;"></div><div class="bar partner" style="height:40px;"></div></div><div class="week-label">KW18</div></div>
-        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:220px;"></div><div class="bar fpv" style="height:140px;"></div><div class="bar partner" style="height:60px;"></div></div><div class="week-label">KW19</div></div>
-        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:250px;"></div><div class="bar fpv" style="height:180px;"></div><div class="bar partner" style="height:80px;"></div></div><div class="week-label">KW20</div></div>
-        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:160px;"></div><div class="bar fpv" style="height:120px;"></div><div class="bar partner" style="height:30px;"></div></div><div class="week-label">KW21</div></div>
-        <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:280px;"></div><div class="bar fpv" style="height:190px;"></div><div class="bar partner" style="height:100px;"></div></div><div class="week-label">KW22</div></div>
-      </div>
-
-      <div class="chart-legend">
-        <div class="legend-item"><div class="legend-color calls"></div>Erstkontakte</div>
-        <div class="legend-item"><div class="legend-color fpv"></div>FPV / Unterlagen</div>
-        <div class="legend-item"><div class="legend-color partner"></div>Neue Fachpartner</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Fachpartner nach Bundesland</div>
-
-      <div class="state-chart">
-        <div class="state-row"><div class="state-name">Oberösterreich</div><div class="state-bar-wrap"><div class="state-bar" style="width:85%;"></div></div><div class="state-value">12</div></div>
-        <div class="state-row"><div class="state-name">Niederösterreich</div><div class="state-bar-wrap"><div class="state-bar" style="width:55%;"></div></div><div class="state-value">7</div></div>
-        <div class="state-row"><div class="state-name">Steiermark</div><div class="state-bar-wrap"><div class="state-bar" style="width:40%;"></div></div><div class="state-value">5</div></div>
-        <div class="state-row"><div class="state-name">Salzburg</div><div class="state-bar-wrap"><div class="state-bar" style="width:32%;"></div></div><div class="state-value">4</div></div>
-        <div class="state-row"><div class="state-name">Wien</div><div class="state-bar-wrap"><div class="state-bar" style="width:25%;"></div></div><div class="state-value">3</div></div>
-        <div class="state-row"><div class="state-name">Burgenland</div><div class="state-bar-wrap"><div class="state-bar" style="width:16%;"></div></div><div class="state-value">2</div></div>
-        <div class="state-row"><div class="state-name">Kärnten</div><div class="state-bar-wrap"><div class="state-bar" style="width:8%;"></div></div><div class="state-value">1</div></div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="dashboard-row">
-    <div class="dashboard-list">
-      <div class="dashboard-list-title">Heute fällig</div>
-      <div class="dashboard-item"><div class="dashboard-item-title">Elektro Huber</div><div class="dashboard-item-meta">Rückruf wegen Angebot</div></div>
-      <div class="dashboard-item"><div class="dashboard-item-title">Solar Partner GmbH</div><div class="dashboard-item-meta">Termin vorbereiten</div></div>
-    </div>
-
-    <div class="dashboard-list">
-      <div class="dashboard-list-title">Letzte Aktivitäten</div>
-      <div class="dashboard-item"><div class="dashboard-item-title">FENECON Angebot gesendet</div><div class="dashboard-item-meta">vor 2 Stunden</div></div>
-      <div class="dashboard-item"><div class="dashboard-item-title">Neuer Lead importiert</div><div class="dashboard-item-meta">heute</div></div>
-    </div>
-  </div>
-
-  <div class="card">
-  <div class="card-title">CSV Import</div>
-
-  <div class="dropzone">
-    <input type="file" id="csvFile" accept=".csv">
-    <p class="hint">
-      CSV Export importieren (UTF-8 empfohlen)
-    </p>
-
-    <div class="actions mt">
-      <button class="green" onclick="importCSV()">
-        CSV importieren
+    <div class="actions" style="margin-bottom:22px;">
+      <button class="light" onclick="window.location.href='stats.html'">
+        📊 Statistiken öffnen
       </button>
     </div>
-  </div>
 
-  <div id="importResult" class="mt small muted"></div>
-</div>
+    <div class="dashboard-grid">
+      <div class="kpi-card"><div class="kpi-title">Leads</div><div class="kpi-value">0</div></div>
+      <div class="kpi-card"><div class="kpi-title">Termine offen</div><div class="kpi-value">0</div></div>
+      <div class="kpi-card"><div class="kpi-title">Angebote</div><div class="kpi-value">0</div></div>
+      <div class="kpi-card"><div class="kpi-title">Hohe Chancen</div><div class="kpi-value">0</div></div>
+    </div>
 
-</main>
+    <div class="dashboard-charts">
 
+      <div class="card">
+        <div class="card-title">Vertriebsverlauf</div>
+
+        <div class="sales-chart">
+          <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:180px;"></div><div class="bar fpv" style="height:110px;"></div><div class="bar partner" style="height:40px;"></div></div><div class="week-label">KW18</div></div>
+          <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:220px;"></div><div class="bar fpv" style="height:140px;"></div><div class="bar partner" style="height:60px;"></div></div><div class="week-label">KW19</div></div>
+          <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:250px;"></div><div class="bar fpv" style="height:180px;"></div><div class="bar partner" style="height:80px;"></div></div><div class="week-label">KW20</div></div>
+          <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:160px;"></div><div class="bar fpv" style="height:120px;"></div><div class="bar partner" style="height:30px;"></div></div><div class="week-label">KW21</div></div>
+          <div class="week-group"><div class="week-bars"><div class="bar calls" style="height:280px;"></div><div class="bar fpv" style="height:190px;"></div><div class="bar partner" style="height:100px;"></div></div><div class="week-label">KW22</div></div>
+        </div>
+
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-color calls"></div>Erstkontakte</div>
+          <div class="legend-item"><div class="legend-color fpv"></div>FPV / Unterlagen</div>
+          <div class="legend-item"><div class="legend-color partner"></div>Neue Fachpartner</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Fachpartner nach Bundesland</div>
+
+        <div class="state-chart">
+          <div class="state-row"><div class="state-name">Oberösterreich</div><div class="state-bar-wrap"><div class="state-bar" style="width:85%;"></div></div><div class="state-value">12</div></div>
+          <div class="state-row"><div class="state-name">Niederösterreich</div><div class="state-bar-wrap"><div class="state-bar" style="width:55%;"></div></div><div class="state-value">7</div></div>
+          <div class="state-row"><div class="state-name">Steiermark</div><div class="state-bar-wrap"><div class="state-bar" style="width:40%;"></div></div><div class="state-value">5</div></div>
+          <div class="state-row"><div class="state-name">Salzburg</div><div class="state-bar-wrap"><div class="state-bar" style="width:32%;"></div></div><div class="state-value">4</div></div>
+          <div class="state-row"><div class="state-name">Wien</div><div class="state-bar-wrap"><div class="state-bar" style="width:25%;"></div></div><div class="state-value">3</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="dashboard-row">
+      <div class="dashboard-list">
+        <div class="dashboard-list-title">Heute fällig</div>
+        <div id="todayList">
+          <div class="dashboard-item">
+            <div class="dashboard-item-title">Noch keine Fälligkeiten berechnet</div>
+            <div class="dashboard-item-meta">Kommt mit Terminlogik</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-list">
+        <div class="dashboard-list-title">Letzte Aktivitäten</div>
+        <div class="dashboard-item">
+          <div class="dashboard-item-title">CRM bereit</div>
+          <div class="dashboard-item-meta">CSV Import und Suche aktiv</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">CSV Import</div>
+
+      <div class="dropzone">
+        <input type="file" id="csvFile" accept=".csv">
+        <p class="hint">CSV Export importieren (UTF-8 empfohlen)</p>
+
+        <div class="actions mt">
+          <button class="green" onclick="importCSV()">CSV importieren</button>
+        </div>
+      </div>
+
+      <div id="importResult" class="mt small muted"></div>
+    </div>
+
+  </main>
 
   <aside class="panel">
     <div class="panel-box">
       <strong>Heute fällig</strong>
-      <p>4 Kontakte nachfassen</p>
+      <p id="panelDue">0 Kontakte nachfassen</p>
     </div>
 
     <div class="panel-box">
       <strong>KI Empfehlungen</strong>
-      <p>Kunde seit 14 Tagen ohne Aktivität.</p>
+      <p>Suche, Import und Kundenakte sind aktiv.</p>
     </div>
 
     <div class="panel-box">
       <strong>Chancenbewertung</strong>
-      <p>Hoch</p>
+      <p id="panelChance">-</p>
     </div>
   </aside>
 
 </div>
-<script>
 
-let crmContacts = JSON.parse(localStorage.getItem("crmContacts") || "[]");
+<script>
+let crmContacts =
+  JSON.parse(localStorage.getItem("crmContacts") || "[]");
 
 function openCustomer(id){
   window.location.href = "kunde.html?id=" + id;
 }
 
 function saveContacts(){
-  localStorage.setItem(
-    "crmContacts",
-    JSON.stringify(crmContacts)
-  );
+  localStorage.setItem("crmContacts", JSON.stringify(crmContacts));
 }
 
 function normalize(value){
@@ -723,11 +526,24 @@ function normalize(value){
     .toLowerCase();
 }
 
+function getChanceClass(chance){
+  const c = normalize(chance);
+
+  if(c.includes("hoch")){
+    return "high";
+  }
+
+  if(c.includes("mittel")){
+    return "medium";
+  }
+
+  return "low";
+}
+
 function isDuplicate(newContact){
-
   return crmContacts.find(c => {
-
     const firmaMatch =
+      normalize(c.firma) &&
       normalize(c.firma) === normalize(newContact.firma);
 
     const emailMatch =
@@ -740,16 +556,44 @@ function isDuplicate(newContact){
 
     return firmaMatch || emailMatch || mobilMatch;
   });
+}
 
+function parseCSVLine(line){
+  const result = [];
+  let current = "";
+  let insideQuotes = false;
+
+  for(let i = 0; i < line.length; i++){
+    const char = line[i];
+    const next = line[i + 1];
+
+    if(char === '"' && next === '"'){
+      current += '"';
+      i++;
+      continue;
+    }
+
+    if(char === '"'){
+      insideQuotes = !insideQuotes;
+      continue;
+    }
+
+    if(char === ";" && !insideQuotes){
+      result.push(current);
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  result.push(current);
+  return result;
 }
 
 function importCSV(){
-
-  const fileInput =
-    document.getElementById("csvFile");
-
-  const file =
-    fileInput.files[0];
+  const fileInput = document.getElementById("csvFile");
+  const file = fileInput.files[0];
 
   if(!file){
     alert("Bitte CSV auswählen");
@@ -759,11 +603,8 @@ function importCSV(){
   const reader = new FileReader();
 
   reader.onload = function(e){
-
     const text = e.target.result;
-
-    const lines =
-      text.split(/\r?\n/);
+    const lines = text.split(/\r?\n/).filter(line => line.trim());
 
     if(lines.length < 2){
       alert("CSV leer");
@@ -771,140 +612,106 @@ function importCSV(){
     }
 
     const headers =
-      lines[0]
-        .replace("﻿","")
-        .split(";")
+      parseCSVLine(lines[0].replace("﻿",""))
         .map(h => h.trim());
 
     let imported = 0;
     let skipped = 0;
 
-    for(let i=1;i<lines.length;i++){
-
-      if(!lines[i].trim()) continue;
-
-      const values =
-        lines[i].split(";");
-
+    for(let i = 1; i < lines.length; i++){
+      const values = parseCSVLine(lines[i]);
       let row = {};
 
       headers.forEach((header,index)=>{
-        row[header] =
-          values[index]
-          ? values[index].trim()
-          : "";
+        row[header] = values[index] ? values[index].trim() : "";
       });
 
       const contact = {
-  id: Date.now() + i,
+        id: Date.now() + i,
 
-  firma:
-    row["Firma"] || "",
+        firma: row["Firma"] || "",
+        vorname: row["Vorname"] || "",
+        nachname: row["Nachname"] || "",
 
-  vorname:
-    row["Vorname"] || "",
+        ansprechpartner:
+          (
+            (row["Vorname"] || "") +
+            " " +
+            (row["Nachname"] || "")
+          ).trim() ||
+          row["Ansprechpartner"] ||
+          "",
 
-  nachname:
-    row["Nachname"] || "",
+        telefon: row["Telefon"] || "",
+        mobil: row["Mobil"] || "",
+        email: row["E-Mail"] || row["Email"] || "",
+        strasse: row["Straße"] || row["Strasse"] || "",
+        plz: row["PLZ"] || "",
+        ort: row["Ort"] || "",
+        bundesland: row["Bundesland"] || "",
+        bezirk: row["Bezirk"] || "",
+        kundentyp: row["Kundentyp"] || "",
+        kundenstatus: row["Kundenstatus"] || "",
+        status: row["Status"] || "",
+        chance: row["Chancenbewertung"] || row["Chance"] || "",
+        leadquelle: row["Leadquelle"] || "",
+        notiz: row["Notiz"] || "",
 
-  ansprechpartner:
-    (
-      (row["Vorname"] || "") +
-      " " +
-      (row["Nachname"] || "")
-    ).trim(),
+        aktivitaeten_alt:
+          row["Aktivitäten"] ||
+          row["Aktivitaeten"] ||
+          "",
 
-  telefon:
-    row["Telefon"] || "",
+        mails_alt:
+          row["Mails"] ||
+          row["Mailverlauf"] ||
+          row["E-Mails"] ||
+          "",
 
-  mobil:
-    row["Mobil"] || "",
+        anhaenge_alt:
+          row["Anhänge"] ||
+          row["Anhaenge"] ||
+          "",
 
-  email:
-    row["E-Mail"] || "",
+        letzterKontakt:
+          row["Letzter Kontakt"] || "",
 
-  strasse:
-    row["Straße"] || "",
+        naechsterKontakt:
+          row["Nächster Kontakt"] ||
+          row["Naechster Kontakt"] ||
+          "",
 
-  plz:
-    row["PLZ"] || "",
+        anzahlAktivitaeten:
+          row["Anzahl Aktivitäten"] || "0",
 
-  ort:
-    row["Ort"] || "",
+        anzahlAnhaenge:
+          row["Anzahl Anhänge"] || "0",
 
-  bundesland:
-    row["Bundesland"] || "",
+        erstkontakt:
+          row["Erstkontakt"] || "",
 
-  bezirk:
-    row["Bezirk"] || "",
+        uhrzeitNaechsterKontakt:
+          row["Uhrzeit"] || "",
 
-  kundentyp:
-    row["Kundentyp"] || "",
+        artNaechsterKontakt:
+          row["Art nächster Kontakt"] || "",
 
-  kundenstatus:
-    row["Kundenstatus"] || "",
+        potenzial:
+          row["Potenzial"] || "",
 
-  status:
-    row["Status"] || "",
+        weclapp:
+          row["In weclapp übernommen"] || "",
 
-  chance:
-    row["Chancenbewertung"] || "",
+        erstellt:
+          new Date().toISOString()
+      };
 
-  leadquelle:
-    row["Leadquelle"] || "",
+      if(!contact.firma && !contact.email){
+        skipped++;
+        continue;
+      }
 
-  notiz:
-    row["Notiz"] || "",
-
-  aktivitaeten_alt:
-    row["Aktivitäten"] ||
-    row["Aktivitaeten"] || "",
-
-  mails_alt:
-    row["Mails"] ||
-    row["Mailverlauf"] ||
-    row["E-Mails"] || "",
-
-  anhaenge_alt:
-    row["Anhänge"] ||
-    row["Anhaenge"] || "",
-
-  letzterKontakt:
-    row["Letzter Kontakt"] || "",
-
-  naechsterKontakt:
-    row["Nächster Kontakt"] ||
-    row["Naechster Kontakt"] || "",
-
-  anzahlAktivitaeten:
-  row["Anzahl Aktivitäten"] || "0",
-
-anzahlAnhaenge:
-  row["Anzahl Anhänge"] || "0",
-
-erstkontakt:
-  row["Erstkontakt"] || "",
-
-uhrzeitNaechsterKontakt:
-  row["Uhrzeit"] || "",
-
-artNaechsterKontakt:
-  row["Art nächster Kontakt"] || "",
-
-potenzial:
-  row["Potenzial"] || "",
-
-weclapp:
-  row["In weclapp übernommen"] || "",
-
-  erstellt:
-    new Date().toISOString()
-};
-
-      const duplicate =
-        isDuplicate(contact);
-
-      if(duplicate){
+      if(isDuplicate(contact)){
         skipped++;
         continue;
       }
@@ -915,73 +722,60 @@ weclapp:
 
     saveContacts();
 
-    document.getElementById(
-      "importResult"
-    ).innerHTML = `
-      ${imported} Kontakte importiert<br>
-      ${skipped} Dubletten übersprungen
-    `;
+    document.getElementById("importResult").innerHTML =
+      `${imported} Kontakte importiert<br>${skipped} Dubletten/Leerzeilen übersprungen`;
 
     renderContacts();
     renderDashboard();
-
   };
 
   reader.readAsText(file,"UTF-8");
 }
 
 function renderContacts(){
+  const list = document.getElementById("contactList");
+  const searchInput = document.getElementById("searchInput");
+  const statusFilter = document.getElementById("statusFilter");
 
-  const list =
-    document.getElementById("contactList");
+  if(!list){
+    return;
+  }
 
-  const searchInput =
-    document.getElementById("searchInput");
-
-  const statusFilter =
-    document.getElementById("statusFilter");
-
-  const search =
-    searchInput
-      ? normalize(searchInput.value)
-      : "";
-
-  const status =
-    statusFilter
-      ? statusFilter.value
-      : "Alle Kontakte";
+  const search = searchInput ? normalize(searchInput.value) : "";
+  const status = statusFilter ? statusFilter.value : "Alle Kontakte";
 
   list.innerHTML = "";
 
-  const filteredContacts =
-    crmContacts.filter(contact => {
+  const filteredContacts = crmContacts.filter(contact => {
+    const searchText = normalize(`
+      ${contact.firma}
+      ${contact.ansprechpartner}
+      ${contact.vorname}
+      ${contact.nachname}
+      ${contact.ort}
+      ${contact.bezirk}
+      ${contact.bundesland}
+      ${contact.email}
+      ${contact.telefon}
+      ${contact.mobil}
+      ${contact.leadquelle}
+      ${contact.status}
+      ${contact.kundenstatus}
+      ${contact.kundentyp}
+      ${contact.potenzial}
+    `);
 
-      const searchText = normalize(`
-        ${contact.firma}
-        ${contact.ansprechpartner}
-        ${contact.vorname}
-        ${contact.nachname}
-        ${contact.ort}
-        ${contact.bezirk}
-        ${contact.bundesland}
-        ${contact.email}
-        ${contact.telefon}
-        ${contact.mobil}
-        ${contact.leadquelle}
-        ${contact.status}
-        ${contact.kundentyp}
-      `);
+    const matchesSearch =
+      !search || searchText.includes(search);
 
-      const matchesSearch =
-        !search || searchText.includes(search);
+    const matchesStatus =
+      status === "Alle Kontakte" ||
+      normalize(contact.status).includes(normalize(status)) ||
+      normalize(contact.kundenstatus).includes(normalize(status)) ||
+      normalize(contact.weclapp).includes(normalize(status));
 
-      const matchesStatus =
-        status === "Alle Kontakte" ||
-        normalize(contact.status).includes(normalize(status)) ||
-        normalize(contact.kundenstatus).includes(normalize(status));
-
-      return matchesSearch && matchesStatus;
-    });
+    return matchesSearch && matchesStatus;
+  });
 
   if(filteredContacts.length === 0){
     list.innerHTML =
@@ -990,31 +784,21 @@ function renderContacts(){
   }
 
   filteredContacts.forEach(contact => {
-
-    const div =
-      document.createElement("div");
-
+    const div = document.createElement("div");
     div.className = "contact-item";
 
-    div.onclick = () =>
-      openCustomer(contact.id);
+    div.onclick = () => openCustomer(contact.id);
 
     div.innerHTML = `
-
       <div class="contact-top">
-        <div class="contact-name">
-          ${contact.firma || "-"}
-        </div>
-
+        <div class="contact-name">${contact.firma || "-"}</div>
         <div class="status-badge orange">
           ${contact.status || contact.kundenstatus || "-"}
         </div>
       </div>
 
       <div class="contact-meta">
-        ${contact.ort || "-"}
-        ·
-        ${contact.kundentyp || "-"}
+        ${contact.ort || "-"} · ${contact.kundentyp || "-"}
       </div>
 
       <div class="contact-meta">
@@ -1022,15 +806,13 @@ function renderContacts(){
       </div>
 
       <div class="contact-bottom">
-
-        <div class="chance-badge high">
+        <div class="chance-badge ${getChanceClass(contact.chance)}">
           ${contact.chance || "-"}
         </div>
 
         <div class="last-contact">
           ${contact.leadquelle || ""}
         </div>
-
       </div>
     `;
 
@@ -1038,37 +820,46 @@ function renderContacts(){
   });
 }
 
-
-
 function renderDashboard(){
+  const kpis = document.querySelectorAll(".kpi-value");
 
-  document.querySelectorAll(
-    ".kpi-value"
-  )[0].innerText =
-    crmContacts.length;
+  if(kpis.length < 4){
+    return;
+  }
+
+  kpis[0].innerText = crmContacts.length;
 
   const termine =
     crmContacts.filter(c =>
-      normalize(c.status)
-      .includes("termin")
+      normalize(c.status).includes("termin") ||
+      normalize(c.kundenstatus).includes("termin")
     ).length;
 
-  document.querySelectorAll(
-    ".kpi-value"
-  )[1].innerText =
-    termine;
+  const angebote =
+    crmContacts.filter(c =>
+      normalize(c.status).includes("angebot") ||
+      normalize(c.aktivitaeten_alt).includes("angebot")
+    ).length;
 
   const hoheChancen =
     crmContacts.filter(c =>
-      normalize(c.chance)
-      .includes("hoch")
+      normalize(c.chance).includes("hoch")
     ).length;
 
-  document.querySelectorAll(
-    ".kpi-value"
-  )[3].innerText =
-    hoheChancen;
+  kpis[1].innerText = termine;
+  kpis[2].innerText = angebote;
+  kpis[3].innerText = hoheChancen;
 
+  const panelDue = document.getElementById("panelDue");
+  const panelChance = document.getElementById("panelChance");
+
+  if(panelDue){
+    panelDue.innerText = `${termine} Kontakte mit Terminstatus`;
+  }
+
+  if(panelChance){
+    panelChance.innerText = `${hoheChancen} hohe Chancen`;
+  }
 }
 
 const searchInput = document.getElementById("searchInput");
@@ -1084,7 +875,7 @@ if(statusFilter){
 
 renderContacts();
 renderDashboard();
-
 </script>
+
 </body>
 </html>
