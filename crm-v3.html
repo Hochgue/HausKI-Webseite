@@ -935,11 +935,21 @@ function renderContacts(){
   const list =
     document.getElementById("contactList");
 
+  const searchInput =
+    document.getElementById("searchInput");
+
+  const statusFilter =
+    document.getElementById("statusFilter");
+
   const search =
-    normalize(document.getElementById("searchInput").value);
+    searchInput
+      ? normalize(searchInput.value)
+      : "";
 
   const status =
-    document.getElementById("statusFilter").value;
+    statusFilter
+      ? statusFilter.value
+      : "Alle Kontakte";
 
   list.innerHTML = "";
 
@@ -1064,8 +1074,18 @@ function renderDashboard(){
     hoheChancen;
 
 }
-document.getElementById("searchInput").addEventListener("input", renderContacts);
-document.getElementById("statusFilter").addEventListener("change", renderContacts);
+
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
+
+if(searchInput){
+  searchInput.addEventListener("input", renderContacts);
+}
+
+if(statusFilter){
+  statusFilter.addEventListener("change", renderContacts);
+}
+
 renderContacts();
 renderDashboard();
 
