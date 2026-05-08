@@ -382,7 +382,7 @@ textarea{
 
   <div class="card tab-content" id="files" style="display:none;">
     <div class="card-title">Anhänge</div>
-    <p style="color:var(--muted);">Anhänge kommen im nächsten Schritt.</p>
+    <div id="filesList"></div>
   </div>
 
   <div class="card tab-content" id="ai" style="display:none;">
@@ -447,6 +447,7 @@ function loadCustomer(){
   setValue("notiz", customer.notiz);
 
   renderTimeline();
+  renderFiles();
   renderAI();
 }
 
@@ -513,13 +514,38 @@ function renderTimeline(){
 
   list.innerHTML = "";
 
+  let hasContent = false;
+
+  if(customer.aktivitaeten_alt){
+    const div = document.createElement("div");
+    div.className = "timeline-item";
+
+    div.innerHTML = `
+      <div class="timeline-date">Importierte Aktivitäten</div>
+      <div class="timeline-type">CSV Import</div>
+      <div>${customer.aktivitaeten_alt}</div>
+    `;
+
+    list.appendChild(div);
+    hasContent = true;
+  }
+
+  if(customer.mails_alt){
+    const div = document.createElement("div");
+    div.className = "timeline-item";
+
+    div.innerHTML = `
+      <div class="timeline-date">Importierte Mails</div>
+      <div class="timeline-type">CSV Import</div>
+      <div>${customer.mails_alt}</div>
+    `;
+
+    list.appendChild(div);
+    hasContent = true;
+  }
+
   const activities =
     customer.activities || [];
-
-  if(activities.length === 0){
-    list.innerHTML = "<p style='color:var(--muted);'>Noch keine Aktivitäten vorhanden.</p>";
-    return;
-  }
 
   activities.forEach(a => {
     const div = document.createElement("div");
@@ -532,7 +558,36 @@ function renderTimeline(){
     `;
 
     list.appendChild(div);
+    hasContent = true;
   });
+
+  if(!hasContent){
+    list.innerHTML =
+      "<p style='color:var(--muted);'>Noch keine Aktivitäten vorhanden.</p>";
+  }
+}
+
+function renderFiles(){
+
+  const list =
+    document.getElementById("filesList");
+
+  if(!list) return;
+
+  if(!customer.anhaenge_alt){
+    list.innerHTML =
+      "<p style='color:var(--muted);'>Keine importierten Anhänge vorhanden.</p>";
+    return;
+  }
+
+  list.innerHTML = `
+    <div class="file-row">
+      <div>
+        <strong>Importierte Anhänge / Mailhinweise</strong><br>
+        <small>${customer.anhaenge_alt}</small>
+      </div>
+    </div>
+  `;
 }
 
 function renderAI(){
