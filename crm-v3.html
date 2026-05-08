@@ -661,6 +661,25 @@ button.light{background:#e2e8f0;color:#1e293b}
     </div>
   </div>
 
+  <div class="card">
+  <div class="card-title">CSV Import</div>
+
+  <div class="dropzone">
+    <input type="file" id="csvFile" accept=".csv">
+    <p class="hint">
+      CSV Export importieren (UTF-8 empfohlen)
+    </p>
+
+    <div class="actions mt">
+      <button class="green" onclick="importCSV()">
+        CSV importieren
+      </button>
+    </div>
+  </div>
+
+  <div id="importResult" class="mt small muted"></div>
+</div>
+
 </main>
 
 
@@ -683,9 +702,285 @@ button.light{background:#e2e8f0;color:#1e293b}
 
 </div>
 <script>
+
+let crmContacts = JSON.parse(localStorage.getItem("crmContacts") || "[]");
+
 function openCustomer(id){
   window.location.href = "kunde.html?id=" + id;
 }
-</script>
+
+function saveContacts(){
+  localStorage.setItem(
+    "crmContacts",
+    JSON.stringify(crmContacts)
+  );
+}
+
+function normalize(value){
+  return (value || "")
+    .toString()
+    .trim()
+    .toLowerCase();
+}
+
+function isDuplicate(newContact){
+
+  return crmContacts.find(c => {
+
+    const firmaMatch =
+      normalize(c.firma) === normalize(newContact.firma);
+
+    const emailMatch =
+      normalize(c.email) &&
+      normalize(c.email) === normalize(newContact.email);
+
+    const mobilMatch =
+      normalize(c.mobil) &&
+      normalize(c.mobil) === normalize(newContact.mobil);
+
+    return firmaMatch || emailMatch || mobilMatch;
+  });
+
+}
+
+function importCSV(){
+
+  const fileInput =
+    document.getElementById("csvFile");
+
+  const file =
+    fileInput.files[0];
+
+  if(!file){
+    alert("Bitte CSV auswählen");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    const text = e.target.result;
+
+    const lines =
+      text.split(/\r?\n/);
+
+    if(lines.length < 2){
+      alert("CSV leer");
+      return;
+    }
+
+    const headers =
+      lines[0]
+        .replace("﻿","")
+        .split(";")
+        .map(h => h.trim());
+
+    let imported = 0;
+    let skipped = 0;
+
+    for(let i=1;i<lines.length;i++){
+
+      if(!lines[i].trim()) continue;
+
+      const values =
+        lines[i].split(";");
+
+      let row = {};
+
+      headers.forEach((header,index)=>{
+        row[header] =
+          values[index]
+          ? values[index].trim()
+          : "";
+      });
+
+      const contact = {
+        id: Date.now() + i,
+
+        firma:
+          row["Firma"] || "",
+
+        vorname:
+          row["Vorname"] || "",
+
+        nachname:
+          row["Nachname"] || "",
+
+        ansprechpartner:
+          (
+            (row["Vorname"] || "") +
+            " " +
+            (row["Nachname"] || "")
+          ).trim(),
+
+        telefon:
+          row["Telefon"] || "",
+
+        mobil:
+          row["Mobil"] || "",
+
+        email:
+          row["E-Mail"] || "",
+
+        strasse:
+          row["Straße"] || "",
+
+        plz:
+          row["PLZ"] || "",
+
+        ort:
+          row["Ort"] || "",
+
+        bundesland:
+          row["Bundesland"] || "",
+
+        bezirk:
+          row["Bezirk"] || "",
+
+        kundentyp:
+          row["Kundentyp"] || "",
+
+        kundenstatus:
+          row["Kundenstatus"] || "",
+
+        status:
+          row["Status"] || "",
+
+        chance:
+          row["Chancenbewertung"] || "",
+
+        leadquelle:
+          row["Leadquelle"] || "",
+
+        notiz:
+          row["Notiz"] || "",
+
+        erstellt:
+          new Date().toISOString()
+      };
+
+      const duplicate =
+        isDuplicate(contact);
+
+      if(duplicate){
+        skipped++;
+        continue;
+      }
+
+      crmContacts.push(contact);
+      imported++;
+    }
+
+    saveContacts();
+
+    document.getElementById(
+      "importResult"
+    ).innerHTML = `
+      ${imported} Kontakte importiert<br>
+      ${skipped} Dubletten übersprungen
+    `;
+
+    renderContacts();
+    renderDashboard();
+
+  };
+
+  reader.readAsText(file,"UTF-8");
+}
+
+function renderContacts(){
+
+  const list =
+    document.getElementById("contactList");
+
+  list.innerHTML = "";
+
+  crmContacts.forEach(contact => {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "contact-item";
+
+    div.onclick = () =>
+      openCustomer(contact.id);
+
+    div.innerHTML = `
+
+      <div class="contact-top">
+        <div class="contact-name">
+          ${contact.firma}
+        </div>
+
+        <div class="status-badge orange">
+          ${contact.status || "-"}
+        </div>
+      </div>
+
+      <div class="contact-meta">
+        ${contact.ort || "-"}
+        ·
+        ${contact.kundentyp || "-"}
+      </div>
+
+      <div class="contact-meta">
+        ${contact.ansprechpartner || "-"}
+      </div>
+
+      <div class="contact-bottom">
+
+        <div class="chance-badge high">
+          ${contact.chance || "-"}
+        </div>
+
+        <div class="last-contact">
+          ${contact.leadquelle || ""}
+        </div>
+
+      </div>
+    `;
+
+    list.appendChild(div);
+
+  });
+
+}
+
+function renderDashboard(){
+
+  document.querySelectorAll(
+    ".kpi-value"
+  )[0].innerText =
+    crmContacts.length;
+
+  const termine =
+    crmContacts.filter(c =>
+      normalize(c.status)
+      .includes("termin")
+    ).length;
+
+  document.querySelectorAll(
+    ".kpi-value"
+  )[1].innerText =
+    termine;
+
+  const hoheChancen =
+    crmContacts.filter(c =>
+      normalize(c.chance)
+      .includes("hoch")
+    ).length;
+
+  document.querySelectorAll(
+    ".kpi-value"
+  )[3].innerText =
+    hoheChancen;
+
+}
+
+renderContacts();
+renderDashboard();
+
+</script>>
 </body>
 </html>
