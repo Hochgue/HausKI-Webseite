@@ -197,6 +197,7 @@ textarea{
   .header-actions{margin-top:20px}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -217,7 +218,7 @@ textarea{
   </div>
 
   <div class="tabs">
-    <div class="tab active" onclick="showTab('overview',this)">Übersicht</div>
+    <div class="tab active" onclick="showTab('overview',this)">Übersicht</div> 
     <div class="tab" onclick="showTab('activity',this)">Aktivität</div>
     <div class="tab" onclick="showTab('timeline',this)">Timeline</div>
     <div class="tab" onclick="showTab('files',this)">Anhänge</div>
@@ -396,6 +397,14 @@ textarea{
 </div>
 
 <script>
+const SUPABASE_URL = "https://wuizcshgkdolkngqoutj.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "HIER_DEINEN_ANON_KEY_EINFÜGEN";
+
+const supabaseClient =
+  supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 let crmContacts =
   JSON.parse(localStorage.getItem("crmContacts") || "[]");
 
@@ -408,9 +417,11 @@ const customerId =
 let customer =
   crmContacts.find(c => Number(c.id) === customerId);
 
+let supabaseFirmaId = null;
+
 if(!customer){
   alert("Kunde nicht gefunden");
-  window.location.href = "index.html";
+  window.location.href = "crm-v3.html";
 }
 
 function setValue(id,value){
@@ -421,7 +432,34 @@ function getValue(id){
   return document.getElementById(id).value.trim();
 }
 
-function loadCustomer(){
+async function findSupabaseFirmaId(){
+
+  if(customer.firma_id){
+    supabaseFirmaId = customer.firma_id;
+    return;
+  }
+
+  if(!customer.firma){
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("crm_firmen")
+    .select("id,firma")
+    .eq("firma", customer.firma)
+    .limit(1);
+
+  if(error){
+    console.error("Fehler Firma suchen:", error);
+    return;
+  }
+
+  if(data && data.length > 0){
+    supabaseFirmaId = data[0].id;
+  }
+}
+
+async function loadCustomer(){
 
   document.getElementById("headerFirma").innerText =
     customer.firma || "Unbekannter Kunde";
@@ -446,7 +484,10 @@ function loadCustomer(){
   setValue("leadquelle", customer.leadquelle);
   setValue("notiz", customer.notiz);
 
+  await findSupabaseFirmaId();
+
   renderTimeline();
+  await loadSupabaseHistory();
   renderFiles();
   renderAI();
 }
@@ -504,6 +545,7 @@ function saveActivity(){
   alert("Aktivität gespeichert");
 
   renderTimeline();
+  loadSupabaseHistory();
   showTab("timeline", document.querySelectorAll(".tab")[2]);
 }
 
@@ -563,8 +605,74 @@ function renderTimeline(){
 
   if(!hasContent){
     list.innerHTML =
-      "<p style='color:var(--muted);'>Noch keine Aktivitäten vorhanden.</p>";
+      "<p style='color:var(--muted);'>Noch keine lokalen Aktivitäten vorhanden.</p>";
   }
+}
+
+async function loadSupabaseHistory(){
+
+  const list =
+    document.getElementById("timelineList");
+
+  if(!list) return;
+
+  if(!supabaseFirmaId){
+    const div = document.createElement("div");
+    div.className = "timeline-item";
+    div.innerHTML = `
+      <div class="timeline-date">Supabase</div>
+      <div class="timeline-type">Keine Verknüpfung gefunden</div>
+      <div>Für diese Firma wurde keine passende Supabase-ID gefunden.</div>
+    `;
+    list.appendChild(div);
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("crm_historie")
+    .select("*")
+    .eq("firma_id", supabaseFirmaId)
+    .order("datum", { ascending: false });
+
+  if(error){
+    console.error("Fehler Supabase Historie:", error);
+    return;
+  }
+
+  if(!data || data.length === 0){
+    const div = document.createElement("div");
+    div.className = "timeline-item";
+    div.innerHTML = `
+      <div class="timeline-date">Supabase</div>
+      <div class="timeline-type">Keine Historie</div>
+      <div>Keine Einträge in crm_historie gefunden.</div>
+    `;
+    list.appendChild(div);
+    return;
+  }
+
+  data.forEach(entry => {
+    const div =
+      document.createElement("div");
+
+    div.className = "timeline-item";
+
+    div.innerHTML = `
+      <div class="timeline-date">
+        ${entry.datum || "-"}
+      </div>
+
+      <div class="timeline-type">
+        ${entry.art || "-"}
+      </div>
+
+      <div>
+        ${entry.notiz || ""}
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
 }
 
 function renderFiles(){
@@ -574,17 +682,16 @@ function renderFiles(){
 
   if(!list) return;
 
-  if(!customer.anhaenge_alt){
-    list.innerHTML =
-      "<p style='color:var(--muted);'>Keine importierten Anhänge vorhanden.</p>";
-    return;
-  }
+  const anzahl =
+    customer.anzahlAnhaenge ||
+    customer.anhaenge_alt ||
+    "0";
 
   list.innerHTML = `
     <div class="file-row">
       <div>
-        <strong>Importierte Anhänge / Mailhinweise</strong><br>
-        <small>${customer.anhaenge_alt}</small>
+        <strong>Importierte Anhänge</strong><br>
+        <small>Anzahl laut Import/Supabase: ${anzahl}</small>
       </div>
     </div>
   `;
