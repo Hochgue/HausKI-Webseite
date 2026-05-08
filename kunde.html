@@ -628,11 +628,10 @@ async function loadSupabaseHistory(){
   }
 
   const { data, error } = await supabaseClient
-    .from("crm_historie")
-    .select("*")
-    .eq("firma_id", supabaseFirmaId)
-    .order("datum", { ascending: false });
-
+  .from("crm_historie")
+  .select("*")
+  .eq("firma_id", supabaseFirmaId)
+  .order("datum", { ascending: false });
   if(error){
     console.error("Fehler Supabase Historie:", error);
     return;
@@ -674,26 +673,54 @@ async function loadSupabaseHistory(){
   });
 }
 
-function renderFiles(){
+async function loadSupabaseFiles(){
 
   const list =
     document.getElementById("filesList");
 
   if(!list) return;
 
-  const anzahl =
-    customer.anzahlAnhaenge ||
-    customer.anhaenge_alt ||
-    "0";
+  if(!supabaseFirmaId){
+    list.innerHTML =
+      "<p style='color:var(--muted);'>Keine Supabase-Verknüpfung gefunden.</p>";
+    return;
+  }
 
-  list.innerHTML = `
-    <div class="file-row">
+  const { data, error } = await supabaseClient
+    .from("crm_anhaenge")
+    .select("*")
+    .eq("firma_id", supabaseFirmaId)
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error("Fehler Supabase Anhänge:", error);
+    list.innerHTML =
+      "<p style='color:var(--muted);'>Fehler beim Laden der Anhänge.</p>";
+    return;
+  }
+
+  if(!data || data.length === 0){
+    list.innerHTML =
+      "<p style='color:var(--muted);'>Keine Anhänge gefunden.</p>";
+    return;
+  }
+
+  list.innerHTML = "";
+
+  data.forEach(file => {
+    const div = document.createElement("div");
+    div.className = "file-row";
+
+    div.innerHTML = `
       <div>
-        <strong>Importierte Anhänge</strong><br>
-        <small>Anzahl laut Import/Supabase: ${anzahl}</small>
+        <strong>${file.filename || file.dateiname || "Anhang"}</strong><br>
+        <small>${file.created_at || ""}</small><br>
+        <small>${file.dateipfad || ""}</small>
       </div>
-    </div>
-  `;
+    `;
+
+    list.appendChild(div);
+  });
 }
 
 function renderAI(){
